@@ -12,7 +12,8 @@ class PixmapData : public NodeData {
 public:
   PixmapData() {}
 
-  PixmapData(QPixmap const &pixmap) : _pixmap(pixmap) {}
+  PixmapData(QPixmap const &pixmap)
+      : _pixmap(pixmap) {}
 
   NodeDataType type() const override {
     //       id      name

@@ -3,7 +3,6 @@
 #include "ConnectionStyle.hpp"
 #include "FlowViewStyle.hpp"
 #include "NodeStyle.hpp"
-
 #include <QObject>
 
 namespace QtNodes {

@@ -23,13 +23,17 @@ class NodeData;
 /// Connection is a representation in DataFlowScene of a connection
 /// It is part of the model, and not the rendering system.
 /// This class is not to be used if you're implementing FlowScene model yourself
-class NODE_EDITOR_PUBLIC Connection : public QObject, public Serializable {
-
+class NODE_EDITOR_PUBLIC Connection
+    : public QObject
+    , public Serializable {
   Q_OBJECT
 
 public:
-  Connection(Node &nodeIn, PortIndex portIndexIn, Node &nodeOut,
-             PortIndex portIndexOut, TypeConverter converter = TypeConverter{});
+  Connection(Node &        nodeIn,
+             PortIndex     portIndexIn,
+             Node &        nodeOut,
+             PortIndex     portIndexOut,
+             TypeConverter converter = TypeConverter{});
 
   Connection(const Connection &) = delete;
   Connection operator=(const Connection &) = delete;
@@ -66,7 +70,7 @@ private:
   void setNodeToPort(Node &node, PortType portType, PortIndex portIndex);
 
   Node *_outNode = nullptr;
-  Node *_inNode = nullptr;
+  Node *_inNode  = nullptr;
 
   PortIndex _outPortIndex;
   PortIndex _inPortIndex;

@@ -7,14 +7,12 @@
 #include "FlowSceneModel.hpp"
 #include "NodeConnectionInteraction.hpp"
 #include "NodeGraphicsObject.hpp"
+#include "checker.hpp"
 #include <QtWidgets/QGraphicsBlurEffect>
 #include <QtWidgets/QGraphicsDropShadowEffect>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QStyleOptionGraphicsItem>
-
-#include "checker.hpp"
-
 #include <iostream>
 
 using QtNodes::Connection;
@@ -26,14 +24,17 @@ using QtNodes::NodeDataType;
 ConnectionGraphicsObject::ConnectionGraphicsObject(NodeIndex const &leftNode,
                                                    PortIndex leftPortIndex,
                                                    NodeIndex const &rightNode,
-                                                   PortIndex rightPortIndex,
+                                                   PortIndex  rightPortIndex,
                                                    FlowScene &scene)
-    : _scene{scene}, _geometry(*this),
-      _state(leftNode.isValid()
+    : _scene{scene}
+    , _geometry(*this)
+    , _state(leftNode.isValid()
                  ? (rightNode.isValid() ? PortType::None : PortType::In)
-                 : PortType::Out),
-      _leftNode{leftNode}, _rightNode{rightNode}, _leftPortIndex{leftPortIndex},
-      _rightPortIndex{rightPortIndex} {
+                 : PortType::Out)
+    , _leftNode{leftNode}
+    , _rightNode{rightNode}
+    , _leftPortIndex{leftPortIndex}
+    , _rightPortIndex{rightPortIndex} {
   _scene.addItem(this);
 
   setFlag(QGraphicsItem::ItemIsMovable, true);
@@ -51,17 +52,19 @@ ConnectionGraphicsObject::ConnectionGraphicsObject(NodeIndex const &leftNode,
     auto ngo = _scene.nodeGraphicsObject(leftNode);
     Q_ASSERT(ngo != nullptr);
 
-    geometry().moveEndPoint(PortType::Out, ngo->geometry().portScenePosition(
-                                               leftPortIndex, PortType::Out,
-                                               ngo->sceneTransform()));
+    geometry().moveEndPoint(
+        PortType::Out,
+        ngo->geometry().portScenePosition(
+            leftPortIndex, PortType::Out, ngo->sceneTransform()));
   }
   if (rightNode.isValid()) {
     auto ngo = _scene.nodeGraphicsObject(rightNode);
     Q_ASSERT(ngo != nullptr);
 
     geometry().moveEndPoint(
-        PortType::In, ngo->geometry().portScenePosition(
-                          rightPortIndex, PortType::In, ngo->sceneTransform()));
+        PortType::In,
+        ngo->geometry().portScenePosition(
+            rightPortIndex, PortType::In, ngo->sceneTransform()));
   }
 }
 
@@ -73,7 +76,9 @@ ConnectionGraphicsObject::~ConnectionGraphicsObject() {
   //_scene.removeItem(this);
 }
 
-int ConnectionGraphicsObject::type() const { return Connection; }
+int ConnectionGraphicsObject::type() const {
+  return Connection;
+}
 
 QtNodes::NodeIndex ConnectionGraphicsObject::node(PortType pType) const {
   return pType == PortType::In ? _rightNode : _leftNode;
@@ -82,7 +87,9 @@ QtNodes::PortIndex ConnectionGraphicsObject::portIndex(PortType pType) const {
   return pType == PortType::In ? _rightPortIndex : _leftPortIndex;
 }
 
-FlowScene &ConnectionGraphicsObject::flowScene() const { return _scene; }
+FlowScene &ConnectionGraphicsObject::flowScene() const {
+  return _scene;
+}
 
 QtNodes::ConnectionGeometry const &ConnectionGraphicsObject::geometry() const {
   return _geometry;
@@ -96,7 +103,9 @@ QtNodes::ConnectionState const &ConnectionGraphicsObject::state() const {
   return _state;
 }
 
-QtNodes::ConnectionState &ConnectionGraphicsObject::state() { return _state; }
+QtNodes::ConnectionState &ConnectionGraphicsObject::state() {
+  return _state;
+}
 
 QRectF ConnectionGraphicsObject::boundingRect() const {
   return _geometry.boundingRect();
@@ -169,7 +178,7 @@ void ConnectionGraphicsObject::lock(bool locked) {
   setFlag(QGraphicsItem::ItemIsSelectable, !locked);
 }
 
-void ConnectionGraphicsObject::paint(QPainter *painter,
+void ConnectionGraphicsObject::paint(QPainter *                      painter,
                                      QStyleOptionGraphicsItem const *option,
                                      QWidget *) {
   painter->setClipRect(option->exposedRect);
@@ -190,7 +199,8 @@ void ConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   state().interactWithNode(node);
   if (node) {
     node->reactToPossibleConnection(
-        state().requiredPort(), dataType(oppositePort(state().requiredPort())),
+        state().requiredPort(),
+        dataType(oppositePort(state().requiredPort())),
         event->scenePos());
   }
 
@@ -212,8 +222,8 @@ void ConnectionGraphicsObject::mouseReleaseEvent(
   event->accept();
 
   try {
-    auto node = locateNodeAt(event->scenePos(), _scene,
-                             _scene.views().at(0)->transform());
+    auto node = locateNodeAt(
+        event->scenePos(), _scene, _scene.views().at(0)->transform());
     if (!node) {
       if (state().requiresPort()) {
         Q_ASSERT(this == _scene._temporaryConn);
@@ -252,8 +262,11 @@ void ConnectionGraphicsObject::hoverEnterEvent(
 
   update();
 
-  flowScene().model()->connectionHovered(_leftNode, _leftPortIndex, _rightNode,
-                                         _rightPortIndex, event->screenPos(),
+  flowScene().model()->connectionHovered(_leftNode,
+                                         _leftPortIndex,
+                                         _rightNode,
+                                         _rightPortIndex,
+                                         event->screenPos(),
                                          true);
 
   event->accept();
@@ -264,8 +277,11 @@ void ConnectionGraphicsObject::hoverLeaveEvent(
   geometry().setHovered(false);
 
   update();
-  flowScene().model()->connectionHovered(_leftNode, _leftPortIndex, _rightNode,
-                                         _rightPortIndex, event->screenPos(),
+  flowScene().model()->connectionHovered(_leftNode,
+                                         _leftPortIndex,
+                                         _rightNode,
+                                         _rightPortIndex,
+                                         event->screenPos(),
                                          false);
   event->accept();
 }

@@ -11,11 +11,11 @@ class SenderNode final : public QtNodes::NodeImp {
 public:
   SenderNode();
   ~SenderNode();
-  QString name() const override;
-  QWidget *embeddedWidget() override;
-  bool resizable() const override;
+  QString                      name() const override;
+  QWidget *                    embeddedWidget() override;
+  bool                         resizable() const override;
   QtNodes::NodeValidationState validationState() const override;
-  QString validationMessage() const override;
+  QString                      validationMessage() const override;
 
 private slots:
   bool addPort(const QString &caption, unsigned int index);
@@ -25,5 +25,5 @@ private:
   Sender *widget_;
 
   QtNodes::NodeValidationState validationState_;
-  QString validationMessage_;
+  QString                      validationMessage_;
 };

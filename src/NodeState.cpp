@@ -4,7 +4,6 @@
 #include "Node.hpp"
 #include "NodeIndex.hpp"
 #include "QUuidStdHash.hpp"
-
 #include "checker.hpp"
 
 using QtNodes::Connection;
@@ -14,8 +13,10 @@ using QtNodes::PortIndex;
 using QtNodes::PortType;
 
 NodeState::NodeState(NodeIndex const &index)
-    : nodeIndex_{index}, _reaction(NOT_REACTING),
-      _reactingPortType(PortType::None), _resizing(false) {
+    : nodeIndex_{index}
+    , _reaction(NOT_REACTING)
+    , _reactingPortType(PortType::None)
+    , _resizing(false) {
   for (auto &i : index.model()->nodePortIndexes(index, PortType::In)) {
     _inConnections.insert(std::pair(i, ConnectionPtrVec{}));
   }
@@ -27,8 +28,8 @@ NodeState::NodeState(NodeIndex const &index)
 
   connect(node, &QtNodes::Node::portAdded, this, &QtNodes::NodeState::addPort);
 
-  connect(node, &QtNodes::Node::portRemoved, this,
-          &QtNodes::NodeState::removePort);
+  connect(
+      node, &QtNodes::Node::portRemoved, this, &QtNodes::NodeState::removePort);
 }
 
 void NodeState::addPort(PortType pType, PortIndex pIndex) {
@@ -81,7 +82,7 @@ NodeState::getEntries(PortType portType) {
     return _outConnections;
 }
 
-NodeState::ConnectionPtrVec NodeState::connections(PortType portType,
+NodeState::ConnectionPtrVec NodeState::connections(PortType  portType,
                                                    PortIndex portIndex) const {
   auto const &connections = getEntries(portType);
 
@@ -92,7 +93,8 @@ NodeState::ConnectionPtrVec NodeState::connections(PortType portType,
   }
 }
 
-void NodeState::setConnection(PortType portType, PortIndex portIndex,
+void NodeState::setConnection(PortType                  portType,
+                              PortIndex                 portIndex,
                               ConnectionGraphicsObject &connection) {
   auto &connections = getEntries(portType);
 
@@ -103,11 +105,12 @@ void NodeState::setConnection(PortType portType, PortIndex portIndex,
   }
 }
 
-void NodeState::eraseConnection(PortType portType, PortIndex portIndex,
+void NodeState::eraseConnection(PortType                  portType,
+                                PortIndex                 portIndex,
                                 ConnectionGraphicsObject &conn) {
   try {
     auto &ptrSet = getEntries(portType).at(portIndex);
-    auto iter = std::find(ptrSet.begin(), ptrSet.end(), &conn);
+    auto  iter   = std::find(ptrSet.begin(), ptrSet.end(), &conn);
     if (iter != ptrSet.end()) {
       ptrSet.erase(iter);
     }
@@ -120,13 +123,17 @@ NodeState::ReactToConnectionState NodeState::reaction() const {
   return _reaction;
 }
 
-PortType NodeState::reactingPortType() const { return _reactingPortType; }
+PortType NodeState::reactingPortType() const {
+  return _reactingPortType;
+}
 
-NodeDataType NodeState::reactingDataType() const { return _reactingDataType; }
+NodeDataType NodeState::reactingDataType() const {
+  return _reactingDataType;
+}
 
 void NodeState::setReaction(ReactToConnectionState reaction,
-                            PortType reactingPortType,
-                            NodeDataType reactingDataType) {
+                            PortType               reactingPortType,
+                            NodeDataType           reactingDataType) {
   _reaction = reaction;
 
   _reactingPortType = reactingPortType;
@@ -134,8 +141,14 @@ void NodeState::setReaction(ReactToConnectionState reaction,
   _reactingDataType = std::move(reactingDataType);
 }
 
-bool NodeState::isReacting() const { return _reaction == REACTING; }
+bool NodeState::isReacting() const {
+  return _reaction == REACTING;
+}
 
-void NodeState::setResizing(bool resizing) { _resizing = resizing; }
+void NodeState::setResizing(bool resizing) {
+  _resizing = resizing;
+}
 
-bool NodeState::resizing() const { return _resizing; }
+bool NodeState::resizing() const {
+  return _resizing;
+}

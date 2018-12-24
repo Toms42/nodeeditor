@@ -17,11 +17,18 @@ using QtNodes::PortIndex;
 using QtNodes::PortType;
 using QtNodes::TypeConverter;
 
-Connection::Connection(Node &nodeIn, PortIndex portIndexIn, Node &nodeOut,
-                       PortIndex portIndexOut, TypeConverter typeConverter)
-    : _uid(QUuid::createUuid()), _outNode(&nodeOut), _inNode(&nodeIn),
-      _outPortIndex(portIndexOut), _inPortIndex(portIndexIn),
-      _connectionState(), _converter(std::move(typeConverter)) {
+Connection::Connection(Node &        nodeIn,
+                       PortIndex     portIndexIn,
+                       Node &        nodeOut,
+                       PortIndex     portIndexOut,
+                       TypeConverter typeConverter)
+    : _uid(QUuid::createUuid())
+    , _outNode(&nodeOut)
+    , _inNode(&nodeIn)
+    , _outPortIndex(portIndexOut)
+    , _inPortIndex(portIndexIn)
+    , _connectionState()
+    , _converter(std::move(typeConverter)) {
   setNodeToPort(nodeIn, PortType::In, portIndexIn);
   setNodeToPort(nodeOut, PortType::Out, portIndexOut);
 }
@@ -37,25 +44,25 @@ QJsonObject Connection::save() const {
   QJsonObject connectionJson;
 
   if (_inNode && _outNode) {
-    connectionJson["in_id"] = _inNode->id().toString();
+    connectionJson["in_id"]    = _inNode->id().toString();
     connectionJson["in_index"] = _inPortIndex;
 
-    connectionJson["out_id"] = _outNode->id().toString();
+    connectionJson["out_id"]    = _outNode->id().toString();
     connectionJson["out_index"] = _outPortIndex;
 
     if (_converter) {
       auto getTypeJson = [this](PortType type) {
-        QJsonObject typeJson;
+        QJsonObject  typeJson;
         NodeDataType nodeType = this->dataType(type);
-        typeJson["id"] = nodeType.id;
-        typeJson["name"] = nodeType.name;
+        typeJson["id"]        = nodeType.id;
+        typeJson["name"]      = nodeType.name;
 
         return typeJson;
       };
 
       QJsonObject converterTypeJson;
 
-      converterTypeJson["in"] = getTypeJson(PortType::In);
+      converterTypeJson["in"]  = getTypeJson(PortType::In);
       converterTypeJson["out"] = getTypeJson(PortType::Out);
 
       connectionJson["converter"] = converterTypeJson;
@@ -76,7 +83,8 @@ ConnectionID Connection::id() const {
   return ret;
 }
 
-void Connection::setNodeToPort(Node &node, PortType portType,
+void Connection::setNodeToPort(Node &    node,
+                               PortType  portType,
                                PortIndex portIndex) {
   auto &nodeWeak = getNodePtrRef(portType);
 
@@ -154,14 +162,14 @@ NodeDataType Connection::dataType(PortType portType) const {
 
     return model->dataType(portType, index);
   } else {
-    Node *validNode;
+    Node *    validNode;
     PortIndex index = INVALID;
 
     if ((validNode = _inNode)) {
-      index = _inPortIndex;
+      index    = _inPortIndex;
       portType = PortType::In;
     } else if ((validNode = _outNode)) {
-      index = _outPortIndex;
+      index    = _outPortIndex;
       portType = PortType::Out;
     }
 

@@ -1,14 +1,10 @@
 #include "ImageShowModel.hpp"
-
-#include <QtCore/QDir>
-#include <QtCore/QEvent>
-
-#include <QtWidgets/QFileDialog>
-
-#include <nodes/DataModelRegistry.hpp>
-
 #include "PixmapData.hpp"
 #include "nodes/Port.hpp"
+#include <QtCore/QDir>
+#include <QtCore/QEvent>
+#include <QtWidgets/QFileDialog>
+#include <nodes/DataModelRegistry.hpp>
 
 ImageShowModel::ImageShowModel()
     : _label(new QLabel("Image will appear here")) {
@@ -26,8 +22,8 @@ ImageShowModel::ImageShowModel()
 
   QtNodes::Port portIn;
   portIn.captionVisible = false;
-  portIn.dataType = PixmapData().type();
-  portIn.handle = [this](std::shared_ptr<NodeData> data) {
+  portIn.dataType       = PixmapData().type();
+  portIn.handle         = [this](std::shared_ptr<NodeData> data) {
     _nodeData = data;
 
     if (_nodeData) {
@@ -50,12 +46,14 @@ ImageShowModel::ImageShowModel()
 
   QtNodes::Port portOut;
   portOut.captionVisible = false;
-  portOut.dataType = PixmapData().type();
+  portOut.dataType       = PixmapData().type();
   portOut.handle = [this](std::shared_ptr<NodeData>) { return _nodeData; };
   addPort(PortType::Out, 5, portOut);
 }
 
-ImageShowModel::~ImageShowModel() { delete _label; }
+ImageShowModel::~ImageShowModel() {
+  delete _label;
+}
 
 bool ImageShowModel::eventFilter(QObject *object, QEvent *event) {
   if (object == _label) {

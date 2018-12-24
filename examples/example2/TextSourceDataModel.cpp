@@ -3,15 +3,17 @@
 TextSourceDataModel::TextSourceDataModel()
     : _lineEdit(new QLineEdit("Default Text")) {
   QtNodes::Port port;
-  port.caption = "out caption";
+  port.caption        = "out caption";
   port.captionVisible = true;
-  port.dataType = TextData().type();
-  port.handle = [this](std::shared_ptr<NodeData>) {
+  port.dataType       = TextData().type();
+  port.handle         = [this](std::shared_ptr<NodeData>) {
     return std::make_shared<TextData>(_lineEdit->text());
   };
 
   addPort(PortType::Out, 5, port);
-  connect(_lineEdit, &QLineEdit::textEdited, this,
+  connect(_lineEdit,
+          &QLineEdit::textEdited,
+          this,
           &TextSourceDataModel::onTextEdited);
 }
 
@@ -20,10 +22,10 @@ void TextSourceDataModel::onTextEdited(QString const &string) {
 
   if (string == "add port") {
     QtNodes::Port port;
-    port.caption = "new caption";
+    port.caption        = "new caption";
     port.captionVisible = true;
-    port.dataType = TextData().type();
-    port.handle = [this](std::shared_ptr<NodeData>) {
+    port.dataType       = TextData().type();
+    port.handle         = [this](std::shared_ptr<NodeData>) {
       return std::make_shared<TextData>(_lineEdit->text());
     };
 

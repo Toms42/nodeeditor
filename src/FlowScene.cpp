@@ -6,31 +6,41 @@
 #include "NodeGraphicsObject.hpp"
 #include "NodeImp.hpp"
 #include "NodeIndex.hpp"
-#include <algorithm>
-
 #include "checker.hpp"
+#include <algorithm>
 
 using QtNodes::FlowScene;
 using QtNodes::NodeGraphicsObject;
 using QtNodes::NodeIndex;
 
 FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
-    : QGraphicsScene(parent), _model(model) {
+    : QGraphicsScene(parent)
+    , _model(model) {
   Q_ASSERT(model != nullptr);
 
   connect(model, &FlowSceneModel::nodeRemoved, this, &FlowScene::nodeRemoved);
   connect(model, &FlowSceneModel::nodeAdded, this, &FlowScene::nodeAdded);
-  connect(model, &FlowSceneModel::nodePortUpdated, this,
+  connect(model,
+          &FlowSceneModel::nodePortUpdated,
+          this,
           &FlowScene::nodePortUpdated);
-  connect(model, &FlowSceneModel::nodeValidationUpdated, this,
+  connect(model,
+          &FlowSceneModel::nodeValidationUpdated,
+          this,
           &FlowScene::nodeValidationUpdated);
-  connect(model, &FlowSceneModel::connectionRemoved, this,
+  connect(model,
+          &FlowSceneModel::connectionRemoved,
+          this,
           &FlowScene::connectionRemoved);
-  connect(model, &FlowSceneModel::connectionAdded, this,
+  connect(model,
+          &FlowSceneModel::connectionAdded,
+          this,
           &FlowScene::connectionAdded);
   connect(model, &FlowSceneModel::nodeMoved, this, &FlowScene::nodeMoved);
   connect(model, &FlowSceneModel::updateNode, this, &FlowScene::updateNode);
-  connect(model, &FlowSceneModel::updateConnection, this,
+  connect(model,
+          &FlowSceneModel::updateConnection,
+          this,
           &FlowScene::updateConnection);
 
   // emit node added on all the existing nodes
@@ -163,9 +173,7 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
   for (auto ty : {PortType::In, PortType::Out}) {
     for (auto &i : thisNodeNGO->nodeState().getEntries(ty)) {
       try {
-
         while (!thisNodeNGO->nodeState().getEntries(ty).at(i.first).empty()) {
-
           auto conn = thisNodeNGO->nodeState().getEntries(ty).at(i.first)[0];
           // remove it from the nodes
           auto &otherNgo = *nodeGraphicsObject(conn->node(oppositePort(ty)));
@@ -176,8 +184,8 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
           thisNgo.nodeState().eraseConnection(ty, conn->portIndex(ty), *conn);
 
           // remove the ConnectionGraphicsObject
-          delete conn;
           auto erased = _connGraphicsObjects.erase(conn->id());
+          conn->deleteLater();
           Q_ASSERT(erased == 1);
         }
       } catch (std::out_of_range) {
@@ -210,8 +218,8 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
       auto connections = model()->nodePortConnections(id, i, ty);
 #ifndef QT_NO_DEBUG
       for (auto conn : connections) {
-        auto remoteConns = model()->nodePortConnections(conn.first, conn.second,
-                                                        oppositePort(ty));
+        auto remoteConns = model()->nodePortConnections(
+            conn.first, conn.second, oppositePort(ty));
 
         // if you fail here, your connections aren't self-consistent
         //      Q_ASSERT(std::any_of(remoteConns.begin(), remoteConns.end(),
@@ -229,7 +237,6 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
                connections.size() <= 1);
 
       for (const auto &conn : connections) {
-
         if (ty == PortType::Out) {
           connectionAdded(id, i, conn.first, conn.second);
         } else {
@@ -249,9 +256,9 @@ void FlowScene::nodeValidationUpdated(NodeIndex const &id) {
 }
 
 void FlowScene::connectionRemoved(NodeIndex const &leftNode,
-                                  PortIndex leftPortID,
+                                  PortIndex        leftPortID,
                                   NodeIndex const &rightNode,
-                                  PortIndex rightPortID) {
+                                  PortIndex        rightPortID) {
   // check the model's sanity
 #ifndef QT_NO_DEBUG
   for (const auto &conn :
@@ -296,9 +303,10 @@ void FlowScene::connectionRemoved(NodeIndex const &leftNode,
     GET_INFO();
   }
 }
-void FlowScene::connectionAdded(NodeIndex const &leftNode, PortIndex leftPortID,
+void FlowScene::connectionAdded(NodeIndex const &leftNode,
+                                PortIndex        leftPortID,
                                 NodeIndex const &rightNode,
-                                PortIndex rightPortID) {
+                                PortIndex        rightPortID) {
   // check the model's sanity
 #ifndef QT_NO_DEBUG
   // Q_ASSERT(leftPortID >= 0);
@@ -335,8 +343,8 @@ void FlowScene::connectionAdded(NodeIndex const &leftNode, PortIndex leftPortID,
 #endif
 
   // create the cgo
-  auto cgo = new ConnectionGraphicsObject(leftNode, leftPortID, rightNode,
-                                          rightPortID, *this);
+  auto cgo = new ConnectionGraphicsObject(
+      leftNode, leftPortID, rightNode, rightPortID, *this);
 
   // add it to the nodes
   auto lngo = nodeGraphicsObject(leftNode);
@@ -360,7 +368,8 @@ void FlowScene::nodeMoved(NodeIndex const &index) {
 //------------------------------------------------------------------------------
 namespace QtNodes {
 
-NodeGraphicsObject *locateNodeAt(QPointF scenePoint, FlowScene &scene,
+NodeGraphicsObject *locateNodeAt(QPointF           scenePoint,
+                                 FlowScene &       scene,
                                  QTransform const &viewTransform) {
   // items under cursor
   QList<QGraphicsItem *> items = scene.items(
@@ -369,14 +378,16 @@ NodeGraphicsObject *locateNodeAt(QPointF scenePoint, FlowScene &scene,
   //// items convertable to NodeGraphicsObject
   std::vector<QGraphicsItem *> filteredItems;
 
-  std::copy_if(items.begin(), items.end(), std::back_inserter(filteredItems),
+  std::copy_if(items.begin(),
+               items.end(),
+               std::back_inserter(filteredItems),
                [](QGraphicsItem *item) {
                  return (dynamic_cast<NodeGraphicsObject *>(item) != nullptr);
                });
 
   if (!filteredItems.empty()) {
     QGraphicsItem *graphicsItem = filteredItems.front();
-    auto ngo = dynamic_cast<NodeGraphicsObject *>(graphicsItem);
+    auto           ngo = dynamic_cast<NodeGraphicsObject *>(graphicsItem);
 
     return ngo;
   }
@@ -389,10 +400,9 @@ void FlowScene::updateNode(const NodeIndex &nodeIndex) {
 }
 
 void FlowScene::updateConnection(const NodeIndex &leftNodeIndex,
-                                 PortIndex leftPortIndex,
+                                 PortIndex        leftPortIndex,
                                  const NodeIndex &rightNodeIndex,
-                                 PortIndex rightPortIndex) {
-
+                                 PortIndex        rightPortIndex) {
   // create a connection ID
   ConnectionID id;
   id.lNodeID = leftNodeIndex.id();

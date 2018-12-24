@@ -3,14 +3,13 @@
 #include "NodeGraphicsFrame.hpp"
 #include "FlowSceneModel.hpp"
 #include <QCursor>
+#include <QDebug>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsSceneMouseEvent>
 
-#include <QDebug>
-
 namespace QtNodes {
 
-NodeGraphicsFrame::NodeGraphicsFrame(FlowScene &scene,
+NodeGraphicsFrame::NodeGraphicsFrame(FlowScene &      scene,
                                      const NodeIndex &nodeIndex)
     : NodeGraphicsObject{scene, nodeIndex} {
   setZValue(-1.0);
@@ -24,10 +23,12 @@ NodeGraphicsFrame::~NodeGraphicsFrame() {
   }
 }
 
-int NodeGraphicsFrame::type() const { return Frame; }
+int NodeGraphicsFrame::type() const {
+  return Frame;
+}
 
-void NodeGraphicsFrame::reactToPossibleConnection(PortType portType,
-                                                  NodeDataType dataType,
+void NodeGraphicsFrame::reactToPossibleConnection(PortType       portType,
+                                                  NodeDataType   dataType,
                                                   const QPointF &scenePoint) {
   Q_UNUSED(portType);
   Q_UNUSED(dataType);
@@ -37,27 +38,8 @@ void NodeGraphicsFrame::reactToPossibleConnection(PortType portType,
 void NodeGraphicsFrame::resetReactionToConnection() {}
 
 QVariant NodeGraphicsFrame::itemChange(GraphicsItemChange change,
-                                       const QVariant &value) {
+                                       const QVariant &   value) {
   return QGraphicsItem::itemChange(change, value);
-}
-
-void NodeGraphicsFrame::embedQWidget() {
-  if (auto w = flowScene().model()->nodeWidget(index())) {
-    _proxyWidget = new QGraphicsProxyWidget(this);
-
-    _proxyWidget->setWidget(w);
-
-    _proxyWidget->setPreferredWidth(5);
-
-    geometry().recalculateSize();
-
-    _proxyWidget->setPos(geometry().widgetPosition());
-
-    update();
-
-    _proxyWidget->setOpacity(0);
-    _proxyWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity);
-  }
 }
 
 void NodeGraphicsFrame::mousePressEvent(QGraphicsSceneMouseEvent *event) {

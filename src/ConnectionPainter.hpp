@@ -9,7 +9,7 @@ class ConnectionGraphicsObject;
 
 class ConnectionPainter {
 public:
-  static void paint(QPainter *painter,
+  static void paint(QPainter *                      painter,
                     ConnectionGraphicsObject const &connection);
 
   static QPainterPath getPainterStroke(ConnectionGeometry const &geom);

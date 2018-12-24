@@ -3,7 +3,6 @@
 #include "DataModelRegistry.hpp"
 #include "FlowScene.hpp"
 #include "NodeGraphicsObject.hpp"
-
 #include "checker.hpp"
 
 using QtNodes::FlowScene;
@@ -14,10 +13,11 @@ using QtNodes::TypeConverter;
 
 NodeConnectionInteraction::NodeConnectionInteraction(
     NodeIndex const &node, ConnectionGraphicsObject &connection)
-    : _node(node), _connection(&connection) {}
+    : _node(node)
+    , _connection(&connection) {}
 
 bool NodeConnectionInteraction::canConnect(PortIndex &portIndex,
-                                           bool &converted) const {
+                                           bool &     converted) const {
   // 1) Connection requires a port
 
   PortType requiredPort = connectionRequiredPort();
@@ -53,7 +53,7 @@ bool NodeConnectionInteraction::canConnect(PortIndex &portIndex,
 
   auto connectionDataType = _connection->dataType(oppositePort(requiredPort));
 
-  auto const modelTarget = _node.model();
+  auto const   modelTarget = _node.model();
   NodeDataType candidateNodeDataType =
       modelTarget->nodePortDataType(_node, portIndex, requiredPort);
 
@@ -85,11 +85,11 @@ bool NodeConnectionInteraction::tryConnect() const {
     return false;
   }
 
-  auto requiredPort = connectionRequiredPort();
+  auto requiredPort  = connectionRequiredPort();
   auto connectedPort = oppositePort(requiredPort);
 
   auto outNodePortIndex = _connection->portIndex(connectedPort);
-  auto outNode = _connection->node(connectedPort);
+  auto outNode          = _connection->node(connectedPort);
 
   auto model = _connection->flowScene().model();
 
@@ -117,9 +117,8 @@ NodeConnectionInteraction::connectionEndScenePosition(PortType portType) const {
 }
 
 QPointF
-NodeConnectionInteraction::nodePortScenePosition(PortType portType,
+NodeConnectionInteraction::nodePortScenePosition(PortType  portType,
                                                  PortIndex portIndex) const {
-
   NodeGraphicsObject const &ngo =
       *_connection->flowScene().nodeGraphicsObject(_node);
 
@@ -143,7 +142,7 @@ PortIndex NodeConnectionInteraction::nodePortIndexUnderScenePoint(
   return portIndex;
 }
 
-bool NodeConnectionInteraction::nodePortIsEmpty(PortType portType,
+bool NodeConnectionInteraction::nodePortIsEmpty(PortType  portType,
                                                 PortIndex portIndex) const {
   NodeState const &nodeState =
       _connection->flowScene().nodeGraphicsObject(_node)->nodeState();

@@ -20,8 +20,10 @@ using QtNodes::FlowScene;
 using QtNodes::FlowView;
 
 FlowView::FlowView(QWidget *parent)
-    : QGraphicsView(parent), _clearSelectionAction(Q_NULLPTR),
-      _deleteSelectionAction(Q_NULLPTR), _scene(Q_NULLPTR) {
+    : QGraphicsView(parent)
+    , _clearSelectionAction(Q_NULLPTR)
+    , _deleteSelectionAction(Q_NULLPTR)
+    , _scene(Q_NULLPTR) {
   setDragMode(QGraphicsView::ScrollHandDrag);
   setRenderHint(QPainter::Antialiasing);
 
@@ -41,7 +43,8 @@ FlowView::FlowView(QWidget *parent)
   // setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 }
 
-FlowView::FlowView(FlowScene *scene, QWidget *parent) : FlowView(parent) {
+FlowView::FlowView(FlowScene *scene, QWidget *parent)
+    : FlowView(parent) {
   setScene(scene);
 }
 
@@ -61,7 +64,9 @@ void FlowView::setScene(FlowScene *scene) {
   delete _clearSelectionAction;
   _clearSelectionAction = new QAction(QStringLiteral("Clear Selection"), this);
   _clearSelectionAction->setShortcut(Qt::Key_Escape);
-  connect(_clearSelectionAction, &QAction::triggered, _scene,
+  connect(_clearSelectionAction,
+          &QAction::triggered,
+          _scene,
           &QGraphicsScene::clearSelection);
   addAction(_clearSelectionAction);
 
@@ -69,7 +74,9 @@ void FlowView::setScene(FlowScene *scene) {
   _deleteSelectionAction =
       new QAction(QStringLiteral("Delete Selection"), this);
   _deleteSelectionAction->setShortcut(Qt::Key_Delete);
-  connect(_deleteSelectionAction, &QAction::triggered, this,
+  connect(_deleteSelectionAction,
+          &QAction::triggered,
+          this,
           &FlowView::deleteSelectedNodes);
   addAction(_deleteSelectionAction);
 }
@@ -115,7 +122,6 @@ void FlowView::contextMenuEvent(QContextMenuEvent *event) {
 
     // add it if it doesn't exist
     if (iter == categoryItems.end()) {
-
       auto item = new QTreeWidgetItem(treeView);
       item->setText(0, category);
       item->setData(0, Qt::UserRole, skipText);
@@ -162,9 +168,9 @@ void FlowView::contextMenuEvent(QContextMenuEvent *event) {
   connect(txtBox, &QLineEdit::textChanged, [&](const QString &text) {
     for (auto &topLvlItem : categoryItems) {
       for (int i = 0; i < topLvlItem->childCount(); ++i) {
-        auto child = topLvlItem->child(i);
-        auto modelName = child->data(0, Qt::UserRole).toString();
-        const bool match = (modelName.contains(text, Qt::CaseInsensitive));
+        auto       child     = topLvlItem->child(i);
+        auto       modelName = child->data(0, Qt::UserRole).toString();
+        const bool match     = (modelName.contains(text, Qt::CaseInsensitive));
         child->setHidden(!match);
       }
     }
@@ -193,7 +199,7 @@ void FlowView::wheelEvent(QWheelEvent *event) {
 }
 
 void FlowView::scaleUp() {
-  double const step = 1.2;
+  double const step   = 1.2;
   double const factor = std::pow(step, 1.0);
 
   QTransform t = transform();
@@ -205,7 +211,7 @@ void FlowView::scaleUp() {
 }
 
 void FlowView::scaleDown() {
-  double const step = 1.2;
+  double const step   = 1.2;
   double const factor = std::pow(step, -1.0);
 
   scale(factor, factor);
@@ -218,11 +224,11 @@ void FlowView::deleteSelectedNodes() {
   for (QGraphicsItem *item : _scene->selectedItems()) {
     if (item->type() == ConnectionGraphicsObject::Connection) {
       if (auto c = qgraphicsitem_cast<ConnectionGraphicsObject *>(item)) {
-
         // does't matter if it works or doesn't, at least we tried
-        scene()->model()->removeConnection(
-            c->node(PortType::Out), c->portIndex(PortType::Out),
-            c->node(PortType::In), c->portIndex(PortType::In));
+        scene()->model()->removeConnection(c->node(PortType::Out),
+                                           c->portIndex(PortType::Out),
+                                           c->node(PortType::In),
+                                           c->portIndex(PortType::In));
       }
     }
   }
@@ -288,27 +294,27 @@ void FlowView::drawBackground(QPainter *painter, const QRectF &r) {
   QGraphicsView::drawBackground(painter, r);
 
   auto drawGrid = [&](double gridStep) {
-    QRect windowRect = rect();
-    QPointF tl = mapToScene(windowRect.topLeft());
-    QPointF br = mapToScene(windowRect.bottomRight());
+    QRect   windowRect = rect();
+    QPointF tl         = mapToScene(windowRect.topLeft());
+    QPointF br         = mapToScene(windowRect.bottomRight());
 
-    double left = std::floor(tl.x() / gridStep - 0.5);
-    double right = std::floor(br.x() / gridStep + 1.0);
+    double left   = std::floor(tl.x() / gridStep - 0.5);
+    double right  = std::floor(br.x() / gridStep + 1.0);
     double bottom = std::floor(tl.y() / gridStep - 0.5);
-    double top = std::floor(br.y() / gridStep + 1.0);
+    double top    = std::floor(br.y() / gridStep + 1.0);
 
     // vertical lines
     for (int xi = int(left); xi <= int(right); ++xi) {
-      QLineF line(xi * gridStep, bottom * gridStep, xi * gridStep,
-                  top * gridStep);
+      QLineF line(
+          xi * gridStep, bottom * gridStep, xi * gridStep, top * gridStep);
 
       painter->drawLine(line);
     }
 
     // horizontal lines
     for (int yi = int(bottom); yi <= int(top); ++yi) {
-      QLineF line(left * gridStep, yi * gridStep, right * gridStep,
-                  yi * gridStep);
+      QLineF line(
+          left * gridStep, yi * gridStep, right * gridStep, yi * gridStep);
       painter->drawLine(line);
     }
   };
@@ -333,7 +339,9 @@ void FlowView::showEvent(QShowEvent *event) {
   QGraphicsView::showEvent(event);
 }
 
-FlowScene *FlowView::scene() { return _scene; }
+FlowScene *FlowView::scene() {
+  return _scene;
+}
 
 void FlowView::resizeEvent(QResizeEvent *event) {
   _scene->setSceneRect(QRect{QPoint{}, event->size()});

@@ -11,15 +11,15 @@ class ReceiverNode final : public QtNodes::NodeImp {
 public:
   ReceiverNode();
   ~ReceiverNode();
-  QString name() const override;
-  QWidget *embeddedWidget() override;
-  bool resizable() const override;
+  QString                      name() const override;
+  QWidget *                    embeddedWidget() override;
+  bool                         resizable() const override;
   QtNodes::NodeValidationState validationState() const override;
-  QString validationMessage() const override;
+  QString                      validationMessage() const override;
 
 private:
   Receiver *widget_;
 
   QtNodes::NodeValidationState validationState_;
-  QString validationMessage_;
+  QString                      validationMessage_;
 };

@@ -6,7 +6,7 @@
 
 namespace QtNodes {
 
-class NODE_EDITOR_PUBLIC FlowViewStyle : public Style {
+class NODE_EDITOR_PUBLIC FlowViewStyle final : public Style {
 public:
   FlowViewStyle();
 

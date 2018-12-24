@@ -4,7 +4,6 @@
 #include "Connection.hpp"
 #include "DataModelRegistry.hpp"
 #include "Node.hpp"
-
 #include "checker.hpp"
 
 namespace QtNodes {
@@ -38,7 +37,9 @@ QList<QUuid> DataFlowModel::nodeUUids() const {
   QList<QUuid> ret;
 
   // extract the keys
-  std::transform(_nodes.begin(), _nodes.end(), std::back_inserter(ret),
+  std::transform(_nodes.begin(),
+                 _nodes.end(),
+                 std::back_inserter(ret),
                  [](const auto &pair) { return pair.first; });
 
   return ret;
@@ -117,8 +118,9 @@ DataFlowModel::nodePainterDelegate(NodeIndex const &index) const {
   return node->nodeImp()->painterDelegate();
 }
 
-bool DataFlowModel::addPort(const NodeIndex &nIndex, PortType pType,
-                            PortIndex pIndex) {
+bool DataFlowModel::addPort(const NodeIndex &nIndex,
+                            PortType         pType,
+                            PortIndex        pIndex) {
   Q_ASSERT(nIndex.isValid());
   auto *node = reinterpret_cast<Node *>(nIndex.internalPointer());
 
@@ -128,7 +130,7 @@ bool DataFlowModel::addPort(const NodeIndex &nIndex, PortType pType,
 }
 
 unsigned int DataFlowModel::nodePortCount(NodeIndex const &index,
-                                          PortType portType) const {
+                                          PortType         portType) const {
   Q_ASSERT(index.isValid());
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
@@ -139,13 +141,14 @@ unsigned int DataFlowModel::nodePortCount(NodeIndex const &index,
 std::list<PortIndex> DataFlowModel::nodePortIndexes(const NodeIndex &index,
                                                     PortType portType) const {
   std::list<PortIndex> retval;
-  auto *node = reinterpret_cast<Node *>(index.internalPointer());
+  auto *               node = reinterpret_cast<Node *>(index.internalPointer());
   return node->nodeImp()->ports(portType);
   ;
 }
 
-QString DataFlowModel::nodePortCaption(NodeIndex const &index, PortIndex pIndex,
-                                       PortType portType) const {
+QString DataFlowModel::nodePortCaption(NodeIndex const &index,
+                                       PortIndex        pIndex,
+                                       PortType         portType) const {
   Q_ASSERT(index.isValid());
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
@@ -157,8 +160,8 @@ QString DataFlowModel::nodePortCaption(NodeIndex const &index, PortIndex pIndex,
 }
 
 NodeDataType DataFlowModel::nodePortDataType(NodeIndex const &index,
-                                             PortIndex pIndex,
-                                             PortType portType) const {
+                                             PortIndex        pIndex,
+                                             PortType         portType) const {
   Q_ASSERT(index.isValid());
 
   auto *node = static_cast<Node *>(index.internalPointer());
@@ -177,9 +180,8 @@ ConnectionPolicy DataFlowModel::nodePortConnectionPolicy(
   return node->nodeImp()->portOutConnectionPolicy(pIndex);
 }
 
-std::vector<std::pair<NodeIndex, PortIndex>>
-DataFlowModel::nodePortConnections(NodeIndex const &index, PortIndex id,
-                                   PortType portType) const {
+std::vector<std::pair<NodeIndex, PortIndex>> DataFlowModel::nodePortConnections(
+    NodeIndex const &index, PortIndex id, PortType portType) const {
   std::vector<std::pair<NodeIndex, PortIndex>> ret;
   Q_ASSERT(index.isValid());
 
@@ -193,8 +195,9 @@ DataFlowModel::nodePortConnections(NodeIndex const &index, PortIndex id,
   return ret;
 }
 
-bool DataFlowModel::removePort(const NodeIndex &nodeIndex, PortType portType,
-                               PortIndex portIndex) {
+bool DataFlowModel::removePort(const NodeIndex &nodeIndex,
+                               PortType         portType,
+                               PortIndex        portIndex) {
   bool success{false};
   for (auto &i : nodePortConnections(nodeIndex, portIndex, portType)) {
     if (portType == PortType::In) {
@@ -228,14 +231,13 @@ bool DataFlowModel::removePort(const NodeIndex &nodeIndex, PortType portType,
 
 // FlowSceneModel write interface
 bool DataFlowModel::removeConnection(NodeIndex const &leftNodeIdx,
-                                     PortIndex leftPortID,
+                                     PortIndex        leftPortID,
                                      NodeIndex const &rightNodeIdx,
-                                     PortIndex rightPortID) {
-
+                                     PortIndex        rightPortID) {
   Q_ASSERT(leftNodeIdx.isValid());
   Q_ASSERT(rightNodeIdx.isValid());
 
-  auto *leftNode = reinterpret_cast<Node *>(leftNodeIdx.internalPointer());
+  auto *leftNode  = reinterpret_cast<Node *>(leftNodeIdx.internalPointer());
   auto *rightNode = reinterpret_cast<Node *>(rightNodeIdx.internalPointer());
 
   ConnectionID connID;
@@ -252,14 +254,16 @@ bool DataFlowModel::removeConnection(NodeIndex const &leftNodeIdx,
 
   // remove it from the nodes
   auto &leftConns = leftNode->connections(PortType::Out, leftPortID);
-  auto iter =
-      std::find_if(leftConns.begin(), leftConns.end(),
-                   [&](Connection *conn) { return conn->id() == connID; });
+  auto  iter =
+      std::find_if(leftConns.begin(), leftConns.end(), [&](Connection *conn) {
+        return conn->id() == connID;
+      });
   Q_ASSERT(iter != leftConns.end());
   leftConns.erase(iter);
 
   auto &rightConns = rightNode->connections(PortType::In, rightPortID);
-  iter = std::find_if(rightConns.begin(), rightConns.end(),
+  iter             = std::find_if(rightConns.begin(),
+                      rightConns.end(),
                       [&](Connection *conn) { return conn->id() == connID; });
   Q_ASSERT(iter != rightConns.end());
   rightConns.erase(iter);
@@ -274,19 +278,18 @@ bool DataFlowModel::removeConnection(NodeIndex const &leftNodeIdx,
 }
 
 bool DataFlowModel::addConnection(NodeIndex const &leftNodeIdx,
-                                  PortIndex leftPortID,
+                                  PortIndex        leftPortID,
                                   NodeIndex const &rightNodeIdx,
-                                  PortIndex rightPortID) {
-
+                                  PortIndex        rightPortID) {
   Q_ASSERT(leftNodeIdx.isValid());
   Q_ASSERT(rightNodeIdx.isValid());
 
-  auto *leftNode = static_cast<Node *>(leftNodeIdx.internalPointer());
+  auto *leftNode  = static_cast<Node *>(leftNodeIdx.internalPointer());
   auto *rightNode = static_cast<Node *>(rightNodeIdx.internalPointer());
 
   // type conversions
   TypeConverter conv = {};
-  auto ltype = nodePortDataType(leftNodeIdx, leftPortID, PortType::Out);
+  auto ltype         = nodePortDataType(leftNodeIdx, leftPortID, PortType::Out);
   auto rtype = nodePortDataType(rightNodeIdx, rightPortID, PortType::In);
   if (ltype.id != rtype.id) {
     conv = _registry->getTypeConverter(ltype, rtype);
@@ -314,8 +317,9 @@ QUuid DataFlowModel::addNode(const QString &typeID, QPointF const &location) {
   return nodeid;
 }
 
-QUuid DataFlowModel::addNode(QString const &typeID, QPointF const &location,
-                             QUuid const &nodeid) {
+QUuid DataFlowModel::addNode(QString const &typeID,
+                             QPointF const &location,
+                             QUuid const &  nodeid) {
   // create the NodeDataModel
   auto model = _registry->create(typeID);
   if (!model) {
@@ -325,17 +329,22 @@ QUuid DataFlowModel::addNode(QString const &typeID, QPointF const &location,
 }
 
 QUuid DataFlowModel::addNode(std::unique_ptr<NodeImp> &&model,
-                             QPointF const &location, QUuid const &nodeid) {
+                             QPointF const &            location,
+                             QUuid const &              nodeid) {
   connect(model.get(), &NodeImp::dataUpdated, this, [this, nodeid](PortIndex) {
     emit nodeValidationUpdated(nodeIndex(nodeid));
   });
 
-  connect(model.get(), &NodeImp::portRemoved, this,
+  connect(model.get(),
+          &NodeImp::portRemoved,
+          this,
           [this, nodeid](PortType pType, PortIndex pIndex) {
             this->removePort(nodeIndex(nodeid), pType, pIndex);
           });
 
-  connect(model.get(), &NodeImp::portAdded, this,
+  connect(model.get(),
+          &NodeImp::portAdded,
+          this,
           [this, nodeid](PortType pType, PortIndex pIndex) {
             this->addPort(nodeIndex(nodeid), pType, pIndex);
           });
@@ -355,8 +364,9 @@ QUuid DataFlowModel::addNode(std::unique_ptr<NodeImp> &&model,
 
   // connect to the geometry gets updated
   connect(
-      nodePtr, &Node::positionChanged, this,
-      [this, nodeid](QPointF const &) { emit nodeMoved(nodeIndex(nodeid)); });
+      nodePtr, &Node::positionChanged, this, [this, nodeid](QPointF const &) {
+        emit nodeMoved(nodeIndex(nodeid));
+      });
 
   // tell the view
   emit nodeAdded(nodeid);
@@ -364,11 +374,11 @@ QUuid DataFlowModel::addNode(std::unique_ptr<NodeImp> &&model,
   return nodeid;
 }
 
-ConnectionID DataFlowModel::addConnection(Node *leftNode, PortIndex leftPortID,
-                                          Node *rightNode,
-                                          PortIndex rightPortID,
+ConnectionID DataFlowModel::addConnection(Node *        leftNode,
+                                          PortIndex     leftPortID,
+                                          Node *        rightNode,
+                                          PortIndex     rightPortID,
                                           TypeConverter conv) {
-
   ConnectionID connID;
   connID.lNodeID = leftNode->id();
   connID.rNodeID = rightNode->id();
@@ -376,8 +386,8 @@ ConnectionID DataFlowModel::addConnection(Node *leftNode, PortIndex leftPortID,
   connID.rPortID = rightPortID;
 
   // create the connection
-  auto conn = std::make_shared<Connection>(*rightNode, rightPortID, *leftNode,
-                                           leftPortID, conv);
+  auto conn = std::make_shared<Connection>(
+      *rightNode, rightPortID, *leftNode, leftPortID, conv);
   if (!_connections.insert(std::make_pair(connID, conn)).second) {
     GET_INFO();
   }
@@ -391,8 +401,10 @@ ConnectionID DataFlowModel::addConnection(Node *leftNode, PortIndex leftPortID,
       ->onDataUpdated(conn->getPortIndex(PortType::Out));
 
   // tell the view the connection was added
-  emit connectionAdded(nodeIndex(leftNode->id()), leftPortID,
-                       nodeIndex(rightNode->id()), rightPortID);
+  emit connectionAdded(nodeIndex(leftNode->id()),
+                       leftPortID,
+                       nodeIndex(rightNode->id()),
+                       rightPortID);
 
   return connID;
 }
@@ -417,7 +429,9 @@ DataFlowModel::nodes() {
   return _nodes;
 }
 
-DataModelRegistry &DataFlowModel::registry() { return *_registry; }
+DataModelRegistry &DataFlowModel::registry() {
+  return *_registry;
+}
 
 void DataFlowModel::setRegistry(std::shared_ptr<DataModelRegistry> registry) {
   _registry = std::move(registry);

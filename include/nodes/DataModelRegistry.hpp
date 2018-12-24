@@ -21,14 +21,13 @@ inline bool operator<(QtNodes::NodeDataType const &d1,
 
 /// Class uses map for storing models (name, model)
 class NODE_EDITOR_PUBLIC DataModelRegistry {
-
 public:
-  using RegistryItemPtr = std::unique_ptr<QtNodes::NodeImp>;
+  using RegistryItemPtr     = std::unique_ptr<QtNodes::NodeImp>;
   using RegistryItemCreator = std::function<RegistryItemPtr()>;
   using RegisteredModelCreatorsMap =
       std::unordered_map<QString, RegistryItemCreator>;
   using RegisteredModelsCategoryMap = std::unordered_map<QString, QString>;
-  using CategoriesSet = std::set<QString>;
+  using CategoriesSet               = std::set<QString>;
 
   using RegisteredTypeConvertersMap = std::map<TypeConverterId, TypeConverter>;
 
@@ -36,7 +35,7 @@ public:
   ~DataModelRegistry() = default;
 
   DataModelRegistry(DataModelRegistry const &) = delete;
-  DataModelRegistry(DataModelRegistry &&) = default;
+  DataModelRegistry(DataModelRegistry &&)      = default;
 
   DataModelRegistry &operator=(DataModelRegistry const &) = delete;
   DataModelRegistry &operator=(DataModelRegistry &&) = default;
@@ -44,7 +43,7 @@ public:
 public:
   template <typename ModelType>
   void registerModel(RegistryItemCreator creator,
-                     QString const &category = "Nodes") {
+                     QString const &     category = "Nodes") {
     registerModelImpl<ModelType>(std::move(creator), category);
   }
 
@@ -62,7 +61,7 @@ public:
   }
 
   void registerTypeConverter(TypeConverterId const &id,
-                             TypeConverter typeConverter) {
+                             TypeConverter          typeConverter) {
     _registeredTypeConverters[id] = std::move(typeConverter);
   }
 
@@ -100,8 +99,10 @@ private:
   struct HasStaticMethodName : std::false_type {};
 
   template <typename T>
-  struct HasStaticMethodName<T, typename std::enable_if<std::is_same<
-                                    decltype(T::Name()), QString>::value>::type>
+  struct HasStaticMethodName<
+      T,
+      typename std::enable_if<
+          std::is_same<decltype(T::Name()), QString>::value>::type>
       : std::true_type {};
 
   template <typename ModelType>

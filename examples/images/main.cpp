@@ -1,11 +1,9 @@
+#include "ImageLoaderModel.hpp"
+#include "ImageShowModel.hpp"
+#include <QtWidgets/QApplication>
 #include <nodes/DataFlowScene.hpp>
 #include <nodes/FlowView.hpp>
 #include <nodes/NodeData.hpp>
-
-#include <QtWidgets/QApplication>
-
-#include "ImageLoaderModel.hpp"
-#include "ImageShowModel.hpp"
 
 using QtNodes::DataFlowScene;
 using QtNodes::DataModelRegistry;

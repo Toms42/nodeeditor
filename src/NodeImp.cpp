@@ -2,11 +2,11 @@
 
 #include "NodeImp.hpp"
 #include "StyleCollection.hpp"
-
 #include "checker.hpp"
 
 namespace QtNodes {
-NodeImp::NodeImp() : nodeStyle_{StyleCollection::nodeStyle()} {}
+NodeImp::NodeImp()
+    : nodeStyle_{StyleCollection::nodeStyle()} {}
 
 NodeImp::~NodeImp() {}
 
@@ -50,9 +50,13 @@ bool NodeImp::removePort(PortType type, PortIndex index) {
   return false;
 }
 
-const NodeStyle &NodeImp::nodeStyle() const { return nodeStyle_; }
+const NodeStyle &NodeImp::nodeStyle() const {
+  return nodeStyle_;
+}
 
-void NodeImp::setNodeStyle(const NodeStyle &style) { nodeStyle_ = style; }
+void NodeImp::setNodeStyle(const NodeStyle &style) {
+  nodeStyle_ = style;
+}
 
 void NodeImp::setInData(std::shared_ptr<NodeData> data, PortIndex index) {
   if (auto found = inPorts_.find(index); found != inPorts_.end()) {
@@ -67,13 +71,17 @@ std::shared_ptr<NodeData> NodeImp::outData(PortIndex index) {
   return nullptr;
 }
 
-bool NodeImp::resizable() const { return true; }
+bool NodeImp::resizable() const {
+  return true;
+}
 
 NodeValidationState NodeImp::validationState() const {
   return NodeValidationState::Valid;
 }
 
-QString NodeImp::validationMessage() const { return ""; }
+QString NodeImp::validationMessage() const {
+  return "";
+}
 
 QJsonObject NodeImp::save() const {
   QJsonObject modelJson;
@@ -183,6 +191,8 @@ ConnectionPolicy NodeImp::portOutConnectionPolicy(PortIndex index) const {
   }
 }
 
-NodePainterDelegate *NodeImp::painterDelegate() const { return nullptr; }
+NodePainterDelegate *NodeImp::painterDelegate() const {
+  return nullptr;
+}
 
 } // namespace QtNodes

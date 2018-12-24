@@ -77,30 +77,29 @@ public:
 
   /// Get the count of DataPorts
   virtual unsigned int nodePortCount(NodeIndex const &index,
-                                     PortType portType) const = 0;
+                                     PortType         portType) const = 0;
 
   virtual std::list<PortIndex> nodePortIndexes(NodeIndex const &index,
                                                PortType portType) const = 0;
 
   /// Get the port caption
-  virtual QString nodePortCaption(NodeIndex const &index, PortIndex portID,
-                                  PortType portType) const = 0;
+  virtual QString nodePortCaption(NodeIndex const &index,
+                                  PortIndex        portID,
+                                  PortType         portType) const = 0;
 
   /// Get the port data type
   virtual NodeDataType nodePortDataType(NodeIndex const &index,
-                                        PortIndex portID,
-                                        PortType portType) const = 0;
+                                        PortIndex        portID,
+                                        PortType         portType) const = 0;
 
   /// Port Policy
-  virtual ConnectionPolicy
-  nodePortConnectionPolicy(NodeIndex const &index, PortIndex portID,
-                           PortType portType) const = 0;
+  virtual ConnectionPolicy nodePortConnectionPolicy(
+      NodeIndex const &index, PortIndex portID, PortType portType) const = 0;
 
   /// Get a connection at a port
   /// Returns the remote node and the remote port index for that node
-  virtual std::vector<std::pair<NodeIndex, PortIndex>>
-  nodePortConnections(NodeIndex const &index, PortIndex portID,
-                      PortType portTypes) const = 0;
+  virtual std::vector<std::pair<NodeIndex, PortIndex>> nodePortConnections(
+      NodeIndex const &index, PortIndex portID, PortType portTypes) const = 0;
 
   // Mutation functions
   /////////////////////
@@ -111,8 +110,9 @@ public:
                                 NodeIndex const & /*rightNode*/,
                                 PortIndex /*rightPortID*/) = 0;
 
-  virtual bool removePort(const NodeIndex &nodeIndex, PortType portType,
-                          PortIndex portIndex) = 0;
+  virtual bool removePort(const NodeIndex &nodeIndex,
+                          PortType         portType,
+                          PortIndex        portIndex) = 0;
 
   /// Add a connection
   virtual bool addConnection(NodeIndex const & /*leftNode*/,
@@ -128,8 +128,8 @@ public:
     return QUuid{};
   }
 
-  virtual bool addPort(const NodeIndex &nIndex, PortType pType,
-                       PortIndex pIndex) = 0;
+  virtual bool
+  addPort(const NodeIndex &nIndex, PortType pType, PortIndex pIndex) = 0;
 
   /// Move a node to a new location
   virtual bool moveNode(NodeIndex const & /*index*/, QPointF /*newLocation*/) {
@@ -151,9 +151,11 @@ public:
                                  PortIndex /*lPortIndex*/,
                                  NodeIndex const & /*rhs*/,
                                  PortIndex /*rPortIndex*/,
-                                 QPoint const & /*pos*/, bool /*entered*/) {}
+                                 QPoint const & /*pos*/,
+                                 bool /*entered*/) {}
 
-  virtual void nodeHovered(NodeIndex const & /*index*/, QPoint const & /*pos*/,
+  virtual void nodeHovered(NodeIndex const & /*index*/,
+                           QPoint const & /*pos*/,
                            bool /*entered*/) {}
 
   virtual void nodeDoubleClicked(NodeIndex const & /*index*/,
@@ -168,16 +170,21 @@ signals:
   void nodeAdded(const QUuid &newID);
   void nodePortUpdated(NodeIndex const &id);
   void nodeValidationUpdated(NodeIndex const &id);
-  void connectionRemoved(NodeIndex const &leftNode, PortIndex leftPortID,
-                         NodeIndex const &rightNode, PortIndex rightPortID);
-  void connectionAdded(NodeIndex const &leftNode, PortIndex leftPortID,
-                       NodeIndex const &rightNode, PortIndex rightPortID);
+  void connectionRemoved(NodeIndex const &leftNode,
+                         PortIndex        leftPortID,
+                         NodeIndex const &rightNode,
+                         PortIndex        rightPortID);
+  void connectionAdded(NodeIndex const &leftNode,
+                       PortIndex        leftPortID,
+                       NodeIndex const &rightNode,
+                       PortIndex        rightPortID);
   void nodeMoved(NodeIndex const &index);
   void connectionsRemoved(PortType type, PortIndex index);
   void updateNode(const NodeIndex &nodeIndex);
-  void updateConnection(const NodeIndex &leftNodeIndex, PortIndex leftPortIndex,
+  void updateConnection(const NodeIndex &leftNodeIndex,
+                        PortIndex        leftPortIndex,
                         const NodeIndex &rightNodeIndex,
-                        PortIndex rightPortIndex);
+                        PortIndex        rightPortIndex);
 
 protected:
   NodeIndex createIndex(const QUuid &id, void *internalPointer) const;

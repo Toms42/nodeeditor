@@ -1,4 +1,6 @@
 #include "NodeStyle.hpp"
+#include "StyleCollection.hpp"
+#include <QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
@@ -6,13 +8,11 @@
 #include <QtCore/QJsonValueRef>
 #include <iostream>
 
-#include <QDebug>
-
-#include "StyleCollection.hpp"
-
 using QtNodes::NodeStyle;
 
-inline void initResources() { Q_INIT_RESOURCE(resources); }
+inline void initResources() {
+  Q_INIT_RESOURCE(resources);
+}
 
 NodeStyle::NodeStyle() {
   // Explicit resources inialization for preventing the static initialization
@@ -24,7 +24,9 @@ NodeStyle::NodeStyle() {
   loadJsonFile(":DefaultStyle.json");
 }
 
-NodeStyle::NodeStyle(QString jsonText) { loadJsonText(jsonText); }
+NodeStyle::NodeStyle(QString jsonText) {
+  loadJsonText(jsonText);
+}
 
 void NodeStyle::setNodeStyle(QString jsonText) {
   NodeStyle style(jsonText);
@@ -33,13 +35,13 @@ void NodeStyle::setNodeStyle(QString jsonText) {
 }
 
 #ifdef STYLE_DEBUG
-#define NODE_STYLE_CHECK_UNDEFINED_VALUE(v, variable)                          \
-  {                                                                            \
-    if (v.type() == QJsonValue::Undefined || v.type() == QJsonValue::Null)     \
-      qWarning() << "Undefined value for parameter:" << #variable;             \
-  }
+#  define NODE_STYLE_CHECK_UNDEFINED_VALUE(v, variable)                        \
+    {                                                                          \
+      if (v.type() == QJsonValue::Undefined || v.type() == QJsonValue::Null)   \
+        qWarning() << "Undefined value for parameter:" << #variable;           \
+    }
 #else
-#define NODE_STYLE_CHECK_UNDEFINED_VALUE(v, variable)
+#  define NODE_STYLE_CHECK_UNDEFINED_VALUE(v, variable)
 #endif
 
 #define NODE_STYLE_READ_COLOR(values, variable)                                \
@@ -47,7 +49,7 @@ void NodeStyle::setNodeStyle(QString jsonText) {
     auto valueRef = values[#variable];                                         \
     NODE_STYLE_CHECK_UNDEFINED_VALUE(valueRef, variable)                       \
     if (valueRef.isArray()) {                                                  \
-      auto colorArray = valueRef.toArray();                                    \
+      auto             colorArray = valueRef.toArray();                        \
       std::vector<int> rgb;                                                    \
       rgb.reserve(3);                                                          \
       for (auto it = colorArray.begin(); it != colorArray.end(); ++it) {       \

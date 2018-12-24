@@ -7,11 +7,12 @@ using QtNodes::ConnectionGeometry;
 using QtNodes::PortType;
 
 ConnectionGeometry::ConnectionGeometry(QtNodes::ConnectionGraphicsObject &obj)
-    : _obj{obj}, _in(0, 0), _out(0, 0)
-      //, _animationPhase(0)
-      ,
-      _lineWidth(3.0), _hovered(false) {
-
+    : _obj{obj}
+    , _in(0, 0)
+    , _out(0, 0)
+    //, _animationPhase(0)
+    , _lineWidth(3.0)
+    , _hovered(false) {
   // TODO if style can change dynamicly, so it have to be unkomment
   // connect(&QtNodes::StyleCollection::instance(),
   //        &StyleCollection::connectionStyleChanged, this, [&]() {
@@ -20,15 +21,25 @@ ConnectionGeometry::ConnectionGeometry(QtNodes::ConnectionGraphicsObject &obj)
   //        });
 }
 
-QPointF ConnectionGeometry::source() const { return _out; }
+QPointF ConnectionGeometry::source() const {
+  return _out;
+}
 
-QPointF ConnectionGeometry::sink() const { return _in; }
+QPointF ConnectionGeometry::sink() const {
+  return _in;
+}
 
-double ConnectionGeometry::lineWidth() const { return _lineWidth; }
+double ConnectionGeometry::lineWidth() const {
+  return _lineWidth;
+}
 
-bool ConnectionGeometry::hovered() const { return _hovered; }
+bool ConnectionGeometry::hovered() const {
+  return _hovered;
+}
 
-void ConnectionGeometry::setHovered(bool hovered) { _hovered = hovered; }
+void ConnectionGeometry::setHovered(bool hovered) {
+  _hovered = hovered;
+}
 
 QPointF const &ConnectionGeometry::getEndPoint(PortType portType) const {
   Q_ASSERT(portType != PortType::None);
@@ -52,7 +63,7 @@ void ConnectionGeometry::setEndPoint(PortType portType, QPointF const &point) {
   }
 }
 
-void ConnectionGeometry::moveEndPoint(PortType portType,
+void ConnectionGeometry::moveEndPoint(PortType       portType,
                                       QPointF const &offset) {
   _obj.prepareGeometryChange();
   switch (portType) {

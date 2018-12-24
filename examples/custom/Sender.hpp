@@ -23,6 +23,6 @@ signals:
   void removePort(unsigned int index);
 
 private:
-  Ui::Sender *ui_;
+  Ui::Sender *      ui_;
   QStringListModel *portListModel_;
 };

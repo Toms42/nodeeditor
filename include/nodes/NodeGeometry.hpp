@@ -62,10 +62,12 @@ public:
   void recalculateSize(QFont const &font) const;
 
   // TODO removed default QTransform()
-  QPointF portScenePosition(PortIndex index, PortType portType,
+  QPointF portScenePosition(PortIndex         index,
+                            PortType          portType,
                             QTransform const &t = QTransform()) const;
 
-  PortIndex checkHitScenePoint(PortType portType, QPointF point,
+  PortIndex checkHitScenePoint(PortType          portType,
+                               QPointF           point,
                                QTransform const &t = QTransform()) const;
 
   QRect resizeRect() const;
@@ -77,11 +79,14 @@ public:
 
   unsigned int validationWidth() const;
 
-  static QPointF calculateNodePositionBetweenNodePorts(
-      PortIndex targetPortIndex, PortType targetPort,
-      NodeGraphicsObject const &targetNode, PortIndex sourcePortIndex,
-      PortType sourcePort, NodeGraphicsObject const &sourceNode,
-      NodeGeometry const &newNodeGeom);
+  static QPointF
+  calculateNodePositionBetweenNodePorts(PortIndex targetPortIndex,
+                                        PortType  targetPort,
+                                        NodeGraphicsObject const &targetNode,
+                                        PortIndex sourcePortIndex,
+                                        PortType  sourcePort,
+                                        NodeGraphicsObject const &sourceNode,
+                                        NodeGeometry const &      newNodeGeom);
 
 private:
   unsigned int captionHeight() const;
@@ -100,11 +105,11 @@ private:
 
   mutable unsigned int _width;
   mutable unsigned int _height;
-  unsigned int _entryWidth;
+  unsigned int         _entryWidth;
   mutable unsigned int _inputPortWidth;
   mutable unsigned int _outputPortWidth;
   mutable unsigned int _entryHeight;
-  unsigned int _spacing;
+  unsigned int         _spacing;
 
   bool _hovered;
 

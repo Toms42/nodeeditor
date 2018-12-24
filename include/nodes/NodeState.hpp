@@ -35,10 +35,12 @@ public:
 
   ConnectionPtrVec connections(PortType portType, PortIndex portIndex) const;
 
-  void setConnection(PortType portType, PortIndex portIndex,
+  void setConnection(PortType                  portType,
+                     PortIndex                 portIndex,
                      ConnectionGraphicsObject &connection);
 
-  void eraseConnection(PortType portType, PortIndex portIndex,
+  void eraseConnection(PortType                  portType,
+                       PortIndex                 portIndex,
                        ConnectionGraphicsObject &connection);
 
   ReactToConnectionState reaction() const;
@@ -48,7 +50,7 @@ public:
   NodeDataType reactingDataType() const;
 
   void setReaction(ReactToConnectionState reaction,
-                   PortType reactingPortType = PortType::None,
+                   PortType               reactingPortType = PortType::None,
 
                    NodeDataType reactingDataType = NodeDataType());
 
@@ -68,13 +70,13 @@ public slots:
   void removePort(PortType pType, PortIndex pIndex);
 
 private:
-  const NodeIndex &nodeIndex_;
+  const NodeIndex &                     nodeIndex_;
   std::map<PortIndex, ConnectionPtrVec> _inConnections;
   std::map<PortIndex, ConnectionPtrVec> _outConnections;
 
   ReactToConnectionState _reaction;
-  PortType _reactingPortType;
-  NodeDataType _reactingDataType;
+  PortType               _reactingPortType;
+  NodeDataType           _reactingDataType;
 
   bool _resizing;
 };

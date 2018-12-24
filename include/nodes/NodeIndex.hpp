@@ -19,7 +19,9 @@ public:
 private:
   /// Regular constructor
   NodeIndex(const QUuid &uuid, void *internalPtr, const FlowSceneModel *model)
-      : _id{uuid}, _internalPointer{internalPtr}, _model{model} {
+      : _id{uuid}
+      , _internalPointer{internalPtr}
+      , _model{model} {
     Q_ASSERT(!_id.isNull());
     Q_ASSERT(_model != nullptr);
   }
@@ -38,9 +40,9 @@ public:
   bool isValid() const { return !id().isNull() && model() != nullptr; }
 
 private:
-  QUuid _id;
-  void *_internalPointer = nullptr;
-  const FlowSceneModel *_model = nullptr;
+  QUuid                 _id;
+  void *                _internalPointer = nullptr;
+  const FlowSceneModel *_model           = nullptr;
 };
 
 inline bool operator==(NodeIndex const &lhs, NodeIndex const &rhs) {

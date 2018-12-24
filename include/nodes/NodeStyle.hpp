@@ -6,7 +6,7 @@
 
 namespace QtNodes {
 
-class NODE_EDITOR_PUBLIC NodeStyle : public Style {
+class NODE_EDITOR_PUBLIC NodeStyle final : public Style {
 public:
   NodeStyle();
 

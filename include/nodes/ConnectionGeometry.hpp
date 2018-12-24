@@ -40,8 +40,8 @@ public:
 private:
   // local object coordinates
   ConnectionGraphicsObject &_obj;
-  QPointF _in;
-  QPointF _out;
+  QPointF                   _in;
+  QPointF                   _out;
 
   // int _animationPhase;
 

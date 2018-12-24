@@ -6,7 +6,7 @@
 
 namespace QtNodes {
 
-class NODE_EDITOR_PUBLIC ConnectionStyle : public Style {
+class NODE_EDITOR_PUBLIC ConnectionStyle final : public Style {
 public:
   ConnectionStyle();
 

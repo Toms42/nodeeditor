@@ -23,7 +23,8 @@ inline bool operator==(ConnectionID const &lhs, ConnectionID const &rhs) {
 // hash for ConnectionID
 namespace std {
 
-template <> struct hash<::QtNodes::ConnectionID> {
+template <>
+struct hash<::QtNodes::ConnectionID> {
   size_t operator()(::QtNodes::ConnectionID const &toHash) const {
     return qHash(toHash.rNodeID) ^ qHash(toHash.lNodeID) ^
            std::hash<QtNodes::PortIndex>()(toHash.lPortID) ^

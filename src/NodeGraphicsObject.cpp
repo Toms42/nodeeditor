@@ -20,8 +20,12 @@ using QtNodes::NodeIndex;
 using QtNodes::NodeState;
 
 NodeGraphicsObject::NodeGraphicsObject(FlowScene &scene, NodeIndex const &node)
-    : _scene(scene), _nodeIndex(node), _geometry(node, *this), _state(node),
-      _locked(false), _proxyWidget(nullptr) {
+    : _scene(scene)
+    , _nodeIndex(node)
+    , _geometry(node, *this)
+    , _state(node)
+    , _locked(false)
+    , _proxyWidget(nullptr) {
   _scene.addItem(this);
 
   setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
@@ -74,19 +78,33 @@ NodeGraphicsObject::~NodeGraphicsObject() {
   //_scene.removeItem(this);
 }
 
-NodeIndex NodeGraphicsObject::index() const { return _nodeIndex; }
+NodeIndex NodeGraphicsObject::index() const {
+  return _nodeIndex;
+}
 
-FlowScene &NodeGraphicsObject::flowScene() { return _scene; }
+FlowScene &NodeGraphicsObject::flowScene() {
+  return _scene;
+}
 
-FlowScene const &NodeGraphicsObject::flowScene() const { return _scene; }
+FlowScene const &NodeGraphicsObject::flowScene() const {
+  return _scene;
+}
 
-NodeGeometry &NodeGraphicsObject::geometry() { return _geometry; }
+NodeGeometry &NodeGraphicsObject::geometry() {
+  return _geometry;
+}
 
-NodeGeometry const &NodeGraphicsObject::geometry() const { return _geometry; }
+NodeGeometry const &NodeGraphicsObject::geometry() const {
+  return _geometry;
+}
 
-NodeState &NodeGraphicsObject::nodeState() { return _state; }
+NodeState &NodeGraphicsObject::nodeState() {
+  return _state;
+}
 
-NodeState const &NodeGraphicsObject::nodeState() const { return _state; }
+NodeState const &NodeGraphicsObject::nodeState() const {
+  return _state;
+}
 
 void NodeGraphicsObject::embedQWidget() {
   if (auto w = flowScene().model()->nodeWidget(index())) {
@@ -123,7 +141,8 @@ void NodeGraphicsObject::moveConnections() const {
 }
 
 void NodeGraphicsObject::reactToPossibleConnection(
-    PortType reactingPortType, NodeDataType reactingDataType,
+    PortType       reactingPortType,
+    NodeDataType   reactingDataType,
     QPointF const &scenePoint) {
   QTransform const t = sceneTransform();
 
@@ -148,7 +167,7 @@ void NodeGraphicsObject::lock(bool locked) {
   setFlag(QGraphicsItem::ItemIsSelectable, !locked);
 }
 
-void NodeGraphicsObject::paint(QPainter *painter,
+void NodeGraphicsObject::paint(QPainter *                      painter,
                                QStyleOptionGraphicsItem const *option,
                                QWidget *) {
   painter->setClipRect(option->exposedRect);
@@ -157,7 +176,7 @@ void NodeGraphicsObject::paint(QPainter *painter,
 }
 
 QVariant NodeGraphicsObject::itemChange(GraphicsItemChange change,
-                                        const QVariant &value) {
+                                        const QVariant &   value) {
   // TODO I comment this, because in destructor in frame we set new position
   // to childs, and it may be after deleting scene, so I have use after free
   if (change == ItemPositionChange && scene()) {
@@ -196,24 +215,31 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event) {
         // connection was already connected to
         Q_ASSERT(_scene._temporaryConn == nullptr);
         if (portToCheck == PortType::In) {
-          _scene._temporaryConn = new ConnectionGraphicsObject(
-              con->node(PortType::Out), con->portIndex(PortType::Out),
-              NodeIndex{}, INVALID, _scene);
+          _scene._temporaryConn =
+              new ConnectionGraphicsObject(con->node(PortType::Out),
+                                           con->portIndex(PortType::Out),
+                                           NodeIndex{},
+                                           INVALID,
+                                           _scene);
           _scene._temporaryConn->geometry().setEndPoint(PortType::In,
                                                         event->scenePos());
         } else {
-          _scene._temporaryConn = new ConnectionGraphicsObject(
-              NodeIndex{}, INVALID, con->node(PortType::In),
-              con->portIndex(PortType::In), _scene);
+          _scene._temporaryConn =
+              new ConnectionGraphicsObject(NodeIndex{},
+                                           INVALID,
+                                           con->node(PortType::In),
+                                           con->portIndex(PortType::In),
+                                           _scene);
           _scene._temporaryConn->geometry().setEndPoint(PortType::Out,
                                                         event->scenePos());
         }
         _scene._temporaryConn->grabMouse();
 
         // past create new connection by existing, we remove already existing
-        flowScene().model()->removeConnection(
-            con->node(PortType::Out), con->portIndex(PortType::Out),
-            con->node(PortType::In), con->portIndex(PortType::In));
+        flowScene().model()->removeConnection(con->node(PortType::Out),
+                                              con->portIndex(PortType::Out),
+                                              con->node(PortType::In),
+                                              con->portIndex(PortType::In));
 
       } else // initialize new Connection
       {

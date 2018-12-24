@@ -13,7 +13,8 @@ using QtNodes::Connection;
 using QtNodes::Node;
 
 Node::Node(std::unique_ptr<NodeImp> &&nodeImp, QUuid const &id)
-    : _uid(id), nodeImp_(std::move(nodeImp)) {
+    : _uid(id)
+    , nodeImp_(std::move(nodeImp)) {
   // propagate data: model => node
   connect(nodeImp_.get(), &NodeImp::dataUpdated, this, &Node::onDataUpdated);
 
@@ -82,27 +83,32 @@ QJsonObject Node::save() const {
   nodeJson["model"] = nodeImp_->save();
 
   QJsonObject obj;
-  obj["x"] = _pos.x();
-  obj["y"] = _pos.y();
+  obj["x"]             = _pos.x();
+  obj["y"]             = _pos.y();
   nodeJson["position"] = obj;
 
   return nodeJson;
 }
 
 void Node::restore(QJsonObject const &json) {
-
   QJsonObject positionJson = json["position"].toObject();
-  QPointF point(positionJson["x"].toDouble(), positionJson["y"].toDouble());
+  QPointF     point(positionJson["x"].toDouble(), positionJson["y"].toDouble());
   setPosition(point);
 
   nodeImp_->restore(json["model"].toObject());
 }
 
-QUuid Node::id() const { return _uid; }
+QUuid Node::id() const {
+  return _uid;
+}
 
-QtNodes::NodeImp *Node::nodeImp() const { return nodeImp_.get(); }
+QtNodes::NodeImp *Node::nodeImp() const {
+  return nodeImp_.get();
+}
 
-QPointF Node::position() const { return _pos; }
+QPointF Node::position() const {
+  return _pos;
+}
 
 void Node::setPosition(QPointF const &newPos) {
   _pos = newPos;
@@ -110,7 +116,7 @@ void Node::setPosition(QPointF const &newPos) {
   emit positionChanged(newPos);
 }
 
-std::vector<Connection *> const &Node::connections(PortType pType,
+std::vector<Connection *> const &Node::connections(PortType  pType,
                                                    PortIndex idx) const {
   try {
     return pType == PortType::In ? _inConnections.at(idx)
@@ -130,13 +136,13 @@ std::vector<Connection *> &Node::connections(PortType pType, PortIndex idx) {
 }
 
 void Node::propagateData(std::shared_ptr<NodeData> nodeData,
-                         PortIndex inPortIndex) const {
+                         PortIndex                 inPortIndex) const {
   nodeImp_->setInData(nodeData, inPortIndex);
 }
 
 void Node::onDataUpdated(PortIndex index) {
-  auto nodeData = nodeImp_->outData(index);
-  auto &conns = connections(PortType::Out, index);
+  auto  nodeData = nodeImp_->outData(index);
+  auto &conns    = connections(PortType::Out, index);
 
   for (auto const &c : conns)
     c->propagateData(nodeData);

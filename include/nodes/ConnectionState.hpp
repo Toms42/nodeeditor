@@ -13,7 +13,8 @@ class NodeGraphicsObject;
 /// Remembers last hovered Node.
 class ConnectionState {
 public:
-  ConnectionState(PortType port = PortType::None) : _requiredPort(port) {}
+  ConnectionState(PortType port = PortType::None)
+      : _requiredPort(port) {}
 
   ConnectionState(const ConnectionState &) = delete;
   ConnectionState operator=(const ConnectionState &) = delete;

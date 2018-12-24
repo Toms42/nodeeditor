@@ -3,11 +3,10 @@
 #include "DataFlowModel.hpp"
 #include "DataModelRegistry.hpp"
 #include "Node.hpp"
+#include "checker.hpp"
 #include <QFileDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
-
-#include "checker.hpp"
 
 using QtNodes::Connection;
 using QtNodes::ConnectionID;
@@ -23,19 +22,23 @@ using QtNodes::NodeValidationState;
 using QtNodes::PortIndex;
 
 DataFlowScene::DataFlowScene(std::shared_ptr<DataModelRegistry> registry,
-                             QObject *parent)
+                             QObject *                          parent)
     : FlowScene(new DataFlowModel(std::move(registry)), parent) {
   _dataFlowModel = static_cast<DataFlowModel *>(model());
 }
 
-DataFlowScene::~DataFlowScene() { delete _dataFlowModel; }
+DataFlowScene::~DataFlowScene() {
+  delete _dataFlowModel;
+}
 
 std::shared_ptr<Connection>
-DataFlowScene::createConnection(Node &nodeIn, PortIndex portIndexIn,
-                                Node &nodeOut, PortIndex portIndexOut,
+DataFlowScene::createConnection(Node &               nodeIn,
+                                PortIndex            portIndexIn,
+                                Node &               nodeOut,
+                                PortIndex            portIndexOut,
                                 TypeConverter const &converter) {
-  auto connid = _dataFlowModel->addConnection(&nodeOut, portIndexOut, &nodeIn,
-                                              portIndexIn, converter);
+  auto connid = _dataFlowModel->addConnection(
+      &nodeOut, portIndexOut, &nodeIn, portIndexIn, converter);
 
   try {
     return _dataFlowModel->connections().at(connid);
@@ -46,10 +49,10 @@ DataFlowScene::createConnection(Node &nodeIn, PortIndex portIndexIn,
 
 std::shared_ptr<Connection>
 DataFlowScene::restoreConnection(QJsonObject const &connectionJson) {
-  QUuid nodeInId = QUuid(connectionJson["in_id"].toString());
+  QUuid nodeInId  = QUuid(connectionJson["in_id"].toString());
   QUuid nodeOutId = QUuid(connectionJson["out_id"].toString());
 
-  PortIndex portIndexIn = connectionJson["in_index"].toInt();
+  PortIndex portIndexIn  = connectionJson["in_index"].toInt();
   PortIndex portIndexOut = connectionJson["out_index"].toInt();
 
   ConnectionID connId;
@@ -59,9 +62,10 @@ DataFlowScene::restoreConnection(QJsonObject const &connectionJson) {
   connId.lPortID = portIndexOut;
   connId.rPortID = portIndexIn;
 
-  if (!_dataFlowModel->addConnection(
-          _dataFlowModel->nodeIndex(nodeOutId), connId.lPortID,
-          _dataFlowModel->nodeIndex(nodeInId), connId.rPortID))
+  if (!_dataFlowModel->addConnection(_dataFlowModel->nodeIndex(nodeOutId),
+                                     connId.lPortID,
+                                     _dataFlowModel->nodeIndex(nodeInId),
+                                     connId.rPortID))
     return nullptr;
 
   try {
@@ -153,8 +157,8 @@ void DataFlowScene::iterateOverNodeDataDependentOrder(
 
   // Iterate over "leaf" nodes
   for (auto const &_node : _dataFlowModel->nodes()) {
-    auto const &node = _node.second;
-    auto model = node->nodeImp();
+    auto const &node  = _node.second;
+    auto        model = node->nodeImp();
 
     if (isNodeLeaf(*node, *model)) {
       visitor(model);
@@ -162,7 +166,7 @@ void DataFlowScene::iterateOverNodeDataDependentOrder(
     }
   }
 
-  auto areNodeInputsVisitedBefore = [&](Node const &node,
+  auto areNodeInputsVisitedBefore = [&](Node const &   node,
                                         NodeImp const &model) {
     for (auto &i : model.ports(PortType::In)) {
       auto connections = node.connections(PortType::In, i);
@@ -214,11 +218,13 @@ DataFlowScene::connections() const {
 }
 
 std::vector<Node *> DataFlowScene::selectedNodes() const {
-  auto ids = FlowScene::selectedNodes();
+  auto                ids = FlowScene::selectedNodes();
   std::vector<Node *> ret;
   ret.reserve(ids.size());
 
-  std::transform(ids.begin(), ids.end(), std::back_inserter(ret),
+  std::transform(ids.begin(),
+                 ids.end(),
+                 std::back_inserter(ret),
                  [this](NodeIndex const &id) {
                    return _dataFlowModel->nodes().find(id.id())->second.get();
                  });
@@ -234,9 +240,11 @@ void DataFlowScene::clearScene() {
 }
 
 void DataFlowScene::save() const {
-  QString fileName = QFileDialog::getSaveFileName(
-      nullptr, tr("Open Flow Scene"), QDir::homePath(),
-      tr("Flow Scene Files (*.flow)"));
+  QString fileName =
+      QFileDialog::getSaveFileName(nullptr,
+                                   tr("Open Flow Scene"),
+                                   QDir::homePath(),
+                                   tr("Flow Scene Files (*.flow)"));
 
   if (!fileName.isEmpty()) {
     if (!fileName.endsWith("flow", Qt::CaseInsensitive))
@@ -254,9 +262,11 @@ void DataFlowScene::load() {
 
   //-------------
 
-  QString fileName = QFileDialog::getOpenFileName(
-      nullptr, tr("Open Flow Scene"), QDir::homePath(),
-      tr("Flow Scene Files (*.flow)"));
+  QString fileName =
+      QFileDialog::getOpenFileName(nullptr,
+                                   tr("Open Flow Scene"),
+                                   QDir::homePath(),
+                                   tr("Flow Scene Files (*.flow)"));
 
   if (!QFileInfo::exists(fileName))
     return;
@@ -316,4 +326,3 @@ void DataFlowScene::loadFromMemory(const QByteArray &data) {
     restoreConnection(connectionJsonArray[i].toObject());
   }
 }
-

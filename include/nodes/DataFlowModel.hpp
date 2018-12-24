@@ -54,52 +54,60 @@ public:
   nodePainterDelegate(NodeIndex const &index) const override;
 
   unsigned int nodePortCount(NodeIndex const &index,
-                             PortType portType) const override;
+                             PortType         portType) const override;
 
   std::list<PortIndex> nodePortIndexes(const NodeIndex &index,
                                        PortType portType) const override;
 
-  QString nodePortCaption(NodeIndex const &index, PortIndex pIndex,
-                          PortType portType) const override;
+  QString nodePortCaption(NodeIndex const &index,
+                          PortIndex        pIndex,
+                          PortType         portType) const override;
 
-  NodeDataType nodePortDataType(NodeIndex const &index, PortIndex pIndex,
-                                PortType portType) const override;
+  NodeDataType nodePortDataType(NodeIndex const &index,
+                                PortIndex        pIndex,
+                                PortType         portType) const override;
 
   ConnectionPolicy nodePortConnectionPolicy(NodeIndex const &index,
-                                            PortIndex pIndex,
+                                            PortIndex        pIndex,
                                             PortType portType) const override;
 
-  std::vector<std::pair<NodeIndex, PortIndex>>
-  nodePortConnections(NodeIndex const &index, PortIndex id,
-                      PortType portType) const override;
+  std::vector<std::pair<NodeIndex, PortIndex>> nodePortConnections(
+      NodeIndex const &index, PortIndex id, PortType portType) const override;
 
-  bool removePort(const NodeIndex &nodeIndex, PortType type,
-                  PortIndex index) override;
+  bool removePort(const NodeIndex &nodeIndex,
+                  PortType         type,
+                  PortIndex        index) override;
 
   // FlowSceneModel write interface
-  bool removeConnection(NodeIndex const &leftNode, PortIndex leftPortID,
-                        NodeIndex const &rightNode,
-                        PortIndex rightPortID) override;
-  bool addConnection(NodeIndex const &leftNode, PortIndex leftPortID,
-                     NodeIndex const &rightNode,
-                     PortIndex rightPortID) override;
-  bool removeNode(NodeIndex const &index) override;
+  bool  removeConnection(NodeIndex const &leftNode,
+                         PortIndex        leftPortID,
+                         NodeIndex const &rightNode,
+                         PortIndex        rightPortID) override;
+  bool  addConnection(NodeIndex const &leftNode,
+                      PortIndex        leftPortID,
+                      NodeIndex const &rightNode,
+                      PortIndex        rightPortID) override;
+  bool  removeNode(NodeIndex const &index) override;
   QUuid addNode(QString const &typeID, QPointF const &location) override;
-  bool moveNode(NodeIndex const &index, QPointF newLocation) override;
+  bool  moveNode(NodeIndex const &index, QPointF newLocation) override;
 
-  bool addPort(const NodeIndex &nIndex, PortType pType,
-               PortIndex pIndex) override;
+  bool
+  addPort(const NodeIndex &nIndex, PortType pType, PortIndex pIndex) override;
 
   // convenience functions
-  QUuid addNode(QString const &typeID, QPointF const &location,
-                QUuid const &uuid);
-  QUuid addNode(std::unique_ptr<NodeImp> &&model, QPointF const &location,
-                QUuid const &uuid = QUuid::createUuid());
-  ConnectionID addConnection(Node *left, PortIndex leftIdx, Node *right,
-                             PortIndex rightIdx, TypeConverter converter);
+  QUuid
+               addNode(QString const &typeID, QPointF const &location, QUuid const &uuid);
+  QUuid        addNode(std::unique_ptr<NodeImp> &&model,
+                       QPointF const &            location,
+                       QUuid const &              uuid = QUuid::createUuid());
+  ConnectionID addConnection(Node *        left,
+                             PortIndex     leftIdx,
+                             Node *        right,
+                             PortIndex     rightIdx,
+                             TypeConverter converter);
 
   using SharedConnection = std::shared_ptr<Connection>;
-  using UniqueNode = std::unique_ptr<Node>;
+  using UniqueNode       = std::unique_ptr<Node>;
 
   std::unordered_map<ConnectionID, SharedConnection> &connections();
 
@@ -110,8 +118,8 @@ public:
   void setRegistry(std::shared_ptr<DataModelRegistry> registry);
 
 private:
-  std::unordered_map<QUuid, UniqueNode> _nodes;
+  std::unordered_map<QUuid, UniqueNode>              _nodes;
   std::unordered_map<ConnectionID, SharedConnection> _connections;
-  std::shared_ptr<DataModelRegistry> _registry;
+  std::shared_ptr<DataModelRegistry>                 _registry;
 };
 }; // namespace QtNodes

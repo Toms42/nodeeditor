@@ -29,8 +29,10 @@ public:
   virtual ~DataFlowScene();
 
   std::shared_ptr<Connection>
-  createConnection(Node &nodeIn, PortIndex portIndexIn, Node &nodeOut,
-                   PortIndex portIndexOut,
+  createConnection(Node &               nodeIn,
+                   PortIndex            portIndexIn,
+                   Node &               nodeOut,
+                   PortIndex            portIndexOut,
                    TypeConverter const &converter = TypeConverter());
 
   std::shared_ptr<Connection>

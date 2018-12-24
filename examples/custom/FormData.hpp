@@ -7,7 +7,8 @@
 class FormData : public QtNodes::NodeData {
 public:
   FormData(){};
-  explicit FormData(const QString &data) : data_{data} {};
+  explicit FormData(const QString &data)
+      : data_{data} {};
 
   QtNodes::NodeDataType type() const {
     return QtNodes::NodeDataType{"Form", "text"};

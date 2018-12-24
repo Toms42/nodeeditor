@@ -27,9 +27,11 @@ class ConnectionGraphicsObject : public QGraphicsObject {
   friend ConnectionGeometry;
 
 public:
-  ConnectionGraphicsObject(NodeIndex const &leftNode, PortIndex leftPortIndex,
-                           NodeIndex const &rightNode, PortIndex rightPortIndex,
-                           FlowScene &scene);
+  ConnectionGraphicsObject(NodeIndex const &leftNode,
+                           PortIndex        leftPortIndex,
+                           NodeIndex const &rightNode,
+                           PortIndex        rightPortIndex,
+                           FlowScene &      scene);
 
   virtual ~ConnectionGraphicsObject();
 
@@ -44,10 +46,10 @@ public:
   FlowScene &flowScene() const;
 
   ConnectionGeometry const &geometry() const;
-  ConnectionGeometry &geometry();
+  ConnectionGeometry &      geometry();
 
   ConnectionState const &state() const;
-  ConnectionState &state();
+  ConnectionState &      state();
 
   QRectF boundingRect() const override;
 
@@ -67,8 +69,9 @@ public:
   FlowScene &scene() { return _scene; }
 
 protected:
-  void paint(QPainter *painter, QStyleOptionGraphicsItem const *option,
-             QWidget *widget = 0) override;
+  void paint(QPainter *                      painter,
+             QStyleOptionGraphicsItem const *option,
+             QWidget *                       widget = 0) override;
 
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -87,7 +90,7 @@ private:
   FlowScene &_scene;
 
   ConnectionGeometry _geometry;
-  ConnectionState _state;
+  ConnectionState    _state;
 
   NodeIndex _leftNode;
   NodeIndex _rightNode;

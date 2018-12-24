@@ -49,8 +49,8 @@ public:
   /// their corresponding end points.
   virtual void moveConnections() const;
 
-  virtual void reactToPossibleConnection(PortType, NodeDataType,
-                                         QPointF const &scenePoint);
+  virtual void
+  reactToPossibleConnection(PortType, NodeDataType, QPointF const &scenePoint);
 
   virtual void resetReactionToConnection();
 
@@ -65,11 +65,12 @@ public:
   void checkParent();
 
 protected:
-  virtual void paint(QPainter *painter, QStyleOptionGraphicsItem const *option,
-                     QWidget *widget = 0) override;
+  virtual void paint(QPainter *                      painter,
+                     QStyleOptionGraphicsItem const *option,
+                     QWidget *                       widget = 0) override;
 
   virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant &value) override;
+                              const QVariant &   value) override;
 
   virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -88,7 +89,7 @@ protected:
   virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
 private:
-  virtual void embedQWidget();
+  void embedQWidget();
 
 protected:
   FlowScene &_scene;

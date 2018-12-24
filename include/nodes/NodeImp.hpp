@@ -17,7 +17,9 @@ class NodeStyle;
 class Node;
 class NodePainterDelegate;
 
-class NODE_EDITOR_PUBLIC NodeImp : public QObject, public Serializable {
+class NODE_EDITOR_PUBLIC NodeImp
+    : public QObject
+    , public Serializable {
   Q_OBJECT
 
   friend Node;
@@ -39,7 +41,7 @@ public:
   bool removePort(PortType type, PortIndex index);
 
   const NodeStyle &nodeStyle() const;
-  void setNodeStyle(const NodeStyle &style);
+  void             setNodeStyle(const NodeStyle &style);
 
   /**\brief this method uses Port::handle for handle input data
    */
@@ -104,7 +106,7 @@ signals:
   void portRemoved(PortType type, PortIndex index);
 
 private:
-  NodeStyle nodeStyle_;
+  NodeStyle                 nodeStyle_;
   std::map<PortIndex, Port> inPorts_;
   std::map<PortIndex, Port> outPorts_;
 };

@@ -2,30 +2,21 @@
 
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
-
+#include <QtTest>
 #include <catch2/catch.hpp>
 
-#include <QtTest>
-
-namespace Catch
-{
+namespace Catch {
 template <>
-struct StringMaker<QPointF>
-{
-  static std::string
-  convert(QPointF const& p)
-  {
+struct StringMaker<QPointF> {
+  static std::string convert(QPointF const &p) {
     return std::string(QTest::toString(p));
   }
 };
 
 template <>
-struct StringMaker<QPoint>
-{
-  static std::string
-  convert(QPoint const& p)
-  {
+struct StringMaker<QPoint> {
+  static std::string convert(QPoint const &p) {
     return std::string(QTest::toString(p));
   }
 };
-}
+} // namespace Catch

@@ -5,9 +5,9 @@
 #include "Sender.hpp"
 
 SenderNode::SenderNode()
-    : widget_{new Sender},
-      validationState_{QtNodes::NodeValidationState::Valid}, validationMessage_{
-                                                                 ""} {
+    : widget_{new Sender}
+    , validationState_{QtNodes::NodeValidationState::Valid}
+    , validationMessage_{""} {
   connect(widget_, &Sender::dataIsReady, this, [this]() {
     for (auto &i : ports(QtNodes::PortType::Out)) {
       emit dataUpdated(i);
@@ -18,27 +18,37 @@ SenderNode::SenderNode()
   connect(widget_, &Sender::removePort, this, &SenderNode::removePort);
 }
 
-SenderNode::~SenderNode() { delete widget_; }
+SenderNode::~SenderNode() {
+  delete widget_;
+}
 
-QString SenderNode::name() const { return "SenderNode"; }
+QString SenderNode::name() const {
+  return "SenderNode";
+}
 
-QWidget *SenderNode::embeddedWidget() { return widget_; }
+QWidget *SenderNode::embeddedWidget() {
+  return widget_;
+}
 
-bool SenderNode::resizable() const { return true; }
+bool SenderNode::resizable() const {
+  return true;
+}
 
 QtNodes::NodeValidationState SenderNode::validationState() const {
   return validationState_;
 }
 
-QString SenderNode::validationMessage() const { return validationMessage_; }
+QString SenderNode::validationMessage() const {
+  return validationMessage_;
+}
 
 bool SenderNode::addPort(const QString &caption, unsigned int index) {
   QtNodes::Port port;
-  port.caption = caption;
+  port.caption        = caption;
   port.captionVisible = true;
-  port.dataType = FormData().type();
-  port.policy = QtNodes::ConnectionPolicy::One;
-  port.handle = [this](std::shared_ptr<QtNodes::NodeData>) {
+  port.dataType       = FormData().type();
+  port.policy         = QtNodes::ConnectionPolicy::One;
+  port.handle         = [this](std::shared_ptr<QtNodes::NodeData>) {
     return std::make_shared<FormData>(widget_->getInfo());
     emit
   };

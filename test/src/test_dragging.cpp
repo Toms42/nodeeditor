@@ -1,22 +1,18 @@
+#include "ApplicationSetup.hpp"
+#include "Stringify.hpp"
+#include "StubNodeDataModel.hpp"
+#include <QtTest>
+#include <QtWidgets/QApplication>
+#include <catch2/catch.hpp>
+#include <iostream>
 #include <nodes/Connection>
 #include <nodes/DataFlowScene>
 #include <nodes/FlowView>
 #include <nodes/Node>
 
-#include <catch2/catch.hpp>
-
-#include <QtTest>
-#include <QtWidgets/QApplication>
-
-#include <iostream>
-
-#include "ApplicationSetup.hpp"
-#include "Stringify.hpp"
-#include "StubNodeDataModel.hpp"
-
 using QtNodes::Connection;
-using QtNodes::DataModelRegistry;
 using QtNodes::DataFlowScene;
+using QtNodes::DataModelRegistry;
 using QtNodes::FlowView;
 using QtNodes::Node;
 using QtNodes::NodeData;
@@ -25,21 +21,19 @@ using QtNodes::NodeDataType;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
 
-TEST_CASE("Dragging node changes position", "[gui]")
-{
+TEST_CASE("Dragging node changes position", "[gui]") {
   auto app = applicationSetup();
 
   DataFlowScene scene;
-  FlowView view(&scene);
+  FlowView      view(&scene);
 
   view.show();
   REQUIRE(QTest::qWaitForWindowExposed(&view));
 
-  SECTION("just one node")
-  {
-    auto& node = scene.createNode(std::make_unique<StubNodeDataModel>());
+  SECTION("just one node") {
+    auto &node = scene.createNode(std::make_unique<StubNodeDataModel>());
 
-    auto& ngo = *scene.nodeGraphicsObject(scene.model()->nodeIndex(node.id()));
+    auto &ngo = *scene.nodeGraphicsObject(scene.model()->nodeIndex(node.id()));
 
     QPointF scPosBefore = node.position();
 
@@ -57,12 +51,13 @@ TEST_CASE("Dragging node changes position", "[gui]")
     CAPTURE(scExpectedDelta);
 
     QTest::mouseMove(view.windowHandle(), vwClickPos);
-    QTest::mousePress(view.windowHandle(), Qt::LeftButton, Qt::NoModifier, vwClickPos);
+    QTest::mousePress(
+        view.windowHandle(), Qt::LeftButton, Qt::NoModifier, vwClickPos);
     QTest::mouseMove(view.windowHandle(), vwDestPos);
 
-    QPointF scDelta           = node.position() - scPosBefore;
-    QPoint roundDelta         = scDelta.toPoint();
-    QPoint roundExpectedDelta = scExpectedDelta.toPoint();
+    QPointF scDelta            = node.position() - scPosBefore;
+    QPoint  roundDelta         = scDelta.toPoint();
+    QPoint  roundExpectedDelta = scExpectedDelta.toPoint();
 
     CHECK(roundDelta == roundExpectedDelta);
   }

@@ -17,7 +17,9 @@ class NodeGraphicsObject;
 class NodeImp;
 class NodeData;
 
-class NODE_EDITOR_PUBLIC Node : public QObject, public Serializable {
+class NODE_EDITOR_PUBLIC Node
+    : public QObject
+    , public Serializable {
   Q_OBJECT
 
 public:
@@ -41,7 +43,7 @@ public:
 public:
   NodeImp *nodeImp() const;
 
-  std::vector<Connection *> const &connections(PortType pType,
+  std::vector<Connection *> const &connections(PortType  pType,
                                                PortIndex pIdx) const;
 
   std::vector<Connection *> &connections(PortType pType, PortIndex pIdx);
@@ -58,7 +60,7 @@ public slots: // data propagation
 
   /// Propagates incoming data to the underlying model.
   void propagateData(std::shared_ptr<NodeData> nodeData,
-                     PortIndex inPortIndex) const;
+                     PortIndex                 inPortIndex) const;
 
   /// Fetches data from model's OUT #index port
   /// and propagates it to the connection
@@ -78,9 +80,9 @@ private:
   QUuid _uid;
 
   // data
-  std::unique_ptr<NodeImp> nodeImp_;
+  std::unique_ptr<NodeImp>                       nodeImp_;
   std::map<PortIndex, std::vector<Connection *>> _inConnections;
   std::map<PortIndex, std::vector<Connection *>> _outConnections;
-  QPointF _pos;
+  QPointF                                        _pos;
 };
 } // namespace QtNodes

@@ -12,7 +12,7 @@ class ConnectionGraphicsObject;
 /// the operation is completed
 class NodeConnectionInteraction {
 public:
-  NodeConnectionInteraction(NodeIndex const &node,
+  NodeConnectionInteraction(NodeIndex const &         node,
                             ConnectionGraphicsObject &connection);
 
   /// Can connect when following conditions are met:
@@ -38,7 +38,7 @@ private:
 
   QPointF nodePortScenePosition(PortType portType, PortIndex portIndex) const;
 
-  PortIndex nodePortIndexUnderScenePoint(PortType portType,
+  PortIndex nodePortIndexUnderScenePoint(PortType       portType,
                                          QPointF const &p) const;
 
   bool nodePortIsEmpty(PortType portType, PortIndex portIndex) const;

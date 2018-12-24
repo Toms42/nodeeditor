@@ -6,7 +6,9 @@
 using QtNodes::ConnectionState;
 using QtNodes::NodeGraphicsObject;
 
-ConnectionState::~ConnectionState() { resetLastHoveredNode(); }
+ConnectionState::~ConnectionState() {
+  resetLastHoveredNode();
+}
 
 void ConnectionState::interactWithNode(NodeGraphicsObject *node) {
   if (node) {
@@ -27,7 +29,9 @@ void ConnectionState::resetLastHoveredNode() {
   _lastHoveredNode = nullptr;
 }
 
-void ConnectionState::setRequiredPort(PortType end) { _requiredPort = end; }
+void ConnectionState::setRequiredPort(PortType end) {
+  _requiredPort = end;
+}
 
 QtNodes::PortType ConnectionState::requiredPort() const {
   return _requiredPort;
@@ -37,7 +41,9 @@ bool ConnectionState::requiresPort() const {
   return _requiredPort != PortType::None;
 }
 
-void ConnectionState::setNoRequiredPort() { _requiredPort = PortType::None; }
+void ConnectionState::setNoRequiredPort() {
+  _requiredPort = PortType::None;
+}
 
 NodeGraphicsObject *ConnectionState::lastHoveredNode() const {
   return _lastHoveredNode;

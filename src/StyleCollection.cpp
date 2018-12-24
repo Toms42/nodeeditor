@@ -5,7 +5,9 @@ using QtNodes::FlowViewStyle;
 using QtNodes::NodeStyle;
 using QtNodes::StyleCollection;
 
-NodeStyle const &StyleCollection::nodeStyle() { return instance()._nodeStyle; }
+NodeStyle const &StyleCollection::nodeStyle() {
+  return instance()._nodeStyle;
+}
 
 ConnectionStyle const &StyleCollection::connectionStyle() {
   return instance()._connectionStyle;

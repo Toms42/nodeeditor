@@ -1,9 +1,8 @@
 #pragma once
 
-#include <iostream>
-
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
+#include <iostream>
 #include <nodes/DataModelRegistry.hpp>
 #include <nodes/NodeImp.hpp>
 

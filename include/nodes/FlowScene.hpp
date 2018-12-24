@@ -47,19 +47,24 @@ private slots:
 
   void nodeValidationUpdated(NodeIndex const &id);
 
-  void connectionRemoved(NodeIndex const &leftNode, PortIndex leftPortID,
-                         NodeIndex const &rightNode, PortIndex rightPortID);
+  void connectionRemoved(NodeIndex const &leftNode,
+                         PortIndex        leftPortID,
+                         NodeIndex const &rightNode,
+                         PortIndex        rightPortID);
 
-  void connectionAdded(NodeIndex const &leftNode, PortIndex leftPortID,
-                       NodeIndex const &rightNode, PortIndex rightPortID);
+  void connectionAdded(NodeIndex const &leftNode,
+                       PortIndex        leftPortID,
+                       NodeIndex const &rightNode,
+                       PortIndex        rightPortID);
 
   void nodeMoved(NodeIndex const &index);
 
   void updateNode(const NodeIndex &nodeIndex);
 
-  void updateConnection(const NodeIndex &leftNodeIndex, PortIndex leftPortIndex,
+  void updateConnection(const NodeIndex &leftNodeIndex,
+                        PortIndex        leftPortIndex,
                         const NodeIndex &rightNodeIndex,
-                        PortIndex rightPortIndex);
+                        PortIndex        rightPortIndex);
 
 private:
   FlowSceneModel *_model;
@@ -73,6 +78,7 @@ private:
   ConnectionGraphicsObject *_temporaryConn = nullptr;
 };
 
-NodeGraphicsObject *locateNodeAt(QPointF scenePoint, FlowScene &scene,
+NodeGraphicsObject *locateNodeAt(QPointF           scenePoint,
+                                 FlowScene &       scene,
                                  QTransform const &viewTransform);
 } // namespace QtNodes

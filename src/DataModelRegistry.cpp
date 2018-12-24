@@ -8,7 +8,9 @@ using QtNodes::DataModelRegistry;
 using QtNodes::NodeDataType;
 using QtNodes::TypeConverter;
 
-DataModelRegistry::DataModelRegistry() { registerModel<FrameImp>(); }
+DataModelRegistry::DataModelRegistry() {
+  registerModel<FrameImp>();
+}
 
 std::unique_ptr<QtNodes::NodeImp>
 DataModelRegistry::create(QString const &modelName) {

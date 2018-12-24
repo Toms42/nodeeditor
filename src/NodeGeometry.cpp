@@ -4,55 +4,85 @@
 #include "NodeIndex.hpp"
 #include "PortType.hpp"
 #include "StyleCollection.hpp"
+#include "checker.hpp"
 #include <QWidget>
 #include <cmath>
 #include <iostream>
 
-#include "checker.hpp"
-
 namespace QtNodes {
 
-unsigned int NodeGeometry::height() const { return _height; }
+unsigned int NodeGeometry::height() const {
+  return _height;
+}
 
 void NodeGeometry::setHeight(unsigned int h) {
   _obj.prepareGeometryChange();
   _height = h;
 }
 
-unsigned int NodeGeometry::width() const { return _width; }
+unsigned int NodeGeometry::width() const {
+  return _width;
+}
 
 void NodeGeometry::setWidth(unsigned int w) {
   _obj.prepareGeometryChange();
   _width = w;
 }
 
-unsigned int NodeGeometry::entryHeight() const { return _entryHeight; }
+unsigned int NodeGeometry::entryHeight() const {
+  return _entryHeight;
+}
 
-void NodeGeometry::setEntryHeight(unsigned int h) { _entryHeight = h; }
+void NodeGeometry::setEntryHeight(unsigned int h) {
+  _entryHeight = h;
+}
 
-unsigned int NodeGeometry::entryWidth() const { return _entryWidth; }
+unsigned int NodeGeometry::entryWidth() const {
+  return _entryWidth;
+}
 
-void NodeGeometry::setEntryWidth(unsigned int w) { _entryWidth = w; }
+void NodeGeometry::setEntryWidth(unsigned int w) {
+  _entryWidth = w;
+}
 
-unsigned int NodeGeometry::spacing() const { return _spacing; }
+unsigned int NodeGeometry::spacing() const {
+  return _spacing;
+}
 
-void NodeGeometry::setSpacing(unsigned int s) { _spacing = s; }
+void NodeGeometry::setSpacing(unsigned int s) {
+  _spacing = s;
+}
 
-bool NodeGeometry::hovered() const { return _hovered; }
+bool NodeGeometry::hovered() const {
+  return _hovered;
+}
 
-void NodeGeometry::setHovered(unsigned int h) { _hovered = h; }
+void NodeGeometry::setHovered(unsigned int h) {
+  _hovered = h;
+}
 
-QPointF const &NodeGeometry::draggingPos() const { return _draggingPos; }
+QPointF const &NodeGeometry::draggingPos() const {
+  return _draggingPos;
+}
 
 void NodeGeometry::setDraggingPosition(QPointF const &pos) {
   _draggingPos = pos;
 }
 
 NodeGeometry::NodeGeometry(const NodeIndex &index, NodeGraphicsObject &obj)
-    : _obj{obj}, _width(100), _height(150), _entryWidth(0), _inputPortWidth(70),
-      _outputPortWidth(70), _entryHeight(0), _spacing(20), _hovered(false),
-      _draggingPos(-1000, -1000), _nodeIndex(index), _fontMetrics(QFont()),
-      _boldFontMetrics(QFont()) {
+    : _obj{obj}
+    , _width(100)
+    , _height(150)
+    , _entryWidth(0)
+    , _inputPortWidth(70)
+    , _outputPortWidth(70)
+    , _entryHeight(0)
+    , _spacing(20)
+    , _hovered(false)
+    , _draggingPos(-1000, -1000)
+    , _nodeIndex(index)
+    , _fontMetrics(QFont())
+    , _boldFontMetrics(QFont()) {
   QFont f;
   f.setBold(true);
 
@@ -77,8 +107,8 @@ unsigned int NodeGeometry::nSinks() const {
 QRectF NodeGeometry::entryBoundingRect() const {
   double const addon = 0.0;
 
-  return QRectF(0 - addon, 0 - addon, _entryWidth + 2 * addon,
-                _entryHeight + 2 * addon);
+  return QRectF(
+      0 - addon, 0 - addon, _entryWidth + 2 * addon, _entryHeight + 2 * addon);
 }
 
 QRectF NodeGeometry::boundingRect() const {
@@ -96,8 +126,8 @@ void NodeGeometry::recalculateSize() const {
 
   {
     unsigned int maxNumOfEntries = std::max(nSinks(), nSources());
-    unsigned int step = _entryHeight + _spacing;
-    _height = step * maxNumOfEntries;
+    unsigned int step            = _entryHeight + _spacing;
+    _height                      = step * maxNumOfEntries;
   }
 
   if (auto w = _nodeIndex.model()->nodeWidget(_nodeIndex)) {
@@ -106,7 +136,7 @@ void NodeGeometry::recalculateSize() const {
 
   _height += captionHeight();
 
-  _inputPortWidth = portWidth(PortType::In);
+  _inputPortWidth  = portWidth(PortType::In);
   _outputPortWidth = portWidth(PortType::Out);
 
   _width = _inputPortWidth + _outputPortWidth + 2 * _spacing;
@@ -126,21 +156,22 @@ void NodeGeometry::recalculateSize() const {
 
 void NodeGeometry::recalculateSize(QFont const &font) const {
   QFontMetrics fontMetrics(font);
-  QFont boldFont = font;
+  QFont        boldFont = font;
 
   boldFont.setBold(true);
 
   QFontMetrics boldFontMetrics(boldFont);
 
   if (_boldFontMetrics != boldFontMetrics) {
-    _fontMetrics = fontMetrics;
+    _fontMetrics     = fontMetrics;
     _boldFontMetrics = boldFontMetrics;
 
     recalculateSize();
   }
 }
 
-QPointF NodeGeometry::portScenePosition(PortIndex index, PortType portType,
+QPointF NodeGeometry::portScenePosition(PortIndex         index,
+                                        PortType          portType,
                                         QTransform const &t) const {
   auto const &nodeStyle = StyleCollection::nodeStyle();
 
@@ -186,7 +217,8 @@ QPointF NodeGeometry::portScenePosition(PortIndex index, PortType portType,
 }
 
 PortIndex
-NodeGeometry::checkHitScenePoint(PortType portType, QPointF const scenePoint,
+NodeGeometry::checkHitScenePoint(PortType          portType,
+                                 QPointF const     scenePoint,
                                  QTransform const &sceneTransform) const {
   auto const &nodeStyle = StyleCollection::nodeStyle();
 
@@ -202,8 +234,8 @@ NodeGeometry::checkHitScenePoint(PortType portType, QPointF const scenePoint,
   for (auto i : items) {
     auto pp = portScenePosition(i, portType, sceneTransform);
 
-    QPointF p = pp - scenePoint;
-    auto distance = std::sqrt(QPointF::dotProduct(p, p));
+    QPointF p        = pp - scenePoint;
+    auto    distance = std::sqrt(QPointF::dotProduct(p, p));
 
     if (distance < tolerance) {
       result = PortIndex(i);
@@ -238,14 +270,12 @@ QPointF NodeGeometry::widgetPosition() const {
 }
 
 unsigned int NodeGeometry::captionHeight() const {
-
   QString name = _nodeIndex.model()->nodeCaption(_nodeIndex);
 
   return _boldFontMetrics.boundingRect(name).height();
 }
 
 unsigned int NodeGeometry::captionWidth() const {
-
   QString name = _nodeIndex.model()->nodeCaption(_nodeIndex);
 
   return _boldFontMetrics.boundingRect(name).width();
@@ -264,10 +294,13 @@ unsigned int NodeGeometry::validationWidth() const {
 }
 
 QPointF NodeGeometry::calculateNodePositionBetweenNodePorts(
-    PortIndex targetPortIndex, PortType targetPort,
-    const NodeGraphicsObject &targetNode, PortIndex sourcePortIndex,
-    PortType sourcePort, const NodeGraphicsObject &sourceNode,
-    const NodeGeometry &newNodeGeom) {
+    PortIndex                 targetPortIndex,
+    PortType                  targetPort,
+    const NodeGraphicsObject &targetNode,
+    PortIndex                 sourcePortIndex,
+    PortType                  sourcePort,
+    const NodeGraphicsObject &sourceNode,
+    const NodeGeometry &      newNodeGeom) {
   // Calculating the nodes position in the scene. It'll be positioned half way
   // between the two ports that it "connects". The first line calculates the
   // halfway point between the ports (node position + port position on the node

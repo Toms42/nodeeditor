@@ -10,7 +10,6 @@
 #include "StyleCollection.hpp"
 #include <QtCore/QMargins>
 #include <cmath>
-
 #include <iostream>
 
 using QtNodes::ConnectionPolicy;
@@ -20,7 +19,7 @@ using QtNodes::NodeIndex;
 using QtNodes::NodePainter;
 using QtNodes::NodeState;
 
-void NodePainter::paint(QPainter *painter,
+void NodePainter::paint(QPainter *                painter,
                         NodeGraphicsObject const &graphicsObject) {
   NodeGeometry const &geom = graphicsObject.geometry();
 
@@ -46,16 +45,16 @@ void NodePainter::paint(QPainter *painter,
   if (auto painterDelegate =
           graphicsObject.index().model()->nodePainterDelegate(
               graphicsObject.index())) {
-    painterDelegate->paint(painter, graphicsObject.geometry(),
-                           graphicsObject.index());
+    painterDelegate->paint(
+        painter, graphicsObject.geometry(), graphicsObject.index());
   }
 }
 
-void NodePainter::drawNodeRect(QPainter *painter,
+void NodePainter::drawNodeRect(QPainter *                painter,
                                NodeGraphicsObject const &graphicsObject) {
-  FlowSceneModel &model = *graphicsObject.flowScene().model();
-  NodeStyle const &nodeStyle = model.nodeStyle(graphicsObject.index());
-  NodeGeometry const &geom = graphicsObject.geometry();
+  FlowSceneModel &    model     = *graphicsObject.flowScene().model();
+  NodeStyle const &   nodeStyle = model.nodeStyle(graphicsObject.index());
+  NodeGeometry const &geom      = graphicsObject.geometry();
 
   auto color = graphicsObject.isSelected() ? nodeStyle.SelectedBoundaryColor
                                            : nodeStyle.NormalBoundaryColor;
@@ -79,8 +78,8 @@ void NodePainter::drawNodeRect(QPainter *painter,
 
   float diam = nodeStyle.ConnectionPointDiameter;
 
-  QRectF boundary(-diam, -diam, 2.0 * diam + geom.width(),
-                  2.0 * diam + geom.height());
+  QRectF boundary(
+      -diam, -diam, 2.0 * diam + geom.width(), 2.0 * diam + geom.height());
 
   double const radius = 3.0;
 
@@ -89,14 +88,14 @@ void NodePainter::drawNodeRect(QPainter *painter,
 
 void NodePainter::drawConnectionPoints(
     QPainter *painter, NodeGraphicsObject const &graphicsObject) {
-  const FlowSceneModel &model = *graphicsObject.flowScene().model();
-  NodeStyle const &nodeStyle = model.nodeStyle(graphicsObject.index());
-  auto const &connectionStyle = StyleCollection::connectionStyle();
-  NodeState const &state = graphicsObject.nodeState();
-  NodeGeometry const &geom = graphicsObject.geometry();
+  const FlowSceneModel &model     = *graphicsObject.flowScene().model();
+  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.index());
+  auto const &          connectionStyle = StyleCollection::connectionStyle();
+  NodeState const &     state           = graphicsObject.nodeState();
+  NodeGeometry const &  geom            = graphicsObject.geometry();
 
-  float diameter = nodeStyle.ConnectionPointDiameter;
-  auto reducedDiameter = diameter * 0.6;
+  float diameter        = nodeStyle.ConnectionPointDiameter;
+  auto  reducedDiameter = diameter * 0.6;
 
   for (PortType portType : {PortType::Out, PortType::In}) {
     for (auto &i : state.getEntries(portType)) {
@@ -114,10 +113,9 @@ void NodePainter::drawConnectionPoints(
       double r = 1.0;
       if (state.isReacting() && canConnect &&
           portType == state.reactingPortType()) {
-
-        auto diff = geom.draggingPos() - p;
-        double dist = std::sqrt(QPointF::dotProduct(diff, diff));
-        bool typeConvertable = false;
+        auto   diff            = geom.draggingPos() - p;
+        double dist            = std::sqrt(QPointF::dotProduct(diff, diff));
+        bool   typeConvertable = false;
 
         {
           if (portType == PortType::In) {
@@ -131,10 +129,10 @@ void NodePainter::drawConnectionPoints(
 
         if (state.reactingDataType().id == dataType.id || typeConvertable) {
           double const thres = 40.0;
-          r = (dist < thres) ? (2.0 - dist / thres) : 1.0;
+          r                  = (dist < thres) ? (2.0 - dist / thres) : 1.0;
         } else {
           double const thres = 80.0;
-          r = (dist < thres) ? (dist / thres) : 1.0;
+          r                  = (dist < thres) ? (dist / thres) : 1.0;
         }
       }
 
@@ -151,11 +149,11 @@ void NodePainter::drawConnectionPoints(
 
 void NodePainter::drawFilledConnectionPoints(
     QPainter *painter, NodeGraphicsObject const &graphicsObject) {
-  FlowSceneModel const &model = *graphicsObject.index().model();
-  NodeStyle const &nodeStyle = model.nodeStyle(graphicsObject.index());
-  auto const &connectionStyle = StyleCollection::connectionStyle();
-  NodeState const &state = graphicsObject.nodeState();
-  NodeGeometry const &geom = graphicsObject.geometry();
+  FlowSceneModel const &model     = *graphicsObject.index().model();
+  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.index());
+  auto const &          connectionStyle = StyleCollection::connectionStyle();
+  NodeState const &     state           = graphicsObject.nodeState();
+  NodeGeometry const &  geom            = graphicsObject.geometry();
 
   auto diameter = nodeStyle.ConnectionPointDiameter;
 
@@ -182,11 +180,11 @@ void NodePainter::drawFilledConnectionPoints(
   }
 }
 
-void NodePainter::drawModelName(QPainter *painter,
+void NodePainter::drawModelName(QPainter *                painter,
                                 NodeGraphicsObject const &graphicsObject) {
-  FlowSceneModel const &model = *graphicsObject.index().model();
-  NodeStyle const &nodeStyle = model.nodeStyle(graphicsObject.index());
-  NodeGeometry const &geom = graphicsObject.geometry();
+  FlowSceneModel const &model     = *graphicsObject.index().model();
+  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.index());
+  NodeGeometry const &  geom      = graphicsObject.geometry();
 
   QString const &name = model.nodeCaption(graphicsObject.index());
 
@@ -199,8 +197,8 @@ void NodePainter::drawModelName(QPainter *painter,
   f.setBold(true);
 
   QFontMetrics metrics(f);
-  auto rect = metrics.boundingRect(name);
-  QPointF position((geom.width() - rect.width()) / 2.0,
+  auto         rect = metrics.boundingRect(name);
+  QPointF      position((geom.width() - rect.width()) / 2.0,
                    (geom.spacing() + geom.entryHeight()) / 3.0);
 
   painter->setFont(f);
@@ -211,12 +209,12 @@ void NodePainter::drawModelName(QPainter *painter,
   painter->setFont(f);
 }
 
-void NodePainter::drawEntryLabels(QPainter *painter,
+void NodePainter::drawEntryLabels(QPainter *                painter,
                                   NodeGraphicsObject const &graphicsObject) {
-  NodeState const &state = graphicsObject.nodeState();
-  NodeGeometry const &geom = graphicsObject.geometry();
-  FlowSceneModel const &model = *graphicsObject.index().model();
-  QFontMetrics const &metrics = painter->fontMetrics();
+  NodeState const &     state   = graphicsObject.nodeState();
+  NodeGeometry const &  geom    = graphicsObject.geometry();
+  FlowSceneModel const &model   = *graphicsObject.index().model();
+  QFontMetrics const &  metrics = painter->fontMetrics();
 
   for (PortType portType : {PortType::Out, PortType::In}) {
     auto const &nodeStyle = model.nodeStyle(graphicsObject.index());
@@ -261,7 +259,7 @@ void NodePainter::drawEntryLabels(QPainter *painter,
   }
 }
 
-void NodePainter::drawResizeRect(QPainter *painter,
+void NodePainter::drawResizeRect(QPainter *                painter,
                                  NodeGraphicsObject const &graphicsObject) {
   FlowSceneModel const &model = *graphicsObject.index().model();
 
@@ -272,10 +270,10 @@ void NodePainter::drawResizeRect(QPainter *painter,
   }
 }
 
-void NodePainter::drawValidationRect(QPainter *painter,
+void NodePainter::drawValidationRect(QPainter *                painter,
                                      NodeGraphicsObject const &graphicsObject) {
   FlowSceneModel const &model = *graphicsObject.index().model();
-  NodeGeometry const &geom = graphicsObject.geometry();
+  NodeGeometry const &  geom  = graphicsObject.geometry();
 
   auto modelValidationState = model.nodeValidationState(graphicsObject.index());
 
@@ -304,7 +302,8 @@ void NodePainter::drawValidationRect(QPainter *painter,
 
     float diam = nodeStyle.ConnectionPointDiameter;
 
-    QRectF boundary(-diam, -diam + geom.height() - geom.validationHeight(),
+    QRectF boundary(-diam,
+                    -diam + geom.height() - geom.validationHeight(),
                     2.0 * diam + geom.width(),
                     2.0 * diam + geom.validationHeight());
 

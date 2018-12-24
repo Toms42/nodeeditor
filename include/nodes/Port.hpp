@@ -13,10 +13,12 @@ namespace QtNodes {
 class NodeData;
 
 struct NODE_EDITOR_PUBLIC Port final {
-  Port() : captionVisible{true}, policy{ConnectionPolicy::Many} {}
+  Port()
+      : captionVisible{true}
+      , policy{ConnectionPolicy::Many} {}
 
-  QString caption;
-  bool captionVisible;
+  QString               caption;
+  bool                  captionVisible;
   QtNodes::NodeDataType dataType;
 
   /**\brief by default Many

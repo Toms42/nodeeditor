@@ -1,35 +1,29 @@
-#include <nodes/NodeData>
-#include <nodes/DataFlowScene>
-#include <nodes/FlowView>
-#include <nodes/ConnectionStyle>
-#include <nodes/TypeConverter>
-
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QMenuBar>
-
-#include <nodes/DataModelRegistry>
-
-#include "NumberSourceDataModel.hpp"
-#include "NumberDisplayDataModel.hpp"
 #include "AdditionModel.hpp"
-#include "SubtractionModel.hpp"
-#include "MultiplicationModel.hpp"
+#include "Converters.hpp"
 #include "DivisionModel.hpp"
 #include "ModuloModel.hpp"
-#include "Converters.hpp"
+#include "MultiplicationModel.hpp"
+#include "NumberDisplayDataModel.hpp"
+#include "NumberSourceDataModel.hpp"
+#include "SubtractionModel.hpp"
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QVBoxLayout>
+#include <nodes/ConnectionStyle>
+#include <nodes/DataFlowScene>
+#include <nodes/DataModelRegistry>
+#include <nodes/FlowView>
+#include <nodes/NodeData>
+#include <nodes/TypeConverter>
 
-
-using QtNodes::DataModelRegistry;
-using QtNodes::DataFlowScene;
-using QtNodes::FlowView;
 using QtNodes::ConnectionStyle;
+using QtNodes::DataFlowScene;
+using QtNodes::DataModelRegistry;
+using QtNodes::FlowView;
 using QtNodes::TypeConverter;
 using QtNodes::TypeConverterId;
 
-static std::shared_ptr<DataModelRegistry>
-registerDataModels()
-{
+static std::shared_ptr<DataModelRegistry> registerDataModels() {
   auto ret = std::make_shared<DataModelRegistry>();
   ret->registerModel<NumberSourceDataModel>("Sources");
 
@@ -45,26 +39,20 @@ registerDataModels()
 
   ret->registerModel<ModuloModel>("Operators");
 
-  ret->registerTypeConverter(std::make_pair(DecimalData().type(),
-                                            IntegerData().type()),
-                             TypeConverter{DecimalToIntegerConverter()});
+  ret->registerTypeConverter(
+      std::make_pair(DecimalData().type(), IntegerData().type()),
+      TypeConverter{DecimalToIntegerConverter()});
 
-
-
-  ret->registerTypeConverter(std::make_pair(IntegerData().type(),
-                                            DecimalData().type()),
-                             TypeConverter{IntegerToDecimalConverter()});
+  ret->registerTypeConverter(
+      std::make_pair(IntegerData().type(), DecimalData().type()),
+      TypeConverter{IntegerToDecimalConverter()});
 
   return ret;
 }
 
-
-static
-void
-setStyle()
-{
+static void setStyle() {
   ConnectionStyle::setConnectionStyle(
-  R"(
+      R"(
   {
     "ConnectionStyle": {
       "ConstructionColor": "gray",
@@ -83,10 +71,7 @@ setStyle()
   )");
 }
 
-
-int
-main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
   setStyle();
@@ -105,11 +90,11 @@ main(int argc, char *argv[])
   l->setContentsMargins(0, 0, 0, 0);
   l->setSpacing(0);
 
-  QObject::connect(saveAction, &QAction::triggered,
-                   scene, &DataFlowScene::save);
+  QObject::connect(
+      saveAction, &QAction::triggered, scene, &DataFlowScene::save);
 
-  QObject::connect(loadAction, &QAction::triggered,
-                   scene, &DataFlowScene::load);
+  QObject::connect(
+      loadAction, &QAction::triggered, scene, &DataFlowScene::load);
 
   mainWidget.setWindowTitle("Dataflow tools: simplest calculator");
   mainWidget.resize(800, 600);

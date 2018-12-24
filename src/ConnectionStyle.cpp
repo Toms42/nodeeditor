@@ -1,20 +1,18 @@
 #include "ConnectionStyle.hpp"
-
-#include <iostream>
-
+#include "StyleCollection.hpp"
+#include <QDebug>
 #include <QtCore/QFile>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValueRef>
-
-#include <QDebug>
-
-#include "StyleCollection.hpp"
+#include <iostream>
 
 using QtNodes::ConnectionStyle;
 
-inline void initResources() { Q_INIT_RESOURCE(resources); }
+inline void initResources() {
+  Q_INIT_RESOURCE(resources);
+}
 
 ConnectionStyle::ConnectionStyle() {
   // Explicit resources inialization for preventing the static initialization
@@ -38,13 +36,13 @@ void ConnectionStyle::setConnectionStyle(QString jsonText) {
 }
 
 #ifdef STYLE_DEBUG
-#define CONNECTION_STYLE_CHECK_UNDEFINED_VALUE(v, variable)                    \
-  {                                                                            \
-    if (v.type() == QJsonValue::Undefined || v.type() == QJsonValue::Null)     \
-      qWarning() << "Undefined value for parameter:" << #variable;             \
-  }
+#  define CONNECTION_STYLE_CHECK_UNDEFINED_VALUE(v, variable)                  \
+    {                                                                          \
+      if (v.type() == QJsonValue::Undefined || v.type() == QJsonValue::Null)   \
+        qWarning() << "Undefined value for parameter:" << #variable;           \
+    }
 #else
-#define CONNECTION_STYLE_CHECK_UNDEFINED_VALUE(v, variable)
+#  define CONNECTION_STYLE_CHECK_UNDEFINED_VALUE(v, variable)
 #endif
 
 #define CONNECTION_VALUE_EXISTS(v)                                             \
@@ -56,7 +54,7 @@ void ConnectionStyle::setConnectionStyle(QString jsonText) {
     CONNECTION_STYLE_CHECK_UNDEFINED_VALUE(valueRef, variable)                 \
     if (CONNECTION_VALUE_EXISTS(valueRef)) {                                   \
       if (valueRef.isArray()) {                                                \
-        auto colorArray = valueRef.toArray();                                  \
+        auto             colorArray = valueRef.toArray();                      \
         std::vector<int> rgb;                                                  \
         rgb.reserve(3);                                                        \
         for (auto it = colorArray.begin(); it != colorArray.end(); ++it) {     \
@@ -123,9 +121,13 @@ void ConnectionStyle::loadJsonFromByteArray(QByteArray const &byteArray) {
   CONNECTION_STYLE_READ_BOOL(obj, UseDataDefinedColors);
 }
 
-QColor ConnectionStyle::constructionColor() const { return ConstructionColor; }
+QColor ConnectionStyle::constructionColor() const {
+  return ConstructionColor;
+}
 
-QColor ConnectionStyle::normalColor() const { return NormalColor; }
+QColor ConnectionStyle::normalColor() const {
+  return NormalColor;
+}
 
 QColor ConnectionStyle::normalColor(QString typeId) const {
   std::size_t hash = qHash(typeId);
@@ -140,19 +142,29 @@ QColor ConnectionStyle::normalColor(QString typeId) const {
   return QColor::fromHsl(hue, sat, 160);
 }
 
-QColor ConnectionStyle::selectedColor() const { return SelectedColor; }
+QColor ConnectionStyle::selectedColor() const {
+  return SelectedColor;
+}
 
-QColor ConnectionStyle::selectedHaloColor() const { return SelectedHaloColor; }
+QColor ConnectionStyle::selectedHaloColor() const {
+  return SelectedHaloColor;
+}
 
-QColor ConnectionStyle::hoveredColor() const { return HoveredColor; }
+QColor ConnectionStyle::hoveredColor() const {
+  return HoveredColor;
+}
 
-float ConnectionStyle::lineWidth() const { return LineWidth; }
+float ConnectionStyle::lineWidth() const {
+  return LineWidth;
+}
 
 float ConnectionStyle::constructionLineWidth() const {
   return ConstructionLineWidth;
 }
 
-float ConnectionStyle::pointDiameter() const { return PointDiameter; }
+float ConnectionStyle::pointDiameter() const {
+  return PointDiameter;
+}
 
 bool ConnectionStyle::useDataDefinedColors() const {
   return UseDataDefinedColors;

@@ -1,5 +1,4 @@
 #include "ConnectionBlurEffect.hpp"
-
 #include "ConnectionGraphicsObject.hpp"
 #include "ConnectionPainter.hpp"
 

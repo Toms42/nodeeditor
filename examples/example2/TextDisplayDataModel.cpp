@@ -4,10 +4,10 @@ TextDisplayDataModel::TextDisplayDataModel()
     : _label(new QLabel("Resulting Text")) {
   _label->setMargin(3);
   QtNodes::Port port;
-  port.caption = "in caption";
+  port.caption        = "in caption";
   port.captionVisible = true;
-  port.dataType = TextData().type();
-  port.handle = [this](std::shared_ptr<NodeData> in) {
+  port.dataType       = TextData().type();
+  port.handle         = [this](std::shared_ptr<NodeData> in) {
     auto data = std::dynamic_pointer_cast<TextData>(in);
     if (data) {
       _label->setText(data->text());

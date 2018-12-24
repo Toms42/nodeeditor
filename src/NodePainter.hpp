@@ -15,29 +15,29 @@ public:
   NodePainter();
 
 public:
-  static void paint(QPainter *painter,
+  static void paint(QPainter *                painter,
                     NodeGraphicsObject const &graphicsObject);
 
-  static void drawNodeRect(QPainter *painter,
+  static void drawNodeRect(QPainter *                painter,
                            NodeGraphicsObject const &graphicsObject);
 
-  static void drawModelName(QPainter *painter,
+  static void drawModelName(QPainter *                painter,
                             NodeGraphicsObject const &graphicsObject);
 
-  static void drawEntryLabels(QPainter *painter,
+  static void drawEntryLabels(QPainter *                painter,
                               NodeGraphicsObject const &graphicsObject);
 
-  static void drawConnectionPoints(QPainter *painter,
+  static void drawConnectionPoints(QPainter *                painter,
                                    NodeGraphicsObject const &graphicsObject);
 
   static void
-  drawFilledConnectionPoints(QPainter *painter,
+  drawFilledConnectionPoints(QPainter *                painter,
                              NodeGraphicsObject const &graphicsObject);
 
-  static void drawResizeRect(QPainter *painter,
+  static void drawResizeRect(QPainter *                painter,
                              NodeGraphicsObject const &graphicsObject);
 
-  static void drawValidationRect(QPainter *painter,
+  static void drawValidationRect(QPainter *                painter,
                                  NodeGraphicsObject const &graphicsObject);
 };
 } // namespace QtNodes

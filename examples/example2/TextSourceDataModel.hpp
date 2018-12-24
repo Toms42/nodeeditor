@@ -1,13 +1,10 @@
 #pragma once
 
+#include "TextData.hpp"
 #include <QtCore/QObject>
 #include <QtWidgets/QLineEdit>
-
-#include "TextData.hpp"
-
-#include <nodes/NodeImp.hpp>
-
 #include <iostream>
+#include <nodes/NodeImp.hpp>
 
 using QtNodes::NodeData;
 using QtNodes::NodeImp;

@@ -1,13 +1,10 @@
-#include <nodes/DataFlowScene.hpp>
-#include <nodes/FlowView.hpp>
-#include <nodes/NodeData.hpp>
-
-#include <QtWidgets/QApplication>
-
-#include <nodes/DataModelRegistry.hpp>
-
 #include "TextDisplayDataModel.hpp"
 #include "TextSourceDataModel.hpp"
+#include <QtWidgets/QApplication>
+#include <nodes/DataFlowScene.hpp>
+#include <nodes/DataModelRegistry.hpp>
+#include <nodes/FlowView.hpp>
+#include <nodes/NodeData.hpp>
 
 using QtNodes::DataFlowScene;
 using QtNodes::DataModelRegistry;

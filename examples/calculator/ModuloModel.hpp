@@ -2,101 +2,73 @@
 
 #include <QtCore/QObject>
 #include <QtWidgets/QLineEdit>
-
+#include <iostream>
 #include <nodes/NodeDataModel>
 
-#include <iostream>
-
-using QtNodes::PortType;
-using QtNodes::PortIndex;
 using QtNodes::NodeData;
-using QtNodes::NodeDataType;
 using QtNodes::NodeDataModel;
+using QtNodes::NodeDataType;
 using QtNodes::NodeValidationState;
+using QtNodes::PortIndex;
+using QtNodes::PortType;
 
 class IntegerData;
 
-class ModuloModel
-  : public NodeDataModel
-{
+class ModuloModel : public NodeDataModel {
   Q_OBJECT
 
 public:
   ModuloModel() = default;
 
-  virtual
-  ~ModuloModel() = default;
+  virtual ~ModuloModel() = default;
 
 public:
+  QString caption() const override { return QStringLiteral("Modulo"); }
 
-  QString
-  caption() const override
-  { return QStringLiteral("Modulo"); }
+  bool captionVisible() const override { return true; }
 
-  bool
-  captionVisible() const override
-  { return true; }
+  bool portCaptionVisible(PortType, PortIndex) const override { return true; }
 
-  bool
-  portCaptionVisible(PortType, PortIndex ) const override
-  { return true; }
+  QString portCaption(PortType portType, PortIndex portIndex) const override {
+    switch (portType) {
+    case PortType::In:
+      if (portIndex == 0)
+        return QStringLiteral("Dividend");
+      else if (portIndex == 1)
+        return QStringLiteral("Divisor");
 
-  QString
-  portCaption(PortType portType, PortIndex portIndex) const override
-  {
-    switch (portType)
-    {
-      case PortType::In:
-        if (portIndex == 0)
-          return QStringLiteral("Dividend");
-        else if (portIndex == 1)
-          return QStringLiteral("Divisor");
+      break;
 
-        break;
+    case PortType::Out:
+      return QStringLiteral("Result");
 
-      case PortType::Out:
-        return QStringLiteral("Result");
-
-      default:
-        break;
+    default:
+      break;
     }
     return QString();
   }
 
-  QString
-  name() const override
-  { return QStringLiteral("Modulo"); }
+  QString name() const override { return QStringLiteral("Modulo"); }
 
 public:
-
-  QJsonObject
-  save() const override;
+  QJsonObject save() const override;
 
 public:
+  unsigned int nPorts(PortType portType) const override;
 
-  unsigned int
-  nPorts(PortType portType) const override;
+  NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
 
-  NodeDataType
-  dataType(PortType portType, PortIndex portIndex) const override;
+  std::shared_ptr<NodeData> outData(PortIndex port) override;
 
-  std::shared_ptr<NodeData>
-  outData(PortIndex port) override;
+  void setInData(std::shared_ptr<NodeData>, int) override;
 
-  void
-  setInData(std::shared_ptr<NodeData>, int) override;
+  QWidget *embeddedWidget() override { return nullptr; }
 
-  QWidget *
-  embeddedWidget() override { return nullptr; }
+  NodeValidationState validationState() const override;
 
-  NodeValidationState
-  validationState() const override;
-
-  QString
-  validationMessage() const override;
+  QString validationMessage() const override;
 
 private:
-
   std::weak_ptr<IntegerData> _number1;
   std::weak_ptr<IntegerData> _number2;
 

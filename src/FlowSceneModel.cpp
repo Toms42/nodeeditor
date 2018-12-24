@@ -40,7 +40,7 @@ bool FlowSceneModel::removeNodeWithConnections(NodeIndex const &index) {
 }
 
 NodeIndex FlowSceneModel::createIndex(const QUuid &id,
-                                      void *internalPointer) const {
+                                      void *       internalPointer) const {
   return NodeIndex(id, internalPointer, this);
 }
 

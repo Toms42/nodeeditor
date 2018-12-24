@@ -21,7 +21,8 @@ public:
 
   /**\brief void method
    */
-  void reactToPossibleConnection(PortType portType, NodeDataType dataType,
+  void reactToPossibleConnection(PortType       portType,
+                                 NodeDataType   dataType,
                                  const QPointF &scenePoint) override;
 
   /**\brief void method
@@ -29,7 +30,7 @@ public:
   void resetReactionToConnection() override;
 
   QVariant itemChange(GraphicsItemChange change,
-                      const QVariant &value) override;
+                      const QVariant &   value) override;
 
   /**\brief void method
    */
@@ -51,7 +52,5 @@ protected:
   void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
   void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
-
-  void embedQWidget() override;
 };
 }; // namespace QtNodes
