@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_IMAGESHOWMODEL_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_IMAGESHOWMODEL_HPP
+
 #pragma once
 
 #include <QtCore/QObject>
@@ -21,7 +24,7 @@ class ImageShowModel : public NodeImp {
 public:
   ImageShowModel();
 
-  virtual ~ImageShowModel();
+  ~ImageShowModel() override;
 
 public:
   QString name() const override { return QString("ImageShowModel"); }
@@ -41,3 +44,5 @@ private:
 
   std::shared_ptr<NodeData> _nodeData;
 };
+
+#endif

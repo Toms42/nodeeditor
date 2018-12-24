@@ -1,3 +1,6 @@
+#ifndef NODES_NODESTATE_HPP
+#define NODES_NODESTATE_HPP
+
 #pragma once
 
 #include "Export.hpp"
@@ -81,3 +84,5 @@ private:
   bool _resizing;
 };
 } // namespace QtNodes
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef NODES_NODEGRAPHICSOBJECT_HPP
+#define NODES_NODEGRAPHICSOBJECT_HPP
+
 #pragma once
 
 #include "NodeGeometry.hpp"
@@ -27,7 +30,7 @@ class NODE_EDITOR_PUBLIC NodeGraphicsObject : public QGraphicsObject {
 public:
   NodeGraphicsObject(FlowScene &scene, NodeIndex const &index);
 
-  virtual ~NodeGraphicsObject();
+  ~NodeGraphicsObject() override;
 
   NodeIndex index() const;
 
@@ -43,7 +46,7 @@ public:
 
   NodeState const &nodeState() const;
 
-  virtual QRectF boundingRect() const override;
+  QRectF boundingRect() const override;
 
   /// Visits all attached connections and corrects
   /// their corresponding end points.
@@ -56,7 +59,7 @@ public:
 
   enum { Node = UserType + 1, Frame };
 
-  virtual int type() const override { return Node; }
+  int type() const override { return Node; }
 
   void lock(bool locked);
 
@@ -65,28 +68,28 @@ public:
   void checkParent();
 
 protected:
-  virtual void paint(QPainter *                      painter,
-                     QStyleOptionGraphicsItem const *option,
-                     QWidget *                       widget = 0) override;
+  void paint(QPainter *                      painter,
+             QStyleOptionGraphicsItem const *option,
+             QWidget *                       widget = nullptr) override;
 
-  virtual QVariant itemChange(GraphicsItemChange change,
-                              const QVariant &   value) override;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant &   value) override;
 
-  virtual void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+  void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
-  virtual void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
+  void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
 
-  virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
-  virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+  void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
 
-  virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+  void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
-  virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *) override;
+  void hoverMoveEvent(QGraphicsSceneHoverEvent *) override;
 
-  virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
+  void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override;
 
-  virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 
 private:
   void embedQWidget();
@@ -106,3 +109,5 @@ protected:
   QGraphicsProxyWidget *_proxyWidget;
 };
 } // namespace QtNodes
+
+#endif

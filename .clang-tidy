@@ -9,9 +9,7 @@ Checks:          'clang-diagnostic-*,clang-analyzer-*,
                   modernize-use-equals-delete,
                   modernize-use-nullptr,
                   modernize-use-override,
-                  readability-*,
-                  misc-*,
-                  llvm-*
+                  misc-*
                   '
 WarningsAsErrors: ''
 HeaderFilterRegex: ''

@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_SRC_STYLECOLLECTION_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_SRC_STYLECOLLECTION_HPP
+
 #pragma once
 
 #include "ConnectionStyle.hpp"
@@ -49,3 +52,5 @@ private:
   FlowViewStyle _flowViewStyle;
 };
 } // namespace QtNodes
+
+#endif

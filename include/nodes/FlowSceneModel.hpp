@@ -1,3 +1,6 @@
+#ifndef NODES_FLOWSCENEMODEL_HPP
+#define NODES_FLOWSCENEMODEL_HPP
+
 #pragma once
 
 #include "Export.hpp"
@@ -191,3 +194,5 @@ protected:
 };
 
 } // namespace QtNodes
+
+#endif

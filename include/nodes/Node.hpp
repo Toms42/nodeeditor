@@ -1,3 +1,6 @@
+#ifndef NODES_NODE_HPP
+#define NODES_NODE_HPP
+
 #pragma once
 
 #include "Export.hpp"
@@ -26,7 +29,7 @@ public:
   /// NodeDataModel should be an rvalue and is moved into the Node
   Node(std::unique_ptr<NodeImp> &&dataModel, QUuid const &id);
 
-  virtual ~Node();
+  ~Node() override;
 
 public:
   QJsonObject save() const override;
@@ -86,3 +89,5 @@ private:
   QPointF                                        _pos;
 };
 } // namespace QtNodes
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef NODES_CONNECTION_HPP
+#define NODES_CONNECTION_HPP
+
 #pragma once
 
 #include "ConnectionGeometry.hpp"
@@ -38,7 +41,7 @@ public:
   Connection(const Connection &) = delete;
   Connection operator=(const Connection &) = delete;
 
-  ~Connection();
+  ~Connection() override;
 
 public:
   QJsonObject save() const override;
@@ -85,3 +88,5 @@ signals:
   void updated(Connection &conn) const;
 };
 } // namespace QtNodes
+
+#endif

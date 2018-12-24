@@ -15,7 +15,6 @@
 using QtNodes::ConnectionPolicy;
 using QtNodes::NodeGeometry;
 using QtNodes::NodeGraphicsObject;
-using QtNodes::NodeIndex;
 using QtNodes::NodePainter;
 using QtNodes::NodeState;
 

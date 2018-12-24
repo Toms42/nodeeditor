@@ -10,15 +10,11 @@
 
 using QtNodes::Connection;
 using QtNodes::ConnectionID;
-using QtNodes::ConnectionPolicy;
 using QtNodes::DataFlowModel;
 using QtNodes::DataFlowScene;
 using QtNodes::DataModelRegistry;
 using QtNodes::Node;
-using QtNodes::NodeDataType;
 using QtNodes::NodeIndex;
-using QtNodes::NodePainterDelegate;
-using QtNodes::NodeValidationState;
 using QtNodes::PortIndex;
 
 DataFlowScene::DataFlowScene(std::shared_ptr<DataModelRegistry> registry,

@@ -15,7 +15,6 @@
 #include <QtWidgets/QStyleOptionGraphicsItem>
 #include <iostream>
 
-using QtNodes::Connection;
 using QtNodes::ConnectionGraphicsObject;
 using QtNodes::ConnectionID;
 using QtNodes::FlowScene;

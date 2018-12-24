@@ -1,3 +1,6 @@
+#ifndef NODES_NODEGRAPHICSFRAME_HPP
+#define NODES_NODEGRAPHICSFRAME_HPP
+
 // NodeGraphicsFrame.hpp
 
 #pragma once
@@ -15,7 +18,7 @@ class NodeGraphicsFrame final : public NodeGraphicsObject {
 public:
   explicit NodeGraphicsFrame(FlowScene &scene, const NodeIndex &nodeIndex);
 
-  virtual ~NodeGraphicsFrame();
+  ~NodeGraphicsFrame() override;
 
   int type() const override;
 
@@ -54,3 +57,5 @@ protected:
   void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 };
 }; // namespace QtNodes
+
+#endif

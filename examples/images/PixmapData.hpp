@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_PIXMAPDATA_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_PIXMAPDATA_HPP
+
 #pragma once
 
 #include "nodes/NodeData.hpp"
@@ -10,7 +13,7 @@ using QtNodes::NodeDataType;
 /// need to be transferred within the Node Editor graph
 class PixmapData : public NodeData {
 public:
-  PixmapData() {}
+  PixmapData() = default;
 
   PixmapData(QPixmap const &pixmap)
       : _pixmap(pixmap) {}
@@ -25,3 +28,5 @@ public:
 private:
   QPixmap _pixmap;
 };
+
+#endif

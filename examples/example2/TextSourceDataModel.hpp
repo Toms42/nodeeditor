@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTSOURCEDATAMODEL_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTSOURCEDATAMODEL_HPP
+
 #pragma once
 
 #include "TextData.hpp"
@@ -19,7 +22,7 @@ class TextSourceDataModel : public NodeImp {
 public:
   TextSourceDataModel();
 
-  virtual ~TextSourceDataModel() { delete _lineEdit; }
+  ~TextSourceDataModel() override { delete _lineEdit; }
 
 public:
   static QString Name() { return QString("TextSourceDataModel"); }
@@ -36,3 +39,5 @@ private slots:
 private:
   QLineEdit *_lineEdit;
 };
+
+#endif

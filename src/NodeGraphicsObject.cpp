@@ -13,7 +13,6 @@
 
 using QtNodes::ConnectionPolicy;
 using QtNodes::FlowScene;
-using QtNodes::Node;
 using QtNodes::NodeGeometry;
 using QtNodes::NodeGraphicsObject;
 using QtNodes::NodeIndex;

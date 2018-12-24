@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTDATA_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTDATA_HPP
+
 #pragma once
 
 #include <nodes/NodeData.hpp>
@@ -9,7 +12,7 @@ using QtNodes::NodeDataType;
 /// need to be transferred within the Node Editor graph
 class TextData : public NodeData {
 public:
-  TextData() {}
+  TextData() = default;
 
   TextData(QString const &text)
       : _text(text) {}
@@ -21,3 +24,5 @@ public:
 private:
   QString _text;
 };
+
+#endif

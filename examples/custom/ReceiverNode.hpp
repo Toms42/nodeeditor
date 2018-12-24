@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_RECEIVERNODE_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_RECEIVERNODE_HPP
+
 // ReceiverNode.hpp
 
 #pragma once
@@ -10,7 +13,7 @@ class ReceiverNode final : public QtNodes::NodeImp {
   Q_OBJECT
 public:
   ReceiverNode();
-  ~ReceiverNode();
+  ~ReceiverNode() override;
   QString                      name() const override;
   QWidget *                    embeddedWidget() override;
   bool                         resizable() const override;
@@ -23,3 +26,5 @@ private:
   QtNodes::NodeValidationState validationState_;
   QString                      validationMessage_;
 };
+
+#endif

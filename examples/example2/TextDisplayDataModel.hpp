@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTDISPLAYDATAMODEL_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTDISPLAYDATAMODEL_HPP
+
 #pragma once
 
 #include "TextData.hpp"
@@ -19,7 +22,7 @@ class TextDisplayDataModel : public NodeImp {
 public:
   TextDisplayDataModel();
 
-  virtual ~TextDisplayDataModel() { delete _label; }
+  ~TextDisplayDataModel() override { delete _label; }
 
 public:
   static QString Name() { return QString("TextDisplayDataModel"); }
@@ -31,3 +34,5 @@ public:
 private:
   QLabel *_label;
 };
+
+#endif

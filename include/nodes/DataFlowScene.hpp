@@ -1,3 +1,6 @@
+#ifndef NODES_DATAFLOWSCENE_HPP
+#define NODES_DATAFLOWSCENE_HPP
+
 #pragma once
 
 #include "Export.hpp"
@@ -26,7 +29,7 @@ public:
                              std::make_shared<DataModelRegistry>(),
                          QObject *parent = Q_NULLPTR);
 
-  virtual ~DataFlowScene();
+  ~DataFlowScene() override;
 
   std::shared_ptr<Connection>
   createConnection(Node &               nodeIn,
@@ -106,3 +109,5 @@ private:
 };
 
 } // namespace QtNodes
+
+#endif

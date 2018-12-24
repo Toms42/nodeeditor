@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_IMAGELOADERMODEL_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_IMAGELOADERMODEL_HPP
+
 #pragma once
 
 #include "PixmapData.hpp"
@@ -22,7 +25,7 @@ class ImageLoaderModel : public NodeImp {
 public:
   ImageLoaderModel();
 
-  virtual ~ImageLoaderModel();
+  ~ImageLoaderModel() override;
 
 public:
   QString name() const override { return QString("ImageLoaderModel"); }
@@ -42,3 +45,5 @@ private:
 
   QPixmap _pixmap;
 };
+
+#endif

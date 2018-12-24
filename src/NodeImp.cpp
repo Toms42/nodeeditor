@@ -8,7 +8,7 @@ namespace QtNodes {
 NodeImp::NodeImp()
     : nodeStyle_{StyleCollection::nodeStyle()} {}
 
-NodeImp::~NodeImp() {}
+NodeImp::~NodeImp() = default;
 
 bool NodeImp::addPort(PortType type, PortIndex index, Port port) {
   switch (type) {

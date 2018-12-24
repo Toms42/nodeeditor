@@ -6,7 +6,6 @@
 #include "QUuidStdHash.hpp"
 #include "checker.hpp"
 
-using QtNodes::Connection;
 using QtNodes::NodeDataType;
 using QtNodes::NodeState;
 using QtNodes::PortIndex;

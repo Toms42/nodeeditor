@@ -1,3 +1,6 @@
+#ifndef NODES_CONNECTIONGRAPHICSOBJECT_HPP
+#define NODES_CONNECTIONGRAPHICSOBJECT_HPP
+
 #pragma once
 
 #include "ConnectionGeometry.hpp"
@@ -33,7 +36,7 @@ public:
                            PortIndex        rightPortIndex,
                            FlowScene &      scene);
 
-  virtual ~ConnectionGraphicsObject();
+  ~ConnectionGraphicsObject() override;
 
   enum { Connection = UserType + 5 };
   int type() const override;
@@ -71,7 +74,7 @@ public:
 protected:
   void paint(QPainter *                      painter,
              QStyleOptionGraphicsItem const *option,
-             QWidget *                       widget = 0) override;
+             QWidget *                       widget = nullptr) override;
 
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
 
@@ -99,3 +102,5 @@ private:
   PortIndex _rightPortIndex;
 };
 } // namespace QtNodes
+
+#endif

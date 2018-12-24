@@ -1,3 +1,6 @@
+#ifndef NODES_FLOWSCENE_HPP
+#define NODES_FLOWSCENE_HPP
+
 #pragma once
 
 #include "ConnectionID.hpp"
@@ -28,7 +31,7 @@ class NODE_EDITOR_PUBLIC FlowScene : public QGraphicsScene {
 public:
   FlowScene(FlowSceneModel *model, QObject *parent = Q_NULLPTR);
 
-  virtual ~FlowScene();
+  ~FlowScene() override;
 
 public:
   FlowSceneModel *model() const { return _model; }
@@ -82,3 +85,5 @@ NodeGraphicsObject *locateNodeAt(QPointF           scenePoint,
                                  FlowScene &       scene,
                                  QTransform const &viewTransform);
 } // namespace QtNodes
+
+#endif

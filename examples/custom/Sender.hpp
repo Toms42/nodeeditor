@@ -1,3 +1,6 @@
+#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_SENDER_HPP
+#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_SENDER_HPP
+
 // Sender.hpp
 
 #pragma once
@@ -6,7 +9,7 @@
 
 namespace Ui {
 class Sender;
-};
+} // namespace Ui
 
 class QStringListModel;
 
@@ -14,7 +17,7 @@ class Sender : public QWidget {
   Q_OBJECT
 public:
   explicit Sender(QWidget *parent = nullptr);
-  ~Sender();
+  ~Sender() override;
   QString getInfo() const;
 
 signals:
@@ -26,3 +29,5 @@ private:
   Ui::Sender *      ui_;
   QStringListModel *portListModel_;
 };
+
+#endif

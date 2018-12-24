@@ -5,7 +5,6 @@
 #include "NodeGraphicsObject.hpp"
 #include "checker.hpp"
 
-using QtNodes::FlowScene;
 using QtNodes::NodeConnectionInteraction;
 using QtNodes::PortIndex;
 using QtNodes::PortType;

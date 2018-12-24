@@ -1,3 +1,6 @@
+#ifndef NODES_FLOWVIEW_HPP
+#define NODES_FLOWVIEW_HPP
+
 #pragma once
 
 #include "Export.hpp"
@@ -61,3 +64,5 @@ private:
   FlowScene *_scene;
 };
 } // namespace QtNodes
+
+#endif

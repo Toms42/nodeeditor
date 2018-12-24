@@ -9,7 +9,6 @@
 
 using QtNodes::Connection;
 using QtNodes::ConnectionID;
-using QtNodes::ConnectionState;
 using QtNodes::Node;
 using QtNodes::NodeData;
 using QtNodes::NodeDataType;

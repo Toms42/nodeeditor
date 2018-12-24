@@ -1,3 +1,6 @@
+#ifndef NODES_NODEIMP_HPP
+#define NODES_NODEIMP_HPP
+
 // NodeImp.hpp
 
 #pragma once
@@ -26,7 +29,7 @@ class NODE_EDITOR_PUBLIC NodeImp
 
 public:
   NodeImp();
-  virtual ~NodeImp();
+  ~NodeImp() override;
 
   virtual QString name() const = 0;
 
@@ -68,7 +71,7 @@ public:
    */
   virtual QString validationMessage() const;
 
-  QJsonObject save() const;
+  QJsonObject save() const override;
 
   NodeDataType dataType(PortType portType, PortIndex portIndex) const;
 
@@ -112,3 +115,5 @@ private:
 };
 
 }; // namespace QtNodes
+
+#endif
