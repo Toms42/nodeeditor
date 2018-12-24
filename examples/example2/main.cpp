@@ -1,21 +1,19 @@
-#include <nodes/NodeData>
-#include <nodes/DataFlowScene>
-#include <nodes/FlowView>
+#include <nodes/DataFlowScene.hpp>
+#include <nodes/FlowView.hpp>
+#include <nodes/NodeData.hpp>
 
 #include <QtWidgets/QApplication>
 
-#include <nodes/DataModelRegistry>
+#include <nodes/DataModelRegistry.hpp>
 
-#include "TextSourceDataModel.hpp"
 #include "TextDisplayDataModel.hpp"
+#include "TextSourceDataModel.hpp"
 
+using QtNodes::DataFlowScene;
 using QtNodes::DataModelRegistry;
 using QtNodes::FlowView;
-using QtNodes::DataFlowScene;
 
-static std::shared_ptr<DataModelRegistry>
-registerDataModels()
-{
+static std::shared_ptr<DataModelRegistry> registerDataModels() {
   auto ret = std::make_shared<DataModelRegistry>();
 
   ret->registerModel<TextSourceDataModel>();
@@ -25,10 +23,7 @@ registerDataModels()
   return ret;
 }
 
-
-int
-main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
   DataFlowScene scene(registerDataModels());

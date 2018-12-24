@@ -1,43 +1,30 @@
 #include "FlowSceneModel.hpp"
+#include "Node.hpp"
 #include "NodeIndex.hpp"
 
-namespace QtNodes
-{
+namespace QtNodes {
 
-
-bool
-FlowSceneModel::
-removeNodeWithConnections(NodeIndex const& index)
-{
-
+bool FlowSceneModel::removeNodeWithConnections(NodeIndex const &index) {
   // delete the conenctions that node has first
-  auto deleteConnections =
-    [&](PortType ty) -> bool
-    {
-      for (PortIndex portID = 0; (size_t)portID < nodePortCount(index, ty); ++portID)
-      {
-        auto inputConnections = nodePortConnections(index, portID, ty);
-        for (const auto& conn : inputConnections)
-        {
-          // try to remove it
-          bool success;
-          if (ty == PortType::In)
-          {
-            success = removeConnection(conn.first, conn.second, index, portID);
-          }
-          else {
-            success = removeConnection(index, portID, conn.first, conn.second);
-          }
+  auto deleteConnections = [&](PortType ty) -> bool {
+    for (auto &portID : nodePortIndexes(index, ty)) {
+      for (const auto &conn : nodePortConnections(index, portID, ty)) {
+        // try to remove it
+        bool success;
+        if (ty == PortType::In) {
+          success = removeConnection(conn.first, conn.second, index, portID);
+        } else {
+          success = removeConnection(index, portID, conn.first, conn.second);
+        }
 
-          // failed, abort the node deletion
-          if (!success)
-          {
-            return false;
-          }
+        // failed, abort the node deletion
+        if (!success) {
+          return false;
         }
       }
-      return true;
-    };
+    }
+    return true;
+  };
 
   bool success = deleteConnections(PortType::In);
 
@@ -52,12 +39,9 @@ removeNodeWithConnections(NodeIndex const& index)
   return removeNode(index);
 }
 
-NodeIndex
-FlowSceneModel::
-createIndex(const QUuid& id, void* internalPointer) const
-{
+NodeIndex FlowSceneModel::createIndex(const QUuid &id,
+                                      void *internalPointer) const {
   return NodeIndex(id, internalPointer, this);
 }
 
 } // namespace QtNodes
-

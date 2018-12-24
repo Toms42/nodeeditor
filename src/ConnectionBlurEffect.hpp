@@ -2,21 +2,17 @@
 
 #include <QtWidgets/QGraphicsItem>
 
-namespace QtNodes
-{
+namespace QtNodes {
 
 class ConnectionGraphicsObject;
 
-class ConnectionBlurEffect : public QGraphicsBlurEffect
-{
+class ConnectionBlurEffect : public QGraphicsBlurEffect {
 
 public:
+  ConnectionBlurEffect(ConnectionGraphicsObject *item);
 
-  ConnectionBlurEffect(ConnectionGraphicsObject* item);
-
-  void
-  draw(QPainter* painter) override;
+  void draw(QPainter *painter) override;
 
 private:
 };
-}
+} // namespace QtNodes

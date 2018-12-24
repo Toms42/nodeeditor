@@ -1,143 +1,143 @@
 #include "Node.hpp"
-
-#include <QtCore/QObject>
-
-#include <utility>
-#include <iostream>
-
-#include "FlowScene.hpp"
-
-#include "NodeGraphicsObject.hpp"
-#include "NodeDataModel.hpp"
-
+#include "Connection.hpp"
 #include "ConnectionGraphicsObject.hpp"
 #include "ConnectionState.hpp"
-#include "Connection.hpp"
+#include "FlowScene.hpp"
+#include "NodeGraphicsObject.hpp"
+#include "NodeImp.hpp"
+#include "checker.hpp"
+#include <QtCore/QObject>
+#include <utility>
 
-using QtNodes::Node;
-using QtNodes::NodeDataModel;
 using QtNodes::Connection;
-using QtNodes::PortType;
-using QtNodes::PortIndex;
-using QtNodes::NodeData;
+using QtNodes::Node;
 
-Node::
-Node(std::unique_ptr<NodeDataModel> && dataModel, QUuid const& id)
-  : _uid(id)
-  ,_nodeDataModel(std::move(dataModel))
-{
+Node::Node(std::unique_ptr<NodeImp> &&nodeImp, QUuid const &id)
+    : _uid(id), nodeImp_(std::move(nodeImp)) {
   // propagate data: model => node
-  connect(_nodeDataModel.get(), &NodeDataModel::dataUpdated,
-          this, &Node::onDataUpdated);
+  connect(nodeImp_.get(), &NodeImp::dataUpdated, this, &Node::onDataUpdated);
 
-  _inConnections.resize(nodeDataModel()->nPorts(PortType::In));
-  _outConnections.resize(nodeDataModel()->nPorts(PortType::Out));
+  for (auto i : nodeImp_->inPorts_) {
+    _inConnections.insert(std::pair(i.first, std::vector<Connection *>()));
+  }
+  for (auto i : nodeImp_->outPorts_) {
+    _outConnections.insert(std::pair(i.first, std::vector<Connection *>()));
+  }
 }
 
+Node::~Node() = default;
 
-Node::
-~Node() = default;
+bool Node::addPort(PortType pType, PortIndex pIndex) {
+  switch (pType) {
+  case PortType::In:
+    if (_inConnections.insert(std::pair(pIndex, std::vector<Connection *>()))
+            .second) {
+      emit portAdded(pType, pIndex);
+      return true;
+    } else {
+      GET_INFO();
+    }
+    break;
+  case PortType::Out:
+    if (_outConnections.insert(std::pair(pIndex, std::vector<Connection *>()))
+            .second) {
+      emit portAdded(pType, pIndex);
+      return true;
+    } else {
+      GET_INFO();
+    }
+    break;
+  default:
+    break;
+  }
 
-QJsonObject
-Node::
-save() const
-{
+  return false;
+}
+
+bool Node::removePort(PortType pType, PortIndex pIndex) {
+  switch (pType) {
+  case PortType::In:
+    if (_inConnections.erase(pIndex)) {
+      emit portRemoved(pType, pIndex);
+      return true;
+    }
+    break;
+  case PortType::Out:
+    if (_outConnections.erase(pIndex)) {
+      emit portRemoved(pType, pIndex);
+      return true;
+    }
+    break;
+  default:
+    break;
+  }
+  return false;
+}
+
+QJsonObject Node::save() const {
   QJsonObject nodeJson;
 
   nodeJson["id"] = id().toString();
 
-  nodeJson["model"] = _nodeDataModel->save();
+  nodeJson["model"] = nodeImp_->save();
 
   QJsonObject obj;
-  obj["x"]             = _pos.x();
-  obj["y"]             = _pos.y();
+  obj["x"] = _pos.x();
+  obj["y"] = _pos.y();
   nodeJson["position"] = obj;
 
   return nodeJson;
 }
 
-
-void
-Node::
-restore(QJsonObject const& json)
-{
+void Node::restore(QJsonObject const &json) {
 
   QJsonObject positionJson = json["position"].toObject();
-  QPointF point(positionJson["x"].toDouble(),
-                positionJson["y"].toDouble());
+  QPointF point(positionJson["x"].toDouble(), positionJson["y"].toDouble());
   setPosition(point);
 
-  _nodeDataModel->restore(json["model"].toObject());
+  nodeImp_->restore(json["model"].toObject());
 }
 
+QUuid Node::id() const { return _uid; }
 
-QUuid
-Node::
-id() const
-{
-  return _uid;
-}
+QtNodes::NodeImp *Node::nodeImp() const { return nodeImp_.get(); }
 
-NodeDataModel*
-Node::
-nodeDataModel() const
-{
-  return _nodeDataModel.get();
-}
+QPointF Node::position() const { return _pos; }
 
-QPointF
-Node::
-position() const
-{
-  return _pos;
-}
-
-void
-Node::
-setPosition(QPointF const& newPos)
-{
+void Node::setPosition(QPointF const &newPos) {
   _pos = newPos;
 
   emit positionChanged(newPos);
 }
 
-std::vector<Connection*> const&
-Node::
-connections(PortType pType, PortIndex idx) const
-{
-  Q_ASSERT(idx >= 0);
-  Q_ASSERT(pType == PortType::In ? (size_t)idx < _inConnections.size() : (size_t)idx < _outConnections.size());
-
-  return pType == PortType::In ? _inConnections[idx] : _outConnections[idx];
+std::vector<Connection *> const &Node::connections(PortType pType,
+                                                   PortIndex idx) const {
+  try {
+    return pType == PortType::In ? _inConnections.at(idx)
+                                 : _outConnections.at(idx);
+  } catch (std::out_of_range) {
+    GET_INFO();
+  }
 }
 
-std::vector<Connection*> &
-Node::
-connections(PortType pType, PortIndex idx)
-{
-  Q_ASSERT(idx >= 0);
-  Q_ASSERT(pType == PortType::In ? (size_t)idx < _inConnections.size() : (size_t)idx < _outConnections.size());
-
-  return pType == PortType::In ? _inConnections[idx] : _outConnections[idx];
+std::vector<Connection *> &Node::connections(PortType pType, PortIndex idx) {
+  try {
+    return pType == PortType::In ? _inConnections.at(idx)
+                                 : _outConnections.at(idx);
+  } catch (std::out_of_range) {
+    GET_INFO();
+  }
 }
 
-void
-Node::
-propagateData(std::shared_ptr<NodeData> nodeData,
-              PortIndex inPortIndex) const
-{
-  _nodeDataModel->setInData(nodeData, inPortIndex);
+void Node::propagateData(std::shared_ptr<NodeData> nodeData,
+                         PortIndex inPortIndex) const {
+  nodeImp_->setInData(nodeData, inPortIndex);
 }
 
+void Node::onDataUpdated(PortIndex index) {
+  auto nodeData = nodeImp_->outData(index);
+  auto &conns = connections(PortType::Out, index);
 
-void
-Node::
-onDataUpdated(PortIndex index)
-{
-  auto nodeData = _nodeDataModel->outData(index);
-  auto& conns   =
-    connections(PortType::Out, index);
-
-  for (auto const & c : conns)
+  for (auto const &c : conns)
     c->propagateData(nodeData);
 }

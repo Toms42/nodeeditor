@@ -1,48 +1,20 @@
 #include "TextDisplayDataModel.hpp"
 
-TextDisplayDataModel::
-TextDisplayDataModel()
-  : _label(new QLabel("Resulting Text"))
-{
+TextDisplayDataModel::TextDisplayDataModel()
+    : _label(new QLabel("Resulting Text")) {
   _label->setMargin(3);
-}
-
-
-unsigned int
-TextDisplayDataModel::
-nPorts(PortType portType) const
-{
-  unsigned int result = 1;
-
-  switch (portType)
-  {
-    case PortType::In:
-      result = 1;
-      break;
-
-    case PortType::Out:
-      result = 0;
-
-    default:
-      break;
-  }
-
-  return result;
-}
-
-
-NodeDataType
-TextDisplayDataModel::
-dataType(PortType, PortIndex) const
-{
-  return TextData().type();
-}
-
-
-std::shared_ptr<NodeData>
-TextDisplayDataModel::
-outData(PortIndex)
-{
-  std::shared_ptr<NodeData> ptr;
-  return ptr;
+  QtNodes::Port port;
+  port.caption = "in caption";
+  port.captionVisible = true;
+  port.dataType = TextData().type();
+  port.handle = [this](std::shared_ptr<NodeData> in) {
+    auto data = std::dynamic_pointer_cast<TextData>(in);
+    if (data) {
+      _label->setText(data->text());
+    } else {
+      _label->clear();
+    }
+    return std::shared_ptr<NodeData>();
+  };
+  addPort(PortType::In, 3, port);
 }

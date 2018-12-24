@@ -1,49 +1,50 @@
-cmake_minimum_required(VERSION 3.2)
-# version 3.4 is required as other do not work with C++14 and clang
+cmake_minimum_required(VERSION 3.12)
 
-project(NodeEditor CXX)
+project(NodeEditor)
 
-set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
-set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin")
 
-get_directory_property(_has_parent PARENT_DIRECTORY)
-if(_has_parent)
-  set(is_root_project OFF)
-else()
-  set(is_root_project ON)
-endif()
+set(CMAKE_CXX_FLAGS_DEBUG "-g ${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 
-set(NE_DEVELOPER_DEFAULTS "${is_root_project}" CACHE BOOL "Turns on default settings for development of NodeEditor")
+#set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+#set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
 
-option(BUILD_TESTING "Build tests" "${NE_DEVELOPER_DEFAULTS}")
-option(BUILD_EXAMPLES "Build Examples" "${NE_DEVELOPER_DEFAULTS}")
-option(NE_FORCE_TEST_COLOR "Force colorized unit test output" OFF)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
-enable_testing()
+include(CTest)
 
-if(NE_DEVELOPER_DEFAULTS)
-  set(CMAKE_CXX_STANDARD 14)
-  set(CMAKE_CXX_EXTENSIONS OFF)
-
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-endif()
-
-add_subdirectory(external)
+option(BUILD_EXAMPLES "Build Examples" ON)
 
 # Find the QtWidgets library
 find_package(Qt5 COMPONENTS
              Core
              Widgets
              Gui
-             OpenGL)
+             OpenGL REQUIRED)
 
-qt5_add_resources(RESOURCES ./resources/resources.qrc)
+set(RESOURCES "resources/resources.qrc")
 
-# Unfortunately, as we have a split include/src, AUTOMOC doesn't work.
-# We'll have to manually specify some files
-set(CMAKE_AUTOMOC ON)
+# because includes and sources in differend directories - we have to add includes
+# in compile source for moc
+set(INC_SRC
+  include/nodes/Connection.hpp
+  include/nodes/ConnectionGeometry.hpp
+  include/nodes/ConnectionGraphicsObject.hpp
+  include/nodes/DataFlowScene.hpp
+  include/nodes/FlowScene.hpp
+  include/nodes/FlowSceneModel.hpp
+  include/nodes/FlowView.hpp
+  include/nodes/Node.hpp
+  include/nodes/NodeImp.hpp
+  include/nodes/NodeGeometry.hpp
+  include/nodes/NodeGraphicsFrame.hpp
+  include/nodes/NodeGraphicsObject.hpp
+  include/nodes/NodeState.hpp
+  )
 
 set(CPP_SOURCE_FILES
   src/Connection.cpp
@@ -53,17 +54,18 @@ set(CPP_SOURCE_FILES
   src/ConnectionPainter.cpp
   src/ConnectionState.cpp
   src/ConnectionStyle.cpp
-  src/DataFlowModel.cpp
   src/DataModelRegistry.cpp
   src/FlowScene.cpp
   src/FlowSceneModel.cpp
+  src/DataFlowModel.cpp
   src/DataFlowScene.cpp
   src/FlowView.cpp
   src/FlowViewStyle.cpp
   src/Node.cpp
   src/NodeConnectionInteraction.cpp
-  src/NodeDataModel.cpp
+  src/NodeImp.cpp
   src/NodeGeometry.cpp
+  src/NodeGraphicsFrame.cpp
   src/NodeGraphicsObject.cpp
   src/NodePainter.cpp
   src/NodeState.cpp
@@ -76,19 +78,15 @@ set(CPP_SOURCE_FILES
 # leave off SHARED here and use BUILD_SHARED_LIBS to
 # choose whether to add -D NODE_EDITOR_SHARED
 add_library(nodes SHARED
+  ${INC_SRC}
   ${CPP_SOURCE_FILES}
   ${RESOURCES}
 )
 add_library(NodeEditor::nodes ALIAS nodes)
 
 target_include_directories(nodes
-  PUBLIC
-    $<INSTALL_INTERFACE:include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/nodes/internal>
-)
+  PRIVATE include/nodes
+  INTERFACE include)
 
 target_link_libraries(nodes
   PUBLIC
@@ -116,29 +114,8 @@ target_compile_options(nodes
 
 target_compile_features(nodes
   PUBLIC
-    cxx_generic_lambdas # Require C++14
+    cxx_std_17
 )
-
-set_target_properties(nodes
-  PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
-)
-
-######
-# Moc
-##
-
-file(GLOB_RECURSE HEADERS_TO_MOC include/nodes/internal/*.hpp)
-
-qt5_wrap_cpp(nodes_moc
-    ${HEADERS_TO_MOC}
-  TARGET nodes
-  OPTIONS --no-notes # Don't display a note for the headers which don't produce a moc_*.cpp
-)
-
-target_sources(nodes PRIVATE ${nodes_moc})
 
 ###########
 # Examples
@@ -160,32 +137,32 @@ endif()
 # Installation
 ##
 
-include(GNUInstallDirs)
+# include(GNUInstallDirs)
 
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/NodeEditor)
+# set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/NodeEditor)
 
-install(TARGETS nodes
-  EXPORT NodeEditorTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+# install(TARGETS nodes
+#   EXPORT NodeEditorTargets
+#   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+# )
 
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+# install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-install(EXPORT NodeEditorTargets
-  FILE NodeEditorTargets.cmake
-  NAMESPACE NodeEditor::
-  DESTINATION ${INSTALL_CONFIGDIR}
-)
+# install(EXPORT NodeEditorTargets
+#   FILE NodeEditorTargets.cmake
+#   NAMESPACE NodeEditor::
+#   DESTINATION ${INSTALL_CONFIGDIR}
+# )
 
-include(CMakePackageConfigHelpers)
+# include(CMakePackageConfigHelpers)
 
-configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/NodeEditorConfig.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/NodeEditorConfig.cmake
-  INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
-)
+# configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/NodeEditorConfig.cmake.in
+#   ${CMAKE_CURRENT_BINARY_DIR}/NodeEditorConfig.cmake
+#   INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+# )
 
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/NodeEditorConfig.cmake
-  DESTINATION ${INSTALL_CONFIGDIR}
-)
+# install(FILES
+#   ${CMAKE_CURRENT_BINARY_DIR}/NodeEditorConfig.cmake
+#   DESTINATION ${INSTALL_CONFIGDIR}
+# )

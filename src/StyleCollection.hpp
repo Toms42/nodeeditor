@@ -1,61 +1,52 @@
 #pragma once
 
-#include "NodeStyle.hpp"
 #include "ConnectionStyle.hpp"
 #include "FlowViewStyle.hpp"
+#include "NodeStyle.hpp"
 
-namespace QtNodes
-{
+#include <QObject>
 
-class StyleCollection
-{
-public:
+namespace QtNodes {
 
-  static
-  NodeStyle const&
-  nodeStyle();
-
-  static
-  ConnectionStyle const&
-  connectionStyle();
-
-  static
-  FlowViewStyle const&
-  flowViewStyle();
+class StyleCollection : public QObject {
+  Q_OBJECT
 
 public:
+  static StyleCollection &instance();
 
-  static
-  void
-  setNodeStyle(NodeStyle);
+  static NodeStyle const &nodeStyle();
 
-  static
-  void
-  setConnectionStyle(ConnectionStyle);
+  static ConnectionStyle const &connectionStyle();
 
-  static
-  void
-  setFlowViewStyle(FlowViewStyle);
+  static FlowViewStyle const &flowViewStyle();
+
+public:
+  static void setNodeStyle(NodeStyle);
+
+  static void setConnectionStyle(ConnectionStyle);
+
+  static void setFlowViewStyle(FlowViewStyle);
+
+  /**\brief when we change style - then boundingRect of geometry classes can
+   * change, so, we have to send message to they about change style
+   */
+signals:
+  void nodeStyleChanged();
+  void connectionStyleChanged();
+  void flowViweStyleChanged();
 
 private:
-
   StyleCollection() = default;
 
-  StyleCollection(StyleCollection const&) = delete;
+  StyleCollection(StyleCollection const &) = delete;
 
-  StyleCollection&
-  operator=(StyleCollection const&) = delete;
-
-  static
-  StyleCollection&
-  instance();
+  StyleCollection &operator=(StyleCollection const &) = delete;
 
 private:
-
   NodeStyle _nodeStyle;
 
   ConnectionStyle _connectionStyle;
 
   FlowViewStyle _flowViewStyle;
 };
-}
+} // namespace QtNodes

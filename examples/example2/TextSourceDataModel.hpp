@@ -5,68 +5,37 @@
 
 #include "TextData.hpp"
 
-#include <nodes/NodeDataModel>
+#include <nodes/NodeImp.hpp>
 
 #include <iostream>
 
-using QtNodes::PortType;
-using QtNodes::PortIndex;
 using QtNodes::NodeData;
-using QtNodes::NodeDataModel;
+using QtNodes::NodeImp;
+using QtNodes::PortIndex;
+using QtNodes::PortType;
 
 /// The model dictates the number of inputs and outputs for the Node.
 /// In this example it has no logic.
-class TextSourceDataModel : public NodeDataModel
-{
+class TextSourceDataModel : public NodeImp {
   Q_OBJECT
 
 public:
   TextSourceDataModel();
 
-  virtual
-  ~TextSourceDataModel() {}
+  virtual ~TextSourceDataModel() { delete _lineEdit; }
 
 public:
+  static QString Name() { return QString("TextSourceDataModel"); }
 
-  QString
-  caption() const override
-  { return QString("Text Source"); }
-
-  bool
-  captionVisible() const override { return false; }
-
-  static QString
-  Name()
-  { return QString("TextSourceDataModel"); }
-
-  QString
-  name() const override
-  { return TextSourceDataModel::Name(); }
+  QString name() const override { return TextSourceDataModel::Name(); }
 
 public:
-
-  unsigned int
-  nPorts(PortType portType) const override;
-
-  NodeDataType
-  dataType(PortType portType, PortIndex portIndex) const override;
-
-  std::shared_ptr<NodeData>
-  outData(PortIndex port) override;
-
-  void
-  setInData(std::shared_ptr<NodeData>, int) override
-  { }
-
-  QWidget *
-  embeddedWidget() override { return _lineEdit; }
+  QWidget *embeddedWidget() override { return _lineEdit; }
 
 private slots:
 
-  void
-  onTextEdited(QString const &string);
+  void onTextEdited(QString const &string);
 
 private:
-
-  QLineEdit * _lineEdit;
+  QLineEdit *_lineEdit;
 };
