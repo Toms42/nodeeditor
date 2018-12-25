@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <utility>
 
 using QtNodes::Connection;
 using QtNodes::ConnectionID;
@@ -36,11 +37,7 @@ DataFlowScene::createConnection(Node &               nodeIn,
   auto connid = _dataFlowModel->addConnection(
       &nodeOut, portIndexOut, &nodeIn, portIndexIn, converter);
 
-  try {
-    return _dataFlowModel->connections().at(connid);
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(return _dataFlowModel->connections().at(connid));
 }
 
 std::shared_ptr<Connection>
@@ -61,14 +58,11 @@ DataFlowScene::restoreConnection(QJsonObject const &connectionJson) {
   if (!_dataFlowModel->addConnection(_dataFlowModel->nodeIndex(nodeOutId),
                                      connId.lPortID,
                                      _dataFlowModel->nodeIndex(nodeInId),
-                                     connId.rPortID))
+                                     connId.rPortID)) {
     return nullptr;
-
-  try {
-    return _dataFlowModel->connections().at(connId);
-  } catch (std::out_of_range) {
-    GET_INFO();
   }
+
+  CHECK_OUT_OF_RANGE(return _dataFlowModel->connections().at(connId));
 }
 
 void DataFlowScene::deleteConnection(Connection &connection) {
@@ -83,11 +77,7 @@ void DataFlowScene::deleteConnection(Connection &connection) {
 Node &DataFlowScene::createNode(std::unique_ptr<NodeImp> &&dataModel) {
   auto uid = _dataFlowModel->addNode(std::move(dataModel), {0.0, 0.0});
 
-  try {
-    return *_dataFlowModel->nodes().at(uid);
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(return *_dataFlowModel->nodes().at(uid));
 }
 
 Node &DataFlowScene::restoreNode(QJsonObject const &nodeJson) {
@@ -103,7 +93,7 @@ Node &DataFlowScene::restoreNode(QJsonObject const &nodeJson) {
     node.restore(nodeJson);
 
     return node;
-  } catch (std::out_of_range) {
+  } catch (std::out_of_range &) {
     GET_INFO();
   }
 }
@@ -117,7 +107,7 @@ DataModelRegistry &DataFlowScene::registry() const {
 }
 
 void DataFlowScene::setRegistry(std::shared_ptr<DataModelRegistry> registry) {
-  _dataFlowModel->setRegistry(registry);
+  _dataFlowModel->setRegistry(std::move(registry));
 }
 
 void DataFlowScene::iterateOverNodes(
@@ -142,7 +132,7 @@ void DataFlowScene::iterateOverNodeDataDependentOrder(
   // empty
   auto isNodeLeaf = [](Node const &node, NodeImp const &model) {
     for (auto &i : model.ports(PortType::In)) {
-      auto connections = node.connections(PortType::In, i);
+      const auto &connections = node.connections(PortType::In, i);
       if (!connections.empty()) {
         return false;
       }
@@ -182,8 +172,9 @@ void DataFlowScene::iterateOverNodeDataDependentOrder(
   while (_dataFlowModel->nodes().size() != visitedNodesSet.size()) {
     for (auto const &_node : _dataFlowModel->nodes()) {
       auto const &node = _node.second;
-      if (visitedNodesSet.find(node->id()) != visitedNodesSet.end())
+      if (visitedNodesSet.find(node->id()) != visitedNodesSet.end()) {
         continue;
+      }
 
       auto model = node->nodeImp();
 
@@ -243,8 +234,9 @@ void DataFlowScene::save() const {
                                    tr("Flow Scene Files (*.flow)"));
 
   if (!fileName.isEmpty()) {
-    if (!fileName.endsWith("flow", Qt::CaseInsensitive))
+    if (!fileName.endsWith("flow", Qt::CaseInsensitive)) {
       fileName += ".flow";
+    }
 
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly)) {
@@ -264,13 +256,15 @@ void DataFlowScene::load() {
                                    QDir::homePath(),
                                    tr("Flow Scene Files (*.flow)"));
 
-  if (!QFileInfo::exists(fileName))
+  if (!QFileInfo::exists(fileName)) {
     return;
+  }
 
   QFile file(fileName);
 
-  if (!file.open(QIODevice::ReadOnly))
+  if (!file.open(QIODevice::ReadOnly)) {
     return;
+  }
 
   QByteArray wholeFile = file.readAll();
 
@@ -296,8 +290,9 @@ QByteArray DataFlowScene::saveToMemory() const {
 
     QJsonObject connectionJson = connection->save();
 
-    if (!connectionJson.isEmpty())
+    if (!connectionJson.isEmpty()) {
       connectionJsonArray.append(connectionJson);
+    }
   }
 
   sceneJson["connections"] = connectionJsonArray;

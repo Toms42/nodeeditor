@@ -54,8 +54,7 @@ public:
 
   void setReaction(ReactToConnectionState reaction,
                    PortType               reactingPortType = PortType::None,
-
-                   NodeDataType reactingDataType = NodeDataType());
+                   NodeDataType           reactingDataType = NodeDataType());
 
   bool isReacting() const;
 

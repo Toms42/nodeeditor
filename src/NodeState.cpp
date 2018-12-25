@@ -67,29 +67,25 @@ void NodeState::removePort(PortType pType, PortIndex pIndex) {
 
 std::map<PortIndex, NodeState::ConnectionPtrVec> const &
 NodeState::getEntries(PortType portType) const {
-  if (portType == PortType::In)
+  if (portType == PortType::In) {
     return _inConnections;
-  else
-    return _outConnections;
+  }
+  { return _outConnections; }
 }
 
 std::map<PortIndex, NodeState::ConnectionPtrVec> &
 NodeState::getEntries(PortType portType) {
-  if (portType == PortType::In)
+  if (portType == PortType::In) {
     return _inConnections;
-  else
-    return _outConnections;
+  }
+  { return _outConnections; }
 }
 
 NodeState::ConnectionPtrVec NodeState::connections(PortType  portType,
                                                    PortIndex portIndex) const {
   auto const &connections = getEntries(portType);
 
-  try {
-    return connections.at(portIndex);
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(return connections.at(portIndex));
 }
 
 void NodeState::setConnection(PortType                  portType,
@@ -97,11 +93,7 @@ void NodeState::setConnection(PortType                  portType,
                               ConnectionGraphicsObject &connection) {
   auto &connections = getEntries(portType);
 
-  try {
-    connections.at(portIndex).push_back(&connection);
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(connections.at(portIndex).push_back(&connection));
 }
 
 void NodeState::eraseConnection(PortType                  portType,
@@ -113,7 +105,7 @@ void NodeState::eraseConnection(PortType                  portType,
     if (iter != ptrSet.end()) {
       ptrSet.erase(iter);
     }
-  } catch (std::out_of_range) {
+  } catch (std::out_of_range &) {
     GET_INFO();
   }
 }

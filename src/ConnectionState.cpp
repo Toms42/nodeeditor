@@ -23,8 +23,9 @@ void ConnectionState::setLastHoveredNode(NodeGraphicsObject *node) {
 }
 
 void ConnectionState::resetLastHoveredNode() {
-  if (_lastHoveredNode)
+  if (_lastHoveredNode) {
     _lastHoveredNode->resetReactionToConnection();
+  }
 
   _lastHoveredNode = nullptr;
 }

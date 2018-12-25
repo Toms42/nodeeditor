@@ -89,10 +89,11 @@ void Connection::setNodeToPort(Node &    node,
 
   nodeWeak = &node;
 
-  if (portType == PortType::Out)
+  if (portType == PortType::Out) {
     _outPortIndex = portIndex;
-  else
+  } else {
     _inPortIndex = portIndex;
+  }
 
   _connectionState.setNoRequiredPort();
 
@@ -160,7 +161,7 @@ NodeDataType Connection::dataType(PortType portType) const {
     PortIndex index = (portType == PortType::In) ? _inPortIndex : _outPortIndex;
 
     return model->dataType(portType, index);
-  } else {
+  }
     Node *    validNode;
     PortIndex index = INVALID;
 
@@ -177,7 +178,6 @@ NodeDataType Connection::dataType(PortType portType) const {
 
       return model->dataType(portType, index);
     }
-  }
 
   Q_UNREACHABLE();
 }

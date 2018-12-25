@@ -140,8 +140,9 @@ static void drawNormalLine(QPainter *                      painter,
 
   ConnectionState const &state = connection.state();
 
-  if (state.requiresPort())
+  if (state.requiresPort()) {
     return;
+  }
 
   // colors
 
@@ -184,8 +185,9 @@ static void drawNormalLine(QPainter *                      painter,
     painter->setBrush(Qt::NoBrush);
 
     QColor cOut = normalColorOut;
-    if (selected)
+    if (selected) {
       cOut = cOut.darker(200);
+    }
     p.setColor(cOut);
     painter->setPen(p);
 
@@ -197,8 +199,9 @@ static void drawNormalLine(QPainter *                      painter,
 
       if (i == segments / 2) {
         QColor cIn = normalColorIn;
-        if (selected)
+        if (selected) {
           cIn = cIn.darker(200);
+        }
 
         p.setColor(cIn);
         painter->setPen(p);

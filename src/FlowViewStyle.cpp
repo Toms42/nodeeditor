@@ -6,6 +6,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValueRef>
+#include <utility>
 
 using QtNodes::FlowViewStyle;
 
@@ -23,11 +24,11 @@ FlowViewStyle::FlowViewStyle() {
   loadJsonFile(":DefaultStyle.json");
 }
 
-FlowViewStyle::FlowViewStyle(QString jsonText) {
+FlowViewStyle::FlowViewStyle(const QString &jsonText) {
   loadJsonText(jsonText);
 }
 
-void FlowViewStyle::setStyle(QString jsonText) {
+void FlowViewStyle::setStyle(const QString &jsonText) {
   FlowViewStyle style(jsonText);
 
   StyleCollection::setFlowViewStyle(style);
@@ -60,7 +61,7 @@ void FlowViewStyle::setStyle(QString jsonText) {
     }                                                                          \
   }
 
-void FlowViewStyle::loadJsonFile(QString styleFile) {
+void FlowViewStyle::loadJsonFile(const QString &styleFile) {
   QFile file(styleFile);
 
   if (!file.open(QIODevice::ReadOnly)) {
@@ -72,7 +73,7 @@ void FlowViewStyle::loadJsonFile(QString styleFile) {
   loadJsonFromByteArray(file.readAll());
 }
 
-void FlowViewStyle::loadJsonText(QString jsonText) {
+void FlowViewStyle::loadJsonText(const QString &jsonText) {
   loadJsonFromByteArray(jsonText.toUtf8());
 }
 

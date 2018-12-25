@@ -28,12 +28,14 @@ bool FlowSceneModel::removeNodeWithConnections(NodeIndex const &index) {
 
   bool success = deleteConnections(PortType::In);
 
-  if (!success)
+  if (!success) {
     return false;
+  }
 
   success = deleteConnections(PortType::Out);
-  if (!success)
+  if (!success) {
     return false;
+  }
 
   // if we get here, then try to remove the node itsself
   return removeNode(index);

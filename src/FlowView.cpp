@@ -192,10 +192,11 @@ void FlowView::wheelEvent(QWheelEvent *event) {
 
   double const d = delta.y() / std::abs(delta.y());
 
-  if (d > 0.0)
+  if (d > 0.0) {
     scaleUp();
-  else
+  } else {
     scaleDown();
+  }
 }
 
 void FlowView::scaleUp() {
@@ -204,8 +205,9 @@ void FlowView::scaleUp() {
 
   QTransform t = transform();
 
-  if (t.m11() > 2.0)
+  if (t.m11() > 2.0) {
     return;
+  }
 
   scale(factor, factor);
 }

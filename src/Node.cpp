@@ -18,10 +18,10 @@ Node::Node(std::unique_ptr<NodeImp> &&nodeImp, QUuid const &id)
   // propagate data: model => node
   connect(nodeImp_.get(), &NodeImp::dataUpdated, this, &Node::onDataUpdated);
 
-  for (auto i : nodeImp_->inPorts_) {
+  for (const auto &i : nodeImp_->inPorts_) {
     _inConnections.insert(std::pair(i.first, std::vector<Connection *>()));
   }
-  for (auto i : nodeImp_->outPorts_) {
+  for (const auto &i : nodeImp_->outPorts_) {
     _outConnections.insert(std::pair(i.first, std::vector<Connection *>()));
   }
 }
@@ -118,32 +118,25 @@ void Node::setPosition(QPointF const &newPos) {
 
 std::vector<Connection *> const &Node::connections(PortType  pType,
                                                    PortIndex idx) const {
-  try {
-    return pType == PortType::In ? _inConnections.at(idx)
-                                 : _outConnections.at(idx);
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(return pType == PortType::In ? _inConnections.at(idx)
+                                                  : _outConnections.at(idx));
 }
 
 std::vector<Connection *> &Node::connections(PortType pType, PortIndex idx) {
-  try {
-    return pType == PortType::In ? _inConnections.at(idx)
-                                 : _outConnections.at(idx);
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(return pType == PortType::In ? _inConnections.at(idx)
+                                                  : _outConnections.at(idx));
 }
 
 void Node::propagateData(std::shared_ptr<NodeData> nodeData,
                          PortIndex                 inPortIndex) const {
-  nodeImp_->setInData(nodeData, inPortIndex);
+  nodeImp_->setInData(std::move(nodeData), inPortIndex);
 }
 
 void Node::onDataUpdated(PortIndex index) {
   auto  nodeData = nodeImp_->outData(index);
   auto &conns    = connections(PortType::Out, index);
 
-  for (auto const &c : conns)
+  for (auto const &c : conns) {
     c->propagateData(nodeData);
+  }
 }

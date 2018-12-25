@@ -28,8 +28,9 @@ bool NodeConnectionInteraction::canConnect(PortIndex &portIndex,
   // 1.5) Forbid connecting the node to itself
   NodeIndex node = _connection->node(oppositePort(requiredPort));
 
-  if (node == _node)
+  if (node == _node) {
     return false;
+  }
 
   // 2) connection point is on top of the node port
 
@@ -44,8 +45,9 @@ bool NodeConnectionInteraction::canConnect(PortIndex &portIndex,
   // 3) Node port is vacant
 
   // port should be empty
-  if (!nodePortIsEmpty(requiredPort, portIndex))
+  if (!nodePortIsEmpty(requiredPort, portIndex)) {
     return false;
+  }
 
   // 4) Connection type equals node port type, or there is a registered type
   // conversion that can translate between the two
@@ -62,7 +64,8 @@ bool NodeConnectionInteraction::canConnect(PortIndex &portIndex,
     if (requiredPort == PortType::In) {
       return modelTarget->getTypeConvertable(
           {connectionDataType, candidateNodeDataType});
-    } else if (requiredPort == PortType::Out) {
+    }
+    if (requiredPort == PortType::Out) {
       return modelTarget->getTypeConvertable(
           {candidateNodeDataType, connectionDataType});
     }
@@ -149,9 +152,10 @@ bool NodeConnectionInteraction::nodePortIsEmpty(PortType  portType,
   auto const &entries = nodeState.getEntries(portType);
 
   try {
-    if (entries.at(portIndex).empty())
+    if (entries.at(portIndex).empty()) {
       return true;
-  } catch (std::out_of_range) {
+    }
+  } catch (std::out_of_range &) {
     GET_INFO();
   }
 

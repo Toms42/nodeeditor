@@ -3,6 +3,7 @@
 #include "NodeImp.hpp"
 #include "StyleCollection.hpp"
 #include "checker.hpp"
+#include <utility>
 
 namespace QtNodes {
 NodeImp::NodeImp()
@@ -60,7 +61,7 @@ void NodeImp::setNodeStyle(const NodeStyle &style) {
 
 void NodeImp::setInData(std::shared_ptr<NodeData> data, PortIndex index) {
   if (auto found = inPorts_.find(index); found != inPorts_.end()) {
-    found->second.handle(data);
+    found->second.handle(std::move(data));
   }
 }
 
@@ -184,11 +185,7 @@ bool NodeImp::portCaptionVisibility(PortType type, PortIndex index) const {
 }
 
 ConnectionPolicy NodeImp::portOutConnectionPolicy(PortIndex index) const {
-  try {
-    return outPorts_.at(index).policy;
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(return outPorts_.at(index).policy);
 }
 
 NodePainterDelegate *NodeImp::painterDelegate() const {

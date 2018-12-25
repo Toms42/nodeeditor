@@ -124,7 +124,7 @@ void FlowScene::nodeRemoved(const QUuid &id) {
     delete ngo;
     auto erased = _nodeGraphicsObjects.erase(id);
     Q_ASSERT(erased == 1);
-  } catch (std::out_of_range) {
+  } catch (std::out_of_range &) {
     GET_INFO();
   }
 }
@@ -188,7 +188,7 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
           conn->deleteLater();
           Q_ASSERT(erased == 1);
         }
-      } catch (std::out_of_range) {
+      } catch (std::out_of_range &) {
         GET_INFO();
       }
     }
@@ -299,7 +299,7 @@ void FlowScene::connectionRemoved(NodeIndex const &leftNode,
     // update validation
     nodeValidationUpdated(leftNode);
     nodeValidationUpdated(rightNode);
-  } catch (std::out_of_range) {
+  } catch (std::out_of_range &) {
     GET_INFO();
   }
 }
@@ -358,11 +358,8 @@ void FlowScene::connectionAdded(NodeIndex const &leftNode,
 }
 
 void FlowScene::nodeMoved(NodeIndex const &index) {
-  try {
-    _nodeGraphicsObjects.at(index.id())->setPos(model()->nodeLocation(index));
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(_nodeGraphicsObjects.at(index.id())
+                         ->setPos(model()->nodeLocation(index)));
 }
 
 //------------------------------------------------------------------------------
@@ -411,11 +408,7 @@ void FlowScene::updateConnection(const NodeIndex &leftNodeIndex,
   id.rPortID = rightPortIndex;
 
   // cgo
-  try {
-    _connGraphicsObjects.at(id)->move();
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(_connGraphicsObjects.at(id)->move());
 }
 
 } // namespace QtNodes

@@ -6,19 +6,22 @@
 
 namespace QtNodes {
 
+/**\warning you can not inheritance this class, because in konstructor uses
+ * virtual functions
+ */
 class NODE_EDITOR_PUBLIC ConnectionStyle final : public Style {
 public:
   ConnectionStyle();
 
-  ConnectionStyle(QString jsonText);
+  ConnectionStyle(const QString &jsonText);
 
 public:
-  static void setConnectionStyle(QString jsonText);
+  static void setConnectionStyle(const QString &jsonText);
 
 private:
-  void loadJsonText(QString jsonText) override;
+  void loadJsonText(const QString &jsonText) override;
 
-  void loadJsonFile(QString fileName) override;
+  void loadJsonFile(const QString &fileName) override;
 
   void loadJsonFromByteArray(QByteArray const &byteArray) override;
 
@@ -27,7 +30,7 @@ public:
 
   QColor normalColor() const;
 
-  QColor normalColor(QString typeId) const;
+  QColor normalColor(const QString &typeId) const;
 
   QColor selectedColor() const;
 

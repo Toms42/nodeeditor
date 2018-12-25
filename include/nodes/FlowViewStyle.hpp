@@ -6,19 +6,22 @@
 
 namespace QtNodes {
 
+/**\warning you can not inheritance this class, because in konstructor uses
+ * virtual functions
+ */
 class NODE_EDITOR_PUBLIC FlowViewStyle final : public Style {
 public:
   FlowViewStyle();
 
-  FlowViewStyle(QString jsonText);
+  FlowViewStyle(const QString &jsonText);
 
 public:
-  static void setStyle(QString jsonText);
+  static void setStyle(const QString &jsonText);
 
 private:
-  void loadJsonText(QString jsonText) override;
+  void loadJsonText(const QString &jsonText) override;
 
-  void loadJsonFile(QString fileName) override;
+  void loadJsonFile(const QString &fileName) override;
 
   void loadJsonFromByteArray(QByteArray const &byteArray) override;
 

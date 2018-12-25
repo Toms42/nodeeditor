@@ -10,6 +10,7 @@
 #include <QtWidgets/QGraphicsEffect>
 #include <QtWidgets/QtWidgets>
 #include <cstdlib>
+#include <utility>
 
 using QtNodes::ConnectionPolicy;
 using QtNodes::FlowScene;
@@ -133,8 +134,9 @@ void NodeGraphicsObject::moveConnections() const {
     auto const &connectionEntries = nodeState().getEntries(portType);
 
     for (auto const &connections : connectionEntries) {
-      for (auto &con : connections.second)
+      for (auto &con : connections.second) {
         con->move();
+      }
     }
   };
 }
@@ -151,7 +153,8 @@ void NodeGraphicsObject::reactToPossibleConnection(
 
   update();
 
-  _state.setReaction(NodeState::REACTING, reactingPortType, reactingDataType);
+  _state.setReaction(
+      NodeState::REACTING, reactingPortType, std::move(reactingDataType));
 }
 
 void NodeGraphicsObject::resetReactionToConnection() {
@@ -178,16 +181,17 @@ QVariant NodeGraphicsObject::itemChange(GraphicsItemChange change,
                                         const QVariant &   value) {
   // TODO I comment this, because in destructor in frame we set new position
   // to childs, and it may be after deleting scene, so I have use after free
-  if (change == ItemPositionChange && scene()) {
-    //  moveConnections();
-  }
+  // if (change == ItemPositionChange && scene()) {
+  //  moveConnections();
+  //}
 
   return QGraphicsItem::itemChange(change, value);
 }
 
 void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-  if (_locked)
+  if (_locked) {
     return;
+  }
 
   // deselect all other items after this one is selected
   if (!isSelected() && !(event->modifiers() & Qt::ControlModifier)) {
@@ -277,6 +281,11 @@ void NodeGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
       auto oldSize = w->size();
 
       oldSize += QSize(diff.x(), diff.y());
+      if (auto sizeHint = w->minimumSizeHint();
+          oldSize.height() < sizeHint.height() ||
+          oldSize.width() < sizeHint.width()) {
+        return;
+      }
 
       w->setFixedSize(oldSize);
 

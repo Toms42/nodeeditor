@@ -130,8 +130,14 @@ void NodeGeometry::recalculateSize() const {
     _height                      = step * maxNumOfEntries;
   }
 
-  if (auto w = _nodeIndex.model()->nodeWidget(_nodeIndex)) {
+  QWidget *w = _nodeIndex.model()->nodeWidget(_nodeIndex);
+  if (w) {
     _height = std::max(_height, static_cast<unsigned>(w->height()));
+    // if port was be dynamicly added, then current _height will be greather
+    // then widget height, so it have to changed
+    if (_height > static_cast<unsigned>(w->height())) {
+      w->setFixedHeight(_height);
+    }
   }
 
   _height += captionHeight();
@@ -141,7 +147,7 @@ void NodeGeometry::recalculateSize() const {
 
   _width = _inputPortWidth + _outputPortWidth + 2 * _spacing;
 
-  if (auto w = _nodeIndex.model()->nodeWidget(_nodeIndex)) {
+  if (w) {
     _width += w->width();
   }
 
@@ -224,8 +230,9 @@ NodeGeometry::checkHitScenePoint(PortType          portType,
 
   PortIndex result = INVALID;
 
-  if (portType == PortType::None)
+  if (portType == PortType::None) {
     return result;
+  }
 
   double const tolerance = 2.0 * nodeStyle.ConnectionPointDiameter;
 
@@ -253,7 +260,7 @@ QRect NodeGeometry::resizeRect() const {
 }
 
 QPointF NodeGeometry::widgetPosition() const {
-  if (auto w = _nodeIndex.model()->nodeWidget(_nodeIndex)) {
+  if (auto *w = _nodeIndex.model()->nodeWidget(_nodeIndex)) {
     if (_nodeIndex.model()->nodeValidationState(_nodeIndex) !=
         NodeValidationState::Valid) {
       return QPointF(_spacing + portWidth(PortType::In),

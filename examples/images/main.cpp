@@ -29,5 +29,5 @@ int main(int argc, char *argv[]) {
   view.resize(800, 600);
   view.show();
 
-  return app.exec();
+  return QApplication::exec();
 }

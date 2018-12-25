@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValueRef>
 #include <iostream>
+#include <utility>
 
 using QtNodes::ConnectionStyle;
 
@@ -24,12 +25,12 @@ ConnectionStyle::ConnectionStyle() {
   loadJsonFile(":DefaultStyle.json");
 }
 
-ConnectionStyle::ConnectionStyle(QString jsonText) {
+ConnectionStyle::ConnectionStyle(const QString &jsonText) {
   loadJsonFile(":DefaultStyle.json");
   loadJsonText(jsonText);
 }
 
-void ConnectionStyle::setConnectionStyle(QString jsonText) {
+void ConnectionStyle::setConnectionStyle(const QString &jsonText) {
   ConnectionStyle style(jsonText);
 
   StyleCollection::setConnectionStyle(style);
@@ -83,7 +84,7 @@ void ConnectionStyle::setConnectionStyle(QString jsonText) {
       variable = valueRef.toBool();                                            \
   }
 
-void ConnectionStyle::loadJsonFile(QString styleFile) {
+void ConnectionStyle::loadJsonFile(const QString &styleFile) {
   QFile file(styleFile);
 
   if (!file.open(QIODevice::ReadOnly)) {
@@ -95,7 +96,7 @@ void ConnectionStyle::loadJsonFile(QString styleFile) {
   loadJsonFromByteArray(file.readAll());
 }
 
-void ConnectionStyle::loadJsonText(QString jsonText) {
+void ConnectionStyle::loadJsonText(const QString &jsonText) {
   loadJsonFromByteArray(jsonText.toUtf8());
 }
 
@@ -129,7 +130,7 @@ QColor ConnectionStyle::normalColor() const {
   return NormalColor;
 }
 
-QColor ConnectionStyle::normalColor(QString typeId) const {
+QColor ConnectionStyle::normalColor(const QString &typeId) const {
   std::size_t hash = qHash(typeId);
 
   std::size_t const hue_range = 0xFF;

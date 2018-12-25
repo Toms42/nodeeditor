@@ -250,7 +250,7 @@ void ConnectionGraphicsObject::mouseReleaseEvent(
       _scene._temporaryConn = nullptr;
       deleteLater();
     }
-  } catch (std::out_of_range) {
+  } catch (std::out_of_range &) {
     GET_INFO();
   }
 }

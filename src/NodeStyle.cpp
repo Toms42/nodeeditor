@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValueRef>
 #include <iostream>
+#include <utility>
 
 using QtNodes::NodeStyle;
 
@@ -24,11 +25,11 @@ NodeStyle::NodeStyle() {
   loadJsonFile(":DefaultStyle.json");
 }
 
-NodeStyle::NodeStyle(QString jsonText) {
+NodeStyle::NodeStyle(const QString &jsonText) {
   loadJsonText(jsonText);
 }
 
-void NodeStyle::setNodeStyle(QString jsonText) {
+void NodeStyle::setNodeStyle(const QString &jsonText) {
   NodeStyle style(jsonText);
 
   StyleCollection::setNodeStyle(style);
@@ -68,7 +69,7 @@ void NodeStyle::setNodeStyle(QString jsonText) {
     variable = valueRef.toDouble();                                            \
   }
 
-void NodeStyle::loadJsonFile(QString styleFile) {
+void NodeStyle::loadJsonFile(const QString &styleFile) {
   QFile file(styleFile);
 
   if (!file.open(QIODevice::ReadOnly)) {
@@ -80,7 +81,7 @@ void NodeStyle::loadJsonFile(QString styleFile) {
   loadJsonFromByteArray(file.readAll());
 }
 
-void NodeStyle::loadJsonText(QString jsonText) {
+void NodeStyle::loadJsonText(const QString &jsonText) {
   loadJsonFromByteArray(jsonText.toUtf8());
 }
 

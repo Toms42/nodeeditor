@@ -47,8 +47,9 @@ QList<QUuid> DataFlowModel::nodeUUids() const {
 
 NodeIndex DataFlowModel::nodeIndex(const QUuid &ID) const {
   auto iter = _nodes.find(ID);
-  if (iter == _nodes.end())
+  if (iter == _nodes.end()) {
     return {};
+  }
 
   return createIndex(ID, iter->second.get());
 }
@@ -246,11 +247,7 @@ bool DataFlowModel::removeConnection(NodeIndex const &leftNodeIdx,
   connID.lPortID = leftPortID;
   connID.rPortID = rightPortID;
 
-  try {
-    _connections.at(connID)->propagateEmptyData();
-  } catch (std::out_of_range) {
-    GET_INFO();
-  }
+  CHECK_OUT_OF_RANGE(_connections.at(connID)->propagateEmptyData());
 
   // remove it from the nodes
   auto &leftConns = leftNode->connections(PortType::Out, leftPortID);

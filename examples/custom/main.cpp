@@ -21,5 +21,5 @@ int main(int argc, char *argv[]) {
   view.setWindowTitle("My custom sample");
   view.show();
 
-  return app.exec();
+  return ::QApplication::exec();
 }
