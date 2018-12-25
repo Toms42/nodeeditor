@@ -6,11 +6,11 @@
 
 class FormData : public QtNodes::NodeData {
 public:
-  FormData(){};
+  FormData() = default;
   explicit FormData(const QString &data)
       : data_{data} {};
 
-  QtNodes::NodeDataType type() const {
+  QtNodes::NodeDataType type() const override {
     return QtNodes::NodeDataType{"Form", "text"};
   };
 

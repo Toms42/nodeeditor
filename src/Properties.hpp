@@ -11,7 +11,7 @@ public:
   void put(QString const &name, QVariant const &v);
 
   template <typename T>
-  bool get(QString name, T *v) const {
+  bool get(const QString &name, T *v) const {
     QVariant const &var = _values[name];
 
     if (var.canConvert<T>()) {
