@@ -1,6 +1,3 @@
-#ifndef NODES_FLOWSCENE_HPP
-#define NODES_FLOWSCENE_HPP
-
 #pragma once
 
 #include "ConnectionID.hpp"
@@ -85,5 +82,3 @@ NodeGraphicsObject *locateNodeAt(QPointF           scenePoint,
                                  FlowScene &       scene,
                                  QTransform const &viewTransform);
 } // namespace QtNodes
-
-#endif

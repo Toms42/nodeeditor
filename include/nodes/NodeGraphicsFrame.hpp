@@ -1,6 +1,3 @@
-#ifndef NODES_NODEGRAPHICSFRAME_HPP
-#define NODES_NODEGRAPHICSFRAME_HPP
-
 // NodeGraphicsFrame.hpp
 
 #pragma once
@@ -57,5 +54,3 @@ protected:
   void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 };
 }; // namespace QtNodes
-
-#endif

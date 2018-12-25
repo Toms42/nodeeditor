@@ -1,6 +1,3 @@
-#ifndef NODES_NODEIMP_HPP
-#define NODES_NODEIMP_HPP
-
 // NodeImp.hpp
 
 #pragma once
@@ -115,5 +112,3 @@ private:
 };
 
 }; // namespace QtNodes
-
-#endif

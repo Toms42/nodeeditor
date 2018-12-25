@@ -1,6 +1,3 @@
-#ifndef NODES_NODE_HPP
-#define NODES_NODE_HPP
-
 #pragma once
 
 #include "Export.hpp"
@@ -89,5 +86,3 @@ private:
   QPointF                                        _pos;
 };
 } // namespace QtNodes
-
-#endif

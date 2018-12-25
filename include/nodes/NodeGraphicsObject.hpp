@@ -1,6 +1,3 @@
-#ifndef NODES_NODEGRAPHICSOBJECT_HPP
-#define NODES_NODEGRAPHICSOBJECT_HPP
-
 #pragma once
 
 #include "NodeGeometry.hpp"
@@ -110,4 +107,3 @@ protected:
 };
 } // namespace QtNodes
 
-#endif

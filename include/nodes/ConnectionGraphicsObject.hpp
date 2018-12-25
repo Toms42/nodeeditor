@@ -1,6 +1,3 @@
-#ifndef NODES_CONNECTIONGRAPHICSOBJECT_HPP
-#define NODES_CONNECTIONGRAPHICSOBJECT_HPP
-
 #pragma once
 
 #include "ConnectionGeometry.hpp"
@@ -102,5 +99,3 @@ private:
   PortIndex _rightPortIndex;
 };
 } // namespace QtNodes
-
-#endif

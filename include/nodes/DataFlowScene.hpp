@@ -1,6 +1,3 @@
-#ifndef NODES_DATAFLOWSCENE_HPP
-#define NODES_DATAFLOWSCENE_HPP
-
 #pragma once
 
 #include "Export.hpp"
@@ -109,5 +106,3 @@ private:
 };
 
 } // namespace QtNodes
-
-#endif

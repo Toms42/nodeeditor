@@ -1,6 +1,3 @@
-#ifndef NODES_CONNECTION_HPP
-#define NODES_CONNECTION_HPP
-
 #pragma once
 
 #include "ConnectionGeometry.hpp"
@@ -88,5 +85,3 @@ signals:
   void updated(Connection &conn) const;
 };
 } // namespace QtNodes
-
-#endif
