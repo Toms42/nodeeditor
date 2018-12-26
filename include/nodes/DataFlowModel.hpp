@@ -23,6 +23,7 @@ class Node;
 class NODE_EDITOR_PUBLIC DataFlowModel : public FlowSceneModel {
 public:
   DataFlowModel(std::shared_ptr<DataModelRegistry> reg);
+  ~DataFlowModel() override = default;
 
   // FlowSceneModel read interface
   QStringList modelRegistry() const override;

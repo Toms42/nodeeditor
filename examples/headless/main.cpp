@@ -1,4 +1,3 @@
-
 #include "models.hpp"
 #include <nodes/DataFlowModel>
 #include <nodes/Node>
@@ -23,7 +22,6 @@ int main() {
 
   model.addConnection(source, 0, sink, 0);
 
-  Q_ASSERT(
-      static_cast<Sink *>(model.nodes()[sink.id()]->nodeDataModel())->data ==
-      "Hello World!");
+  Q_ASSERT(reinterpret_cast<Sink *>(model.nodes()[sink.id()]->nodeDataModel())
+               ->data == "Hello World!");
 }

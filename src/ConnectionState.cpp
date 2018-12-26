@@ -13,8 +13,6 @@ ConnectionState::~ConnectionState() {
 void ConnectionState::interactWithNode(NodeGraphicsObject *node) {
   if (node) {
     _lastHoveredNode = node;
-  } else {
-    resetLastHoveredNode();
   }
 }
 

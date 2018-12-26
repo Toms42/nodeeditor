@@ -21,7 +21,7 @@ using QtNodes::PortIndex;
 DataFlowScene::DataFlowScene(std::shared_ptr<DataModelRegistry> registry,
                              QObject *                          parent)
     : FlowScene(new DataFlowModel(std::move(registry)), parent) {
-  _dataFlowModel = static_cast<DataFlowModel *>(model());
+  _dataFlowModel = reinterpret_cast<DataFlowModel *>(model());
 }
 
 DataFlowScene::~DataFlowScene() {

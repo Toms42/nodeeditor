@@ -44,7 +44,7 @@ ConnectionGraphicsObject::ConnectionGraphicsObject(NodeIndex const &leftNode,
 
   // addGraphicsEffect();
 
-  setZValue(-1.0);
+  setZValue(-0.5);
 
   // initialize the end points
   if (leftNode.isValid()) {
@@ -192,10 +192,11 @@ void ConnectionGraphicsObject::mousePressEvent(
 }
 
 void ConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
-  auto view = static_cast<QGraphicsView *>(event->widget());
+  auto view = reinterpret_cast<QGraphicsView *>(event->widget());
   auto node = locateNodeAt(event->scenePos(), _scene, view->transform());
 
-  state().interactWithNode(node);
+  // TODO I don't see any reason for do this
+  // state().interactWithNode(node);
   if (node) {
     node->reactToPossibleConnection(
         state().requiredPort(),

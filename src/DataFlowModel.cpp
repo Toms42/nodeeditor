@@ -56,7 +56,7 @@ NodeIndex DataFlowModel::nodeIndex(const QUuid &ID) const {
 QString DataFlowModel::nodeTypeIdentifier(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   return node->nodeImp()->name();
 }
@@ -75,21 +75,21 @@ QString DataFlowModel::nodeCaption(NodeIndex const &index) const {
 QPointF DataFlowModel::nodeLocation(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   return node->position();
 }
 QWidget *DataFlowModel::nodeWidget(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   return node->nodeImp()->embeddedWidget();
 }
 bool DataFlowModel::nodeResizable(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   return node->nodeImp()->resizable();
 }
@@ -97,7 +97,7 @@ NodeValidationState
 DataFlowModel::nodeValidationState(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   return node->nodeImp()->validationState();
 }
@@ -105,7 +105,7 @@ DataFlowModel::nodeValidationState(NodeIndex const &index) const {
 QString DataFlowModel::nodeValidationMessage(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   return node->nodeImp()->validationMessage();
 }
@@ -114,7 +114,7 @@ NodePainterDelegate *
 DataFlowModel::nodePainterDelegate(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   return node->nodeImp()->painterDelegate();
 }
@@ -165,7 +165,7 @@ NodeDataType DataFlowModel::nodePortDataType(NodeIndex const &index,
                                              PortType         portType) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   return node->nodeImp()->dataType(portType, pIndex);
 }
@@ -173,7 +173,7 @@ ConnectionPolicy DataFlowModel::nodePortConnectionPolicy(
     NodeIndex const &index, PortIndex pIndex, PortType portType) const {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
   if (portType == PortType::In) {
     return ConnectionPolicy::One;
@@ -281,8 +281,8 @@ bool DataFlowModel::addConnection(NodeIndex const &leftNodeIdx,
   Q_ASSERT(leftNodeIdx.isValid());
   Q_ASSERT(rightNodeIdx.isValid());
 
-  auto *leftNode  = static_cast<Node *>(leftNodeIdx.internalPointer());
-  auto *rightNode = static_cast<Node *>(rightNodeIdx.internalPointer());
+  auto *leftNode  = reinterpret_cast<Node *>(leftNodeIdx.internalPointer());
+  auto *rightNode = reinterpret_cast<Node *>(rightNodeIdx.internalPointer());
 
   // type conversions
   TypeConverter conv = {};
@@ -409,7 +409,7 @@ ConnectionID DataFlowModel::addConnection(Node *        leftNode,
 bool DataFlowModel::moveNode(NodeIndex const &index, QPointF newLocation) {
   Q_ASSERT(index.isValid());
 
-  auto *node = static_cast<Node *>(index.internalPointer());
+  auto *node = reinterpret_cast<Node *>(index.internalPointer());
   node->setPosition(newLocation);
 
   // no need to emit, it's done by the function already
