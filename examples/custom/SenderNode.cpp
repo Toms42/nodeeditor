@@ -47,7 +47,7 @@ bool SenderNode::addPort(const QString &caption, unsigned int index) {
   port.caption        = caption;
   port.captionVisible = true;
   port.dataType       = FormData().type();
-  port.policy         = QtNodes::ConnectionPolicy::One;
+  port.outPolicy      = QtNodes::ConnectionPolicy::One;
   port.handle         = [this](std::shared_ptr<QtNodes::NodeData>) {
     return std::make_shared<FormData>(widget_->getInfo());
     emit

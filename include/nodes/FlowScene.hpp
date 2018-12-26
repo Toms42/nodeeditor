@@ -14,16 +14,14 @@ namespace QtNodes {
 
 class FlowSceneModel;
 class ConnectionGraphicsObject;
-class NodeGraphicsObject;
+class NodeComposite;
 class NodeIndex;
+class NodeGraphicsObject;
 
 /// The FlowScene is responsible for rendering a FlowSceneModel
 /// If you're looking for a basic dataflow model, see DataFlowScene
 class NODE_EDITOR_PUBLIC FlowScene : public QGraphicsScene {
   Q_OBJECT
-
-  friend NodeGraphicsObject;
-  friend ConnectionGraphicsObject;
 
 public:
   FlowScene(FlowSceneModel *model, QObject *parent = Q_NULLPTR);
@@ -33,9 +31,18 @@ public:
 public:
   FlowSceneModel *model() const { return _model; }
 
-  NodeGraphicsObject *nodeGraphicsObject(const NodeIndex &index);
+  NodeComposite *nodeComposite(const NodeIndex &index);
 
   std::vector<NodeIndex> selectedNodes() const;
+
+  /**\return temp connection. Only one exempljar per time
+   */
+  ConnectionGraphicsObject *temporaryConn() const;
+
+  /**\brief set temp connection. Also add it to scene
+   * \warning not set ownershiep
+   */
+  void setTemporaryConn(ConnectionGraphicsObject *conn);
 
 private slots:
 
@@ -69,7 +76,7 @@ private slots:
 private:
   FlowSceneModel *_model;
 
-  std::unordered_map<QUuid, NodeGraphicsObject *> _nodeGraphicsObjects;
+  std::unordered_map<QUuid, class NodeComposite *> nodeComposites_;
 
   std::unordered_map<ConnectionID, ConnectionGraphicsObject *>
       _connGraphicsObjects;
@@ -78,7 +85,7 @@ private:
   ConnectionGraphicsObject *_temporaryConn = nullptr;
 };
 
-NodeGraphicsObject *locateNodeAt(QPointF           scenePoint,
-                                 FlowScene &       scene,
-                                 QTransform const &viewTransform);
+NodeComposite *locateNodeAt(QPointF           scenePoint,
+                            FlowScene &       scene,
+                            QTransform const &viewTransform);
 } // namespace QtNodes

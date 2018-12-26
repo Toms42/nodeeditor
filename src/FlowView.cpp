@@ -241,7 +241,7 @@ void FlowView::deleteSelectedNodes() {
   // when a selected connection is deleted by deleting the node.
   for (QGraphicsItem *item : _scene->selectedItems()) {
     if (auto n = qgraphicsitem_cast<NodeGraphicsObject *>(item)) {
-      auto index = n->index();
+      auto index = n->nodeIndex();
 
       scene()->model()->removeNodeWithConnections(index);
     }

@@ -6,6 +6,6 @@ add_subdirectory(example2)
 
 add_subdirectory(images)
 
-#add_subdirectory(styles)
+add_subdirectory(styles)
 
 add_subdirectory(custom)

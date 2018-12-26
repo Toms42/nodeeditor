@@ -1,8 +1,8 @@
 #include "NodePainter.hpp"
 #include "FlowScene.hpp"
 #include "FlowSceneModel.hpp"
+#include "NodeComposite.hpp"
 #include "NodeGeometry.hpp"
-#include "NodeGraphicsObject.hpp"
 #include "NodeIndex.hpp"
 #include "NodePainterDelegate.hpp"
 #include "NodeState.hpp"
@@ -18,8 +18,8 @@ using QtNodes::NodeGraphicsObject;
 using QtNodes::NodePainter;
 using QtNodes::NodeState;
 
-void NodePainter::paint(QPainter *                painter,
-                        NodeGraphicsObject const &graphicsObject) {
+void NodePainter::paint(QPainter *           painter,
+                        NodeComposite const &graphicsObject) {
   NodeGeometry const &geom = graphicsObject.geometry();
 
   geom.recalculateSize(painter->font());
@@ -42,17 +42,17 @@ void NodePainter::paint(QPainter *                painter,
 
   /// call custom painter
   if (auto painterDelegate =
-          graphicsObject.index().model()->nodePainterDelegate(
-              graphicsObject.index())) {
+          graphicsObject.nodeIndex().model()->nodePainterDelegate(
+              graphicsObject.nodeIndex())) {
     painterDelegate->paint(
-        painter, graphicsObject.geometry(), graphicsObject.index());
+        painter, graphicsObject.geometry(), graphicsObject.nodeIndex());
   }
 }
 
-void NodePainter::drawNodeRect(QPainter *                painter,
-                               NodeGraphicsObject const &graphicsObject) {
+void NodePainter::drawNodeRect(QPainter *           painter,
+                               NodeComposite const &graphicsObject) {
   FlowSceneModel &    model     = *graphicsObject.flowScene().model();
-  NodeStyle const &   nodeStyle = model.nodeStyle(graphicsObject.index());
+  NodeStyle const &   nodeStyle = model.nodeStyle(graphicsObject.nodeIndex());
   NodeGeometry const &geom      = graphicsObject.geometry();
 
   auto color = graphicsObject.isSelected() ? nodeStyle.SelectedBoundaryColor
@@ -85,10 +85,10 @@ void NodePainter::drawNodeRect(QPainter *                painter,
   painter->drawRoundedRect(boundary, radius, radius);
 }
 
-void NodePainter::drawConnectionPoints(
-    QPainter *painter, NodeGraphicsObject const &graphicsObject) {
+void NodePainter::drawConnectionPoints(QPainter *           painter,
+                                       NodeComposite const &graphicsObject) {
   const FlowSceneModel &model     = *graphicsObject.flowScene().model();
-  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.index());
+  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.nodeIndex());
   auto const &          connectionStyle = StyleCollection::connectionStyle();
   NodeState const &     state           = graphicsObject.nodeState();
   NodeGeometry const &  geom            = graphicsObject.geometry();
@@ -101,13 +101,14 @@ void NodePainter::drawConnectionPoints(
       QPointF p = geom.portScenePosition(i.first, portType);
 
       auto const &dataType =
-          model.nodePortDataType(graphicsObject.index(), i.first, portType);
+          model.nodePortDataType(graphicsObject.nodeIndex(), i.first, portType);
 
-      bool canConnect = (state.getEntries(portType).at(i.first).empty() ||
-                         (portType == PortType::Out &&
-                          model.nodePortConnectionPolicy(
-                              graphicsObject.index(), i.first, PortType::Out) ==
-                              ConnectionPolicy::Many));
+      bool canConnect =
+          (state.getEntries(portType).at(i.first).empty() ||
+           (portType == PortType::Out &&
+            model.nodePortConnectionPolicy(
+                graphicsObject.nodeIndex(), i.first, PortType::Out) ==
+                ConnectionPolicy::Many));
 
       double r = 1.0;
       if (state.isReacting() && canConnect &&
@@ -147,9 +148,9 @@ void NodePainter::drawConnectionPoints(
 }
 
 void NodePainter::drawFilledConnectionPoints(
-    QPainter *painter, NodeGraphicsObject const &graphicsObject) {
-  FlowSceneModel const &model     = *graphicsObject.index().model();
-  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.index());
+    QPainter *painter, NodeComposite const &graphicsObject) {
+  FlowSceneModel const &model     = *graphicsObject.nodeIndex().model();
+  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.nodeIndex());
   auto const &          connectionStyle = StyleCollection::connectionStyle();
   NodeState const &     state           = graphicsObject.nodeState();
   NodeGeometry const &  geom            = graphicsObject.geometry();
@@ -161,8 +162,8 @@ void NodePainter::drawFilledConnectionPoints(
       QPointF p = geom.portScenePosition(i.first, portType);
 
       if (!state.getEntries(portType).at(i.first).empty()) {
-        auto const &dataType =
-            model.nodePortDataType(graphicsObject.index(), i.first, portType);
+        auto const &dataType = model.nodePortDataType(
+            graphicsObject.nodeIndex(), i.first, portType);
 
         if (connectionStyle.useDataDefinedColors()) {
           QColor const c = connectionStyle.normalColor(dataType.id);
@@ -179,13 +180,13 @@ void NodePainter::drawFilledConnectionPoints(
   }
 }
 
-void NodePainter::drawModelName(QPainter *                painter,
-                                NodeGraphicsObject const &graphicsObject) {
-  FlowSceneModel const &model     = *graphicsObject.index().model();
-  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.index());
+void NodePainter::drawModelName(QPainter *           painter,
+                                NodeComposite const &graphicsObject) {
+  FlowSceneModel const &model     = *graphicsObject.nodeIndex().model();
+  NodeStyle const &     nodeStyle = model.nodeStyle(graphicsObject.nodeIndex());
   NodeGeometry const &  geom      = graphicsObject.geometry();
 
-  QString const &name = model.nodeCaption(graphicsObject.index());
+  QString const &name = model.nodeCaption(graphicsObject.nodeIndex());
 
   if (name.isEmpty()) {
     return;
@@ -208,15 +209,15 @@ void NodePainter::drawModelName(QPainter *                painter,
   painter->setFont(f);
 }
 
-void NodePainter::drawEntryLabels(QPainter *                painter,
-                                  NodeGraphicsObject const &graphicsObject) {
+void NodePainter::drawEntryLabels(QPainter *           painter,
+                                  NodeComposite const &graphicsObject) {
   NodeState const &     state   = graphicsObject.nodeState();
   NodeGeometry const &  geom    = graphicsObject.geometry();
-  FlowSceneModel const &model   = *graphicsObject.index().model();
+  FlowSceneModel const &model   = *graphicsObject.nodeIndex().model();
   QFontMetrics const &  metrics = painter->fontMetrics();
 
   for (PortType portType : {PortType::Out, PortType::In}) {
-    auto const &nodeStyle = model.nodeStyle(graphicsObject.index());
+    auto const &nodeStyle = model.nodeStyle(graphicsObject.nodeIndex());
 
     for (auto &i : state.getEntries(portType)) {
       QPointF p = geom.portScenePosition(i.first, portType);
@@ -229,10 +230,11 @@ void NodePainter::drawEntryLabels(QPainter *                painter,
       }
 
       QString s =
-          model.nodePortCaption(graphicsObject.index(), i.first, portType);
+          model.nodePortCaption(graphicsObject.nodeIndex(), i.first, portType);
 
       if (s.isEmpty()) {
-        s = model.nodePortDataType(graphicsObject.index(), i.first, portType)
+        s = model
+                .nodePortDataType(graphicsObject.nodeIndex(), i.first, portType)
                 .name;
       }
 
@@ -258,26 +260,27 @@ void NodePainter::drawEntryLabels(QPainter *                painter,
   }
 }
 
-void NodePainter::drawResizeRect(QPainter *                painter,
-                                 NodeGraphicsObject const &graphicsObject) {
-  FlowSceneModel const &model = *graphicsObject.index().model();
+void NodePainter::drawResizeRect(QPainter *           painter,
+                                 NodeComposite const &graphicsObject) {
+  FlowSceneModel const &model = *graphicsObject.nodeIndex().model();
 
-  if (model.nodeResizable(graphicsObject.index())) {
+  if (model.nodeResizable(graphicsObject.nodeIndex())) {
     painter->setBrush(Qt::gray);
 
     painter->drawEllipse(graphicsObject.geometry().resizeRect());
   }
 }
 
-void NodePainter::drawValidationRect(QPainter *                painter,
-                                     NodeGraphicsObject const &graphicsObject) {
-  FlowSceneModel const &model = *graphicsObject.index().model();
+void NodePainter::drawValidationRect(QPainter *           painter,
+                                     NodeComposite const &graphicsObject) {
+  FlowSceneModel const &model = *graphicsObject.nodeIndex().model();
   NodeGeometry const &  geom  = graphicsObject.geometry();
 
-  auto modelValidationState = model.nodeValidationState(graphicsObject.index());
+  auto modelValidationState =
+      model.nodeValidationState(graphicsObject.nodeIndex());
 
   if (modelValidationState != NodeValidationState::Valid) {
-    NodeStyle const &nodeStyle = model.nodeStyle(graphicsObject.index());
+    NodeStyle const &nodeStyle = model.nodeStyle(graphicsObject.nodeIndex());
 
     auto color = graphicsObject.isSelected() ? nodeStyle.SelectedBoundaryColor
                                              : nodeStyle.NormalBoundaryColor;
@@ -312,7 +315,7 @@ void NodePainter::drawValidationRect(QPainter *                painter,
 
     // Drawing the validation message itself
     QString const &errorMsg =
-        model.nodeValidationMessage(graphicsObject.index());
+        model.nodeValidationMessage(graphicsObject.nodeIndex());
 
     QFont f = painter->font();
 

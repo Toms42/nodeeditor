@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_RECEIVERNODE_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_RECEIVERNODE_HPP
-
 // ReceiverNode.hpp
 
 #pragma once
@@ -26,5 +23,3 @@ private:
   QtNodes::NodeValidationState validationState_;
   QString                      validationMessage_;
 };
-
-#endif

@@ -6,7 +6,7 @@ namespace QtNodes {
 
 class NodeState;
 class NodeGeometry;
-class NodeGraphicsObject;
+class NodeComposite;
 class FlowItemEntry;
 class FlowScene;
 
@@ -15,29 +15,27 @@ public:
   NodePainter();
 
 public:
-  static void paint(QPainter *                painter,
-                    NodeGraphicsObject const &graphicsObject);
+  static void paint(QPainter *painter, NodeComposite const &graphicsObject);
 
-  static void drawNodeRect(QPainter *                painter,
-                           NodeGraphicsObject const &graphicsObject);
+  static void drawNodeRect(QPainter *           painter,
+                           NodeComposite const &graphicsObject);
 
-  static void drawModelName(QPainter *                painter,
-                            NodeGraphicsObject const &graphicsObject);
+  static void drawModelName(QPainter *           painter,
+                            NodeComposite const &graphicsObject);
 
-  static void drawEntryLabels(QPainter *                painter,
-                              NodeGraphicsObject const &graphicsObject);
+  static void drawEntryLabels(QPainter *           painter,
+                              NodeComposite const &graphicsObject);
 
-  static void drawConnectionPoints(QPainter *                painter,
-                                   NodeGraphicsObject const &graphicsObject);
+  static void drawConnectionPoints(QPainter *           painter,
+                                   NodeComposite const &graphicsObject);
 
-  static void
-  drawFilledConnectionPoints(QPainter *                painter,
-                             NodeGraphicsObject const &graphicsObject);
+  static void drawFilledConnectionPoints(QPainter *           painter,
+                                         NodeComposite const &graphicsObject);
 
-  static void drawResizeRect(QPainter *                painter,
-                             NodeGraphicsObject const &graphicsObject);
+  static void drawResizeRect(QPainter *           painter,
+                             NodeComposite const &graphicsObject);
 
-  static void drawValidationRect(QPainter *                painter,
-                                 NodeGraphicsObject const &graphicsObject);
+  static void drawValidationRect(QPainter *           painter,
+                                 NodeComposite const &graphicsObject);
 };
 } // namespace QtNodes

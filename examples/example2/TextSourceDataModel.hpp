@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTSOURCEDATAMODEL_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTSOURCEDATAMODEL_HPP
-
 #pragma once
 
 #include "TextData.hpp"
@@ -39,5 +36,3 @@ private slots:
 private:
   QLineEdit *_lineEdit;
 };
-
-#endif

@@ -11,11 +11,11 @@
 
 namespace QtNodes {
 
-class NodeGraphicsObject;
+class NodeComposite;
 
 class NODE_EDITOR_PUBLIC NodeGeometry final : public QObject {
 public:
-  NodeGeometry(NodeIndex const &index, NodeGraphicsObject &obj);
+  NodeGeometry(NodeIndex const &index, NodeComposite &obj);
 
 public:
   unsigned int height() const;
@@ -80,13 +80,15 @@ public:
   unsigned int validationWidth() const;
 
   static QPointF
-  calculateNodePositionBetweenNodePorts(PortIndex targetPortIndex,
-                                        PortType  targetPort,
-                                        NodeGraphicsObject const &targetNode,
-                                        PortIndex sourcePortIndex,
-                                        PortType  sourcePort,
-                                        NodeGraphicsObject const &sourceNode,
-                                        NodeGeometry const &      newNodeGeom);
+  calculateNodePositionBetweenNodePorts(PortIndex            targetPortIndex,
+                                        PortType             targetPort,
+                                        NodeComposite const &targetNode,
+                                        PortIndex            sourcePortIndex,
+                                        PortType             sourcePort,
+                                        NodeComposite const &sourceNode,
+                                        NodeGeometry const & newNodeGeom);
+
+  void prepareGeometryChange() const;
 
 private:
   unsigned int captionHeight() const;
@@ -96,7 +98,7 @@ private:
   unsigned int portWidth(PortType portType) const;
 
 private:
-  NodeGraphicsObject &_obj;
+  NodeComposite &_obj;
 
   // some variables are mutable because
   // we need to change drawing metrics

@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_SENDERNODE_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_SENDERNODE_HPP
-
 // SenderNode.hpp
 
 #pragma once
@@ -30,5 +27,3 @@ private:
   QtNodes::NodeValidationState validationState_;
   QString                      validationMessage_;
 };
-
-#endif

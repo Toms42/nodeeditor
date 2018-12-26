@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_PIXMAPDATA_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_PIXMAPDATA_HPP
-
 #pragma once
 
 #include "nodes/NodeData.hpp"
@@ -28,5 +25,3 @@ public:
 private:
   QPixmap _pixmap;
 };
-
-#endif

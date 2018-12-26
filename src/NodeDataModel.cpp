@@ -187,7 +187,7 @@ bool NodeDataModel::portCaptionVisibility(PortType  type,
 }
 
 ConnectionPolicy NodeDataModel::portOutConnectionPolicy(PortIndex index) const {
-  CHECK_OUT_OF_RANGE(return outPorts_.at(index).policy);
+  CHECK_OUT_OF_RANGE(return outPorts_.at(index).outPolicy);
 }
 
 NodePainterDelegate *NodeDataModel::painterDelegate() const {

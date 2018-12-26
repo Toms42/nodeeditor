@@ -3,21 +3,23 @@
 #pragma once
 
 #include "FlowScene.hpp"
+#include "NodeComposite.hpp"
 #include "NodeGeometry.hpp"
-#include "NodeGraphicsObject.hpp"
 #include "NodeIndex.hpp"
 #include "NodeState.hpp"
 
 namespace QtNodes {
-class NodeGraphicsFrame final : public NodeGraphicsObject {
+class NodeGraphicsFrame final : public NodeComposite {
   Q_OBJECT
 
 public:
-  explicit NodeGraphicsFrame(FlowScene &scene, const NodeIndex &nodeIndex);
+  NodeGraphicsFrame(FlowScene &scene, const NodeIndex &nodeIndex);
 
   ~NodeGraphicsFrame() override;
 
   int type() const override;
+
+  bool canBeParent() const override;
 
   /**\brief void method
    */
@@ -28,29 +30,5 @@ public:
   /**\brief void method
    */
   void resetReactionToConnection() override;
-
-  QVariant itemChange(GraphicsItemChange change,
-                      const QVariant &   value) override;
-
-  /**\brief void method
-   */
-  void moveConnections() const override;
-
-protected:
-  void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
-
-  void mouseMoveEvent(QGraphicsSceneMouseEvent *event) override;
-
-  void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
-
-  /**\brief void method
-   */
-  void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-
-  /**\brief void method
-   */
-  void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-
-  void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
 };
 }; // namespace QtNodes

@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_IMAGELOADERMODEL_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_IMAGELOADERMODEL_HPP
-
 #pragma once
 
 #include "PixmapData.hpp"
@@ -45,5 +42,3 @@ private:
 
   QPixmap _pixmap;
 };
-
-#endif

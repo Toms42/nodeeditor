@@ -1,12 +1,12 @@
 #include "models.hpp"
 #include <QtWidgets/QApplication>
-#include <nodes/ConnectionStyle>
-#include <nodes/DataFlowScene>
-#include <nodes/DataModelRegistry>
-#include <nodes/FlowView>
-#include <nodes/FlowViewStyle>
-#include <nodes/NodeData>
-#include <nodes/NodeStyle>
+#include <nodes/ConnectionStyle.hpp>
+#include <nodes/DataFlowScene.hpp>
+#include <nodes/DataModelRegistry.hpp>
+#include <nodes/FlowView.hpp>
+#include <nodes/FlowViewStyle.hpp>
+#include <nodes/NodeData.hpp>
+#include <nodes/NodeStyle.hpp>
 
 using QtNodes::ConnectionStyle;
 using QtNodes::DataFlowScene;

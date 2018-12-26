@@ -34,8 +34,6 @@ ConnectionGraphicsObject::ConnectionGraphicsObject(NodeIndex const &leftNode,
     , _rightNode{rightNode}
     , _leftPortIndex{leftPortIndex}
     , _rightPortIndex{rightPortIndex} {
-  _scene.addItem(this);
-
   setFlag(QGraphicsItem::ItemIsMovable, true);
   setFlag(QGraphicsItem::ItemIsFocusable, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -48,7 +46,7 @@ ConnectionGraphicsObject::ConnectionGraphicsObject(NodeIndex const &leftNode,
 
   // initialize the end points
   if (leftNode.isValid()) {
-    auto ngo = _scene.nodeGraphicsObject(leftNode);
+    auto ngo = _scene.nodeComposite(leftNode);
     Q_ASSERT(ngo != nullptr);
 
     geometry().moveEndPoint(
@@ -57,7 +55,7 @@ ConnectionGraphicsObject::ConnectionGraphicsObject(NodeIndex const &leftNode,
             leftPortIndex, PortType::Out, ngo->sceneTransform()));
   }
   if (rightNode.isValid()) {
-    auto ngo = _scene.nodeGraphicsObject(rightNode);
+    auto ngo = _scene.nodeComposite(rightNode);
     Q_ASSERT(ngo != nullptr);
 
     geometry().moveEndPoint(
@@ -67,13 +65,7 @@ ConnectionGraphicsObject::ConnectionGraphicsObject(NodeIndex const &leftNode,
   }
 }
 
-ConnectionGraphicsObject::~ConnectionGraphicsObject() {
-  // TODO I think it is uncorrect. When, for example, we set parent to item - it
-  // will be big problem, because, when we remove parent item, all childs will
-  // be removed form scene automaticly
-
-  //_scene.removeItem(this);
-}
+ConnectionGraphicsObject::~ConnectionGraphicsObject() {}
 
 int ConnectionGraphicsObject::type() const {
   return Connection;
@@ -150,7 +142,7 @@ void ConnectionGraphicsObject::move() {
     if (nodeIndex.isValid()) {
       // here we dereference pointer, which can be nullptr! So we first check
       // this
-      auto temp = _scene.nodeGraphicsObject(nodeIndex);
+      auto temp = _scene.nodeComposite(nodeIndex);
       if (temp) {
         auto const &nodeGraphics = *temp;
 
@@ -226,9 +218,9 @@ void ConnectionGraphicsObject::mouseReleaseEvent(
         event->scenePos(), _scene, _scene.views().at(0)->transform());
     if (!node) {
       if (state().requiresPort()) {
-        Q_ASSERT(this == _scene._temporaryConn);
+        Q_ASSERT(this == _scene.temporaryConn());
         // remove this from the scene
-        _scene._temporaryConn = nullptr;
+        _scene.setTemporaryConn(nullptr);
         deleteLater();
       }
       return;
@@ -238,17 +230,17 @@ void ConnectionGraphicsObject::mouseReleaseEvent(
       return;
     }
 
-    NodeConnectionInteraction interaction(node->index(), *this);
+    NodeConnectionInteraction interaction(node->nodeIndex(), *this);
 
     if (interaction.tryConnect()) {
       node->resetReactionToConnection();
-      Q_ASSERT(this == _scene._temporaryConn);
+      Q_ASSERT(this == _scene.temporaryConn());
 
-      _scene._temporaryConn = nullptr;
+      _scene.setTemporaryConn(nullptr);
       deleteLater();
     } else if (state().requiresPort()) {
-      Q_ASSERT(this == _scene._temporaryConn);
-      _scene._temporaryConn = nullptr;
+      Q_ASSERT(this == _scene.temporaryConn());
+      _scene.setTemporaryConn(nullptr);
       deleteLater();
     }
   } catch (std::out_of_range &) {

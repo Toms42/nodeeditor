@@ -11,20 +11,24 @@ namespace QtNodes {
 
 NodeGraphicsFrame::NodeGraphicsFrame(FlowScene &      scene,
                                      const NodeIndex &nodeIndex)
-    : NodeGraphicsObject{scene, nodeIndex} {
+    : NodeComposite{scene, nodeIndex} {
   setZValue(-1.0);
-  _proxyWidget->setOpacity(0);
+  proxyWidget()->setOpacity(0);
 }
 
 NodeGraphicsFrame::~NodeGraphicsFrame() {
   for (auto &i : childItems()) {
+    i->setPos(mapToScene(i->pos()));
     i->setParentItem(nullptr);
-    i->setPos(i->pos() + pos());
   }
 }
 
 int NodeGraphicsFrame::type() const {
   return Frame;
+}
+
+bool NodeGraphicsFrame::canBeParent() const {
+  return true;
 }
 
 void NodeGraphicsFrame::reactToPossibleConnection(PortType       portType,
@@ -36,54 +40,5 @@ void NodeGraphicsFrame::reactToPossibleConnection(PortType       portType,
 }
 
 void NodeGraphicsFrame::resetReactionToConnection() {}
-
-QVariant NodeGraphicsFrame::itemChange(GraphicsItemChange change,
-                                       const QVariant &   value) {
-  return QGraphicsItem::itemChange(change, value);
-}
-
-void NodeGraphicsFrame::mousePressEvent(QGraphicsSceneMouseEvent *event) {
-  if (_locked) {
-    return;
-  }
-
-  if (!isSelected() && !(event->modifiers() & Qt::ControlModifier)) {
-    _scene.clearSelection();
-  }
-
-  auto pos = event->pos();
-
-  if (geometry().resizeRect().contains(QPoint(pos.x(), pos.y()))) {
-    nodeState().setResizing(true);
-  }
-}
-
-void NodeGraphicsFrame::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
-  NodeGraphicsObject::mouseMoveEvent(event);
-}
-
-void NodeGraphicsFrame::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
-  nodeState().setResizing(false);
-  QGraphicsObject::mouseReleaseEvent(event);
-}
-
-void NodeGraphicsFrame::moveConnections() const {}
-
-void NodeGraphicsFrame::hoverEnterEvent(QGraphicsSceneHoverEvent *) {}
-
-void NodeGraphicsFrame::hoverLeaveEvent(QGraphicsSceneHoverEvent *) {}
-
-void NodeGraphicsFrame::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
-  auto pos = event->pos();
-
-  if (flowScene().model()->nodeResizable(index()) &&
-      geometry().resizeRect().contains(QPoint(pos.x(), pos.y()))) {
-    setCursor(QCursor(Qt::SizeFDiagCursor));
-  } else {
-    setCursor(QCursor());
-  }
-
-  event->accept();
-}
 
 } // namespace QtNodes

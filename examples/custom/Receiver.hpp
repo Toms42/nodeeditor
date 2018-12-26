@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_RECEIVER_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_RECEIVER_HPP
-
 // Receiver.hpp
 
 #pragma once
@@ -21,5 +18,3 @@ public:
 private:
   Ui::Receiver *ui_;
 };
-
-#endif

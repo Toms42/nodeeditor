@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_IMAGESHOWMODEL_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_IMAGES_IMAGESHOWMODEL_HPP
-
 #pragma once
 
 #include <QtCore/QObject>
@@ -44,5 +41,3 @@ private:
 
   std::shared_ptr<NodeData> _nodeData;
 };
-
-#endif

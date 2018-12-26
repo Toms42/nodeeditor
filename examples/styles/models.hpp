@@ -2,8 +2,8 @@
 
 #include <QtCore/QObject>
 #include <memory>
-#include <nodes/NodeData>
-#include <nodes/NodeDataModel>
+#include <nodes/NodeData.hpp>
+#include <nodes/NodeDataModel.hpp>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataModel;
@@ -29,11 +29,36 @@ class MyDataModel : public NodeDataModel {
   Q_OBJECT
 
 public:
+  MyDataModel() {
+    QtNodes::Port outPort;
+    outPort.caption        = "out_caption";
+    outPort.captionVisible = false;
+    outPort.dataType       = MyNodeData().type();
+    outPort.handle         = [this](std::shared_ptr<NodeData>) {
+      Q_UNUSED(this);
+      return std::make_shared<MyNodeData>();
+    };
+
+    QtNodes::Port inPort;
+    inPort.caption        = "in_caption";
+    inPort.captionVisible = false;
+    inPort.dataType       = MyNodeData().type();
+    inPort.handle         = [this](std::shared_ptr<NodeData>) {
+      Q_UNUSED(this);
+      return nullptr;
+    };
+
+    addPort(PortType::Out, 0, outPort);
+    addPort(PortType::Out, 1, outPort);
+    addPort(PortType::Out, 2, outPort);
+
+    addPort(PortType::In, 5, inPort);
+    addPort(PortType::In, 6, inPort);
+    addPort(PortType::In, 7, inPort);
+  }
   virtual ~MyDataModel() {}
 
 public:
-  QString caption() const override { return QString("My Data Model"); }
-
   QString name() const override { return QString("MyDataModel"); }
 
 public:
@@ -46,19 +71,5 @@ public:
   }
 
 public:
-  unsigned int nPorts(PortType) const override { return 3; }
-
-  NodeDataType dataType(PortType, PortIndex) const override {
-    return MyNodeData().type();
-  }
-
-  std::shared_ptr<NodeData> outData(PortIndex) override {
-    return std::make_shared<MyNodeData>();
-  }
-
-  void setInData(std::shared_ptr<NodeData>, int) override {
-    //
-  }
-
   QWidget *embeddedWidget() override { return nullptr; }
 };

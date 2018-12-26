@@ -1,15 +1,10 @@
 #pragma once
 
+#include "types.hpp"
 #include <QtCore/QUuid>
 #include <utility>
 
 namespace QtNodes {
-
-enum class PortType { None, In, Out };
-
-using PortIndex = int;
-
-static PortIndex INVALID = -1;
 
 inline PortType oppositePort(PortType port) {
   PortType result = PortType::None;

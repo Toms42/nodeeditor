@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_SENDER_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_CUSTOM_SENDER_HPP
-
 // Sender.hpp
 
 #pragma once
@@ -29,5 +26,3 @@ private:
   Ui::Sender *      ui_;
   QStringListModel *portListModel_;
 };
-
-#endif

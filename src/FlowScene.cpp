@@ -70,17 +70,41 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
 
   // for some reason these end up in the wrong spot, fix that
   for (const auto &n : model->nodeUUids()) {
-    auto ngo = nodeGraphicsObject(model->nodeIndex(n));
+    auto ngo = nodeComposite(model->nodeIndex(n));
     ngo->geometry().recalculateSize();
-    ngo->moveConnections();
+    // TODO check this
+    // ngo->moveConnections();
   }
 }
 
-FlowScene::~FlowScene() = default;
+QtNodes::ConnectionGraphicsObject *FlowScene::temporaryConn() const {
+  return _temporaryConn;
+}
 
-NodeGraphicsObject *FlowScene::nodeGraphicsObject(const NodeIndex &index) {
-  auto iter = _nodeGraphicsObjects.find(index.id());
-  if (iter == _nodeGraphicsObjects.end()) {
+void FlowScene::setTemporaryConn(ConnectionGraphicsObject *obj) {
+  _temporaryConn = obj;
+  if (_temporaryConn) {
+    addItem(_temporaryConn);
+  }
+}
+
+FlowScene::~FlowScene() {
+  // here we delete items for guarante that no one item not be called after
+  // deleting the scene
+  for (auto &i : items()) {
+    removeItem(i);
+  }
+  for (auto &i : nodeComposites_) {
+    delete i.second;
+  }
+  for (auto &i : _connGraphicsObjects) {
+    delete i.second;
+  }
+}
+
+QtNodes::NodeComposite *FlowScene::nodeComposite(const NodeIndex &index) {
+  auto iter = nodeComposites_.find(index.id());
+  if (iter == nodeComposites_.end()) {
     return nullptr;
   }
   return iter->second;
@@ -96,7 +120,7 @@ std::vector<NodeIndex> FlowScene::selectedNodes() const {
     auto ngo = qgraphicsitem_cast<NodeGraphicsObject *>(item);
 
     if (ngo != nullptr) {
-      ret.push_back(ngo->index());
+      ret.push_back(ngo->nodeIndex());
     }
   }
 
@@ -109,7 +133,7 @@ void FlowScene::nodeRemoved(const QUuid &id) {
   Q_ASSERT(!id.isNull());
 
   try {
-    auto ngo = _nodeGraphicsObjects.at(id);
+    auto ngo = nodeComposites_.at(id);
 #ifndef QT_NO_DEBUG
     // make sure there are no connections left
     for (const auto &connPtrSet : ngo->nodeState().getEntries(PortType::In)) {
@@ -122,7 +146,7 @@ void FlowScene::nodeRemoved(const QUuid &id) {
 
     // just delete it
     delete ngo;
-    auto erased = _nodeGraphicsObjects.erase(id);
+    auto erased = nodeComposites_.erase(id);
     Q_ASSERT(erased == 1);
   } catch (std::out_of_range &) {
     GET_INFO();
@@ -133,27 +157,24 @@ void FlowScene::nodeAdded(const QUuid &newID) {
   Q_ASSERT(!newID.isNull());
 
   // make sure the ID doens't exist already
-  Q_ASSERT(_nodeGraphicsObjects.find(newID) == _nodeGraphicsObjects.end());
+  Q_ASSERT(nodeComposites_.find(newID) == nodeComposites_.end());
 
   auto index = model()->nodeIndex(newID);
   Q_ASSERT(index.isValid());
 
+  NodeComposite *ngo{};
   if (reinterpret_cast<Node *>(model()->nodeIndex(newID).internalPointer())
           ->nodeImp()
           ->name() == "Frame") {
-    auto ngo = new NodeGraphicsFrame(*this, index);
-    Q_ASSERT(ngo->scene() == this);
-
-    if (!_nodeGraphicsObjects.insert(std::pair(index.id(), ngo)).second) {
-      GET_INFO();
-    }
+    ngo = new NodeGraphicsFrame(*this, index);
   } else {
-    auto ngo = new NodeGraphicsObject(*this, index);
-    Q_ASSERT(ngo->scene() == this);
+    ngo = new NodeGraphicsObject(*this, index);
+  }
+  addItem(ngo);
+  Q_ASSERT(ngo->scene() == this);
 
-    if (!_nodeGraphicsObjects.insert(std::pair(index.id(), ngo)).second) {
-      GET_INFO();
-    }
+  if (!nodeComposites_.insert(std::pair(index.id(), ngo)).second) {
+    GET_INFO();
   }
 
   nodeMoved(index);
@@ -166,7 +187,7 @@ void FlowScene::nodeAdded(const QUuid &newID) {
 void FlowScene::nodePortUpdated(NodeIndex const &id) {
   Q_ASSERT(!id.id().isNull());
 
-  auto thisNodeNGO = nodeGraphicsObject(id);
+  auto thisNodeNGO = nodeComposite(id);
   Q_ASSERT(thisNodeNGO != Q_NULLPTR);
 
   // remove all the connections
@@ -176,11 +197,11 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
         while (!thisNodeNGO->nodeState().getEntries(ty).at(i.first).empty()) {
           auto conn = thisNodeNGO->nodeState().getEntries(ty).at(i.first)[0];
           // remove it from the nodes
-          auto &otherNgo = *nodeGraphicsObject(conn->node(oppositePort(ty)));
+          auto &otherNgo = *nodeComposite(conn->node(oppositePort(ty)));
           otherNgo.nodeState().eraseConnection(
               oppositePort(ty), conn->portIndex(oppositePort(ty)), *conn);
 
-          auto &thisNgo = *nodeGraphicsObject(conn->node(ty));
+          auto &thisNgo = *nodeComposite(conn->node(ty));
           thisNgo.nodeState().eraseConnection(ty, conn->portIndex(ty), *conn);
 
           // remove the ConnectionGraphicsObject
@@ -198,7 +219,7 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
 
   // just delete it
   delete thisNodeNGO;
-  auto erased = _nodeGraphicsObjects.erase(id.id());
+  auto erased = nodeComposites_.erase(id.id());
 
   Q_ASSERT(erased == 1);
 
@@ -206,7 +227,7 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
   auto ngo = new NodeGraphicsObject(*this, id);
   Q_ASSERT(ngo->scene() == this);
 
-  if (!_nodeGraphicsObjects.insert(std::pair(id.id(), ngo)).second) {
+  if (!nodeComposites_.insert(std::pair(id.id(), ngo)).second) {
     GET_INFO();
   }
 
@@ -249,10 +270,10 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
 
 void FlowScene::nodeValidationUpdated(NodeIndex const &id) {
   // repaint
-  auto ngo = nodeGraphicsObject(id);
+  auto ngo = nodeComposite(id);
   ngo->geometry().recalculateSize();
-  ngo->moveConnections();
-  ngo->update();
+  // TODO  check this
+  // ngo->moveConnections();
 }
 
 void FlowScene::connectionRemoved(NodeIndex const &leftNode,
@@ -286,10 +307,10 @@ void FlowScene::connectionRemoved(NodeIndex const &leftNode,
   try {
     auto &cgo = *_connGraphicsObjects.at(id);
     // remove it from the nodes
-    auto &lngo = *nodeGraphicsObject(leftNode);
+    auto &lngo = *nodeComposite(leftNode);
     lngo.nodeState().eraseConnection(PortType::Out, leftPortID, cgo);
 
-    auto &rngo = *nodeGraphicsObject(rightNode);
+    auto &rngo = *nodeComposite(rightNode);
     rngo.nodeState().eraseConnection(PortType::In, rightPortID, cgo);
 
     // remove the ConnectionGraphicsObject
@@ -345,29 +366,30 @@ void FlowScene::connectionAdded(NodeIndex const &leftNode,
   // create the cgo
   auto cgo = new ConnectionGraphicsObject(
       leftNode, leftPortID, rightNode, rightPortID, *this);
+  addItem(cgo);
 
   // add it to the nodes
-  auto lngo = nodeGraphicsObject(leftNode);
+  auto lngo = nodeComposite(leftNode);
   lngo->nodeState().setConnection(PortType::Out, leftPortID, *cgo);
 
-  auto rngo = nodeGraphicsObject(rightNode);
+  auto rngo = nodeComposite(rightNode);
   rngo->nodeState().setConnection(PortType::In, rightPortID, *cgo);
 
   // add the cgo to the map
-  _connGraphicsObjects[cgo->id()] = cgo;
+  _connGraphicsObjects.insert(std::pair(cgo->id(), cgo));
 }
 
 void FlowScene::nodeMoved(NodeIndex const &index) {
-  CHECK_OUT_OF_RANGE(_nodeGraphicsObjects.at(index.id())
-                         ->setPos(model()->nodeLocation(index)));
+  CHECK_OUT_OF_RANGE(
+      nodeComposites_.at(index.id())->setPos(model()->nodeLocation(index)));
 }
 
 //------------------------------------------------------------------------------
 namespace QtNodes {
 
-NodeGraphicsObject *locateNodeAt(QPointF           scenePoint,
-                                 FlowScene &       scene,
-                                 QTransform const &viewTransform) {
+NodeComposite *locateNodeAt(QPointF           scenePoint,
+                            FlowScene &       scene,
+                            QTransform const &viewTransform) {
   // items under cursor
   QList<QGraphicsItem *> items = scene.items(
       scenePoint, Qt::IntersectsItemShape, Qt::DescendingOrder, viewTransform);
@@ -393,7 +415,7 @@ NodeGraphicsObject *locateNodeAt(QPointF           scenePoint,
 }
 
 void FlowScene::updateNode(const NodeIndex &nodeIndex) {
-  nodeGraphicsObject(nodeIndex)->update();
+  nodeComposite(nodeIndex)->update();
 }
 
 void FlowScene::updateConnection(const NodeIndex &leftNodeIndex,

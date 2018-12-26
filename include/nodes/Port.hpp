@@ -15,7 +15,7 @@ class NodeData;
 struct NODE_EDITOR_PUBLIC Port final {
   Port()
       : captionVisible{true}
-      , policy{ConnectionPolicy::Many} {}
+      , outPolicy{ConnectionPolicy::Many} {}
 
   QString               caption;
   bool                  captionVisible;
@@ -23,7 +23,7 @@ struct NODE_EDITOR_PUBLIC Port final {
 
   /**\brief by default Many
    */
-  ConnectionPolicy policy;
+  ConnectionPolicy outPolicy;
 
   // this function process data (in or out). For In port you can ignore retunr
   // value, and for Out port you can ignore argument (nullptr by default)

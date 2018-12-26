@@ -2,7 +2,7 @@
 #include "ConnectionGraphicsObject.hpp"
 #include "DataModelRegistry.hpp"
 #include "FlowScene.hpp"
-#include "NodeGraphicsObject.hpp"
+#include "NodeComposite.hpp"
 #include "checker.hpp"
 
 using QtNodes::NodeConnectionInteraction;
@@ -121,8 +121,7 @@ NodeConnectionInteraction::connectionEndScenePosition(PortType portType) const {
 QPointF
 NodeConnectionInteraction::nodePortScenePosition(PortType  portType,
                                                  PortIndex portIndex) const {
-  NodeGraphicsObject const &ngo =
-      *_connection->flowScene().nodeGraphicsObject(_node);
+  NodeComposite const &ngo = *_connection->flowScene().nodeComposite(_node);
 
   NodeGeometry const &geom = ngo.geometry();
 
@@ -133,9 +132,8 @@ NodeConnectionInteraction::nodePortScenePosition(PortType  portType,
 
 PortIndex NodeConnectionInteraction::nodePortIndexUnderScenePoint(
     PortType portType, QPointF const &scenePoint) const {
-  NodeGraphicsObject const &ngo =
-      *_connection->flowScene().nodeGraphicsObject(_node);
-  NodeGeometry const &nodeGeom = ngo.geometry();
+  NodeComposite const &ngo = *_connection->flowScene().nodeComposite(_node);
+  NodeGeometry const & nodeGeom = ngo.geometry();
 
   QTransform sceneTransform = ngo.sceneTransform();
 
@@ -147,7 +145,7 @@ PortIndex NodeConnectionInteraction::nodePortIndexUnderScenePoint(
 bool NodeConnectionInteraction::nodePortIsEmpty(PortType  portType,
                                                 PortIndex portIndex) const {
   NodeState const &nodeState =
-      _connection->flowScene().nodeGraphicsObject(_node)->nodeState();
+      _connection->flowScene().nodeComposite(_node)->nodeState();
 
   auto const &entries = nodeState.getEntries(portType);
 

@@ -1,6 +1,3 @@
-#ifndef _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTDATA_HPP
-#define _HOME_LEVKOVITCH_PUBLIC_MY_GIT_NODEEDITOR_EXAMPLES_EXAMPLE2_TEXTDATA_HPP
-
 #pragma once
 
 #include <nodes/NodeData.hpp>
@@ -24,5 +21,3 @@ public:
 private:
   QString _text;
 };
-
-#endif

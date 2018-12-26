@@ -1,6 +1,6 @@
 #include "NodeGeometry.hpp"
 #include "FlowSceneModel.hpp"
-#include "NodeGraphicsObject.hpp"
+#include "NodeComposite.hpp"
 #include "NodeIndex.hpp"
 #include "PortType.hpp"
 #include "StyleCollection.hpp"
@@ -16,7 +16,7 @@ unsigned int NodeGeometry::height() const {
 }
 
 void NodeGeometry::setHeight(unsigned int h) {
-  _obj.prepareGeometryChange();
+  prepareGeometryChange();
   _height = h;
 }
 
@@ -25,7 +25,7 @@ unsigned int NodeGeometry::width() const {
 }
 
 void NodeGeometry::setWidth(unsigned int w) {
-  _obj.prepareGeometryChange();
+  prepareGeometryChange();
   _width = w;
 }
 
@@ -69,7 +69,7 @@ void NodeGeometry::setDraggingPosition(QPointF const &pos) {
   _draggingPos = pos;
 }
 
-NodeGeometry::NodeGeometry(const NodeIndex &index, NodeGraphicsObject &obj)
+NodeGeometry::NodeGeometry(const NodeIndex &index, NodeComposite &obj)
     : _obj{obj}
     , _width(100)
     , _height(150)
@@ -120,7 +120,7 @@ QRectF NodeGeometry::boundingRect() const {
 }
 
 void NodeGeometry::recalculateSize() const {
-  _obj.prepareGeometryChange();
+  prepareGeometryChange();
 
   _entryHeight = _fontMetrics.height();
 
@@ -189,7 +189,8 @@ QPointF NodeGeometry::portScenePosition(PortIndex         index,
 
   totalHeight += captionHeight();
 
-  auto indexes = _obj.index().model()->nodePortIndexes(_obj.index(), portType);
+  auto indexes =
+      _obj.nodeIndex().model()->nodePortIndexes(_obj.nodeIndex(), portType);
 
   if (auto found = std::find(std::begin(indexes), std::end(indexes), index);
       found != std::end(indexes)) {
@@ -301,13 +302,13 @@ unsigned int NodeGeometry::validationWidth() const {
 }
 
 QPointF NodeGeometry::calculateNodePositionBetweenNodePorts(
-    PortIndex                 targetPortIndex,
-    PortType                  targetPort,
-    const NodeGraphicsObject &targetNode,
-    PortIndex                 sourcePortIndex,
-    PortType                  sourcePort,
-    const NodeGraphicsObject &sourceNode,
-    const NodeGeometry &      newNodeGeom) {
+    PortIndex            targetPortIndex,
+    PortType             targetPort,
+    const NodeComposite &targetNode,
+    PortIndex            sourcePortIndex,
+    PortType             sourcePort,
+    const NodeComposite &sourceNode,
+    const NodeGeometry & newNodeGeom) {
   // Calculating the nodes position in the scene. It'll be positioned half way
   // between the two ports that it "connects". The first line calculates the
   // halfway point between the ports (node position + port position on the node
@@ -339,6 +340,10 @@ unsigned int NodeGeometry::portWidth(PortType portType) const {
   }
 
   return width;
+}
+
+void NodeGeometry::prepareGeometryChange() const {
+  _obj.prepareGeometryChange();
 }
 
 } // namespace QtNodes
