@@ -1,7 +1,7 @@
 #include "Connection.hpp"
 #include "ConnectionState.hpp"
 #include "Node.hpp"
-#include "NodeImp.hpp"
+#include "NodeDataModel.hpp"
 #include <QtGlobal>
 #include <QtWidgets/QtWidgets>
 #include <cmath>
@@ -162,22 +162,22 @@ NodeDataType Connection::dataType(PortType portType) const {
 
     return model->dataType(portType, index);
   }
-    Node *    validNode;
-    PortIndex index = INVALID;
+  Node *    validNode;
+  PortIndex index = INVALID;
 
-    if ((validNode = _inNode)) {
-      index    = _inPortIndex;
-      portType = PortType::In;
-    } else if ((validNode = _outNode)) {
-      index    = _outPortIndex;
-      portType = PortType::Out;
-    }
+  if ((validNode = _inNode)) {
+    index    = _inPortIndex;
+    portType = PortType::In;
+  } else if ((validNode = _outNode)) {
+    index    = _outPortIndex;
+    portType = PortType::Out;
+  }
 
-    if (validNode) {
-      auto const &model = validNode->nodeImp();
+  if (validNode) {
+    auto const &model = validNode->nodeImp();
 
-      return model->dataType(portType, index);
-    }
+    return model->dataType(portType, index);
+  }
 
   Q_UNREACHABLE();
 }

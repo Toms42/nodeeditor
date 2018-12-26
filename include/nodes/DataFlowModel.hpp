@@ -15,7 +15,7 @@
 
 namespace QtNodes {
 class DataModelRegistry;
-class NodeImp;
+class NodeDataModel;
 class Connection;
 class Node;
 
@@ -98,9 +98,9 @@ public:
   // convenience functions
   QUuid
                addNode(QString const &typeID, QPointF const &location, QUuid const &uuid);
-  QUuid        addNode(std::unique_ptr<NodeImp> &&model,
-                       QPointF const &            location,
-                       QUuid const &              uuid = QUuid::createUuid());
+  QUuid        addNode(std::unique_ptr<NodeDataModel> &&model,
+                       QPointF const &                  location,
+                       QUuid const &                    uuid = QUuid::createUuid());
   ConnectionID addConnection(Node *        left,
                              PortIndex     leftIdx,
                              Node *        right,

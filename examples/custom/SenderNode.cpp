@@ -53,9 +53,9 @@ bool SenderNode::addPort(const QString &caption, unsigned int index) {
     emit
   };
 
-  return QtNodes::NodeImp::addPort(QtNodes::PortType::Out, index, port);
+  return QtNodes::NodeDataModel::addPort(QtNodes::PortType::Out, index, port);
 };
 
 bool SenderNode::SenderNode::removePort(unsigned int index) {
-  return QtNodes::NodeImp::removePort(QtNodes::PortType::Out, index);
+  return QtNodes::NodeDataModel::removePort(QtNodes::PortType::Out, index);
 }

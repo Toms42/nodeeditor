@@ -12,7 +12,7 @@ namespace QtNodes {
 
 class Connection;
 class DataModelRegistry;
-class NodeImp;
+class NodeDataModel;
 class Node;
 class DataFlowModel;
 
@@ -40,7 +40,7 @@ public:
 
   void deleteConnection(Connection &connection);
 
-  Node &createNode(std::unique_ptr<NodeImp> &&dataModel);
+  Node &createNode(std::unique_ptr<NodeDataModel> &&dataModel);
 
   Node &restoreNode(QJsonObject const &nodeJson);
 
@@ -52,10 +52,10 @@ public:
 
   void iterateOverNodes(std::function<void(Node *)> const &visitor);
 
-  void iterateOverNodeData(std::function<void(NodeImp *)> const &visitor);
+  void iterateOverNodeData(std::function<void(NodeDataModel *)> const &visitor);
 
   void iterateOverNodeDataDependentOrder(
-      std::function<void(NodeImp *)> const &visitor);
+      std::function<void(NodeDataModel *)> const &visitor);
 
   QPointF getNodePosition(Node const &node) const;
 

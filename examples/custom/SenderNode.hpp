@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "nodes/NodeImp.hpp"
+#include "nodes/NodeDataModel.hpp"
 
 class Sender;
 
-class SenderNode final : public QtNodes::NodeImp {
+class SenderNode final : public QtNodes::NodeDataModel {
   Q_OBJECT
 public:
   SenderNode();

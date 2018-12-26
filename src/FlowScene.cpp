@@ -2,9 +2,9 @@
 #include "ConnectionGraphicsObject.hpp"
 #include "FlowSceneModel.hpp"
 #include "Node.hpp"
+#include "NodeDataModel.hpp"
 #include "NodeGraphicsFrame.hpp"
 #include "NodeGraphicsObject.hpp"
-#include "NodeImp.hpp"
 #include "NodeIndex.hpp"
 #include "checker.hpp"
 #include <algorithm>

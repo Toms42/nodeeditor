@@ -41,7 +41,7 @@ set(INC_SRC
   include/nodes/FlowSceneModel.hpp
   include/nodes/FlowView.hpp
   include/nodes/Node.hpp
-  include/nodes/NodeImp.hpp
+  include/nodes/NodeDataModel.hpp
   include/nodes/NodeGeometry.hpp
   include/nodes/NodeGraphicsFrame.hpp
   include/nodes/NodeGraphicsObject.hpp
@@ -65,7 +65,7 @@ set(CPP_SOURCE_FILES
   src/FlowViewStyle.cpp
   src/Node.cpp
   src/NodeConnectionInteraction.cpp
-  src/NodeImp.cpp
+  src/NodeDataModel.cpp
   src/NodeGeometry.cpp
   src/NodeGraphicsFrame.cpp
   src/NodeGraphicsObject.cpp

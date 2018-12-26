@@ -7,16 +7,16 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLineEdit>
 #include <iostream>
-#include <nodes/NodeImp.hpp>
+#include <nodes/NodeDataModel.hpp>
 
 using QtNodes::NodeData;
-using QtNodes::NodeImp;
+using QtNodes::NodeDataModel;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
 
 /// The model dictates the number of inputs and outputs for the Node.
 /// In this example it has no logic.
-class TextSourceDataModel : public NodeImp {
+class TextSourceDataModel : public NodeDataModel {
   Q_OBJECT
 
 public:

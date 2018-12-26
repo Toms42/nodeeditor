@@ -17,7 +17,7 @@ class NodeStyle;
 class Node;
 class NodePainterDelegate;
 
-class NODE_EDITOR_PUBLIC NodeImp
+class NODE_EDITOR_PUBLIC NodeDataModel
     : public QObject
     , public Serializable {
   Q_OBJECT
@@ -25,8 +25,8 @@ class NODE_EDITOR_PUBLIC NodeImp
   friend Node;
 
 public:
-  NodeImp();
-  ~NodeImp() override;
+  NodeDataModel();
+  ~NodeDataModel() override;
 
   virtual QString name() const = 0;
 

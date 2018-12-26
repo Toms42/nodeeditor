@@ -1,14 +1,14 @@
-// Frame.hpp
+// FrameDataModel.hpp
 
 #pragma once
 
-#include "NodeImp.hpp"
+#include "NodeDataModel.hpp"
 #include <QWidget>
 #include <iostream>
 
 namespace QtNodes {
 
-class FrameImp final : public NodeImp {
+class FrameImp final : public NodeDataModel {
 public:
   FrameImp()
       : widget_{new QWidget} {}

@@ -14,7 +14,7 @@ namespace QtNodes {
 class Connection;
 class ConnectionState;
 class NodeGraphicsObject;
-class NodeImp;
+class NodeDataModel;
 class NodeData;
 
 class NODE_EDITOR_PUBLIC Node
@@ -24,7 +24,7 @@ class NODE_EDITOR_PUBLIC Node
 
 public:
   /// NodeDataModel should be an rvalue and is moved into the Node
-  Node(std::unique_ptr<NodeImp> &&dataModel, QUuid const &id);
+  Node(std::unique_ptr<NodeDataModel> &&dataModel, QUuid const &id);
 
   ~Node() override;
 
@@ -41,7 +41,7 @@ public:
   void setPosition(QPointF const &newPos);
 
 public:
-  NodeImp *nodeImp() const;
+  NodeDataModel *nodeImp() const;
 
   std::vector<Connection *> const &connections(PortType  pType,
                                                PortIndex pIdx) const;
@@ -80,7 +80,7 @@ private:
   QUuid _uid;
 
   // data
-  std::unique_ptr<NodeImp>                       nodeImp_;
+  std::unique_ptr<NodeDataModel>                 nodeImp_;
   std::map<PortIndex, std::vector<Connection *>> _inConnections;
   std::map<PortIndex, std::vector<Connection *>> _outConnections;
   QPointF                                        _pos;

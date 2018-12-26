@@ -2,7 +2,7 @@
 
 #include "Export.hpp"
 #include "FlowSceneModel.hpp"
-#include "NodeImp.hpp"
+#include "NodeDataModel.hpp"
 #include "QStringStdHash.hpp"
 #include "TypeConverter.hpp"
 #include "memory.hpp"
@@ -22,7 +22,7 @@ inline bool operator<(QtNodes::NodeDataType const &d1,
 /// Class uses map for storing models (name, model)
 class NODE_EDITOR_PUBLIC DataModelRegistry {
 public:
-  using RegistryItemPtr     = std::unique_ptr<QtNodes::NodeImp>;
+  using RegistryItemPtr     = std::unique_ptr<QtNodes::NodeDataModel>;
   using RegistryItemCreator = std::function<RegistryItemPtr()>;
   using RegisteredModelCreatorsMap =
       std::unordered_map<QString, RegistryItemCreator>;
@@ -65,7 +65,7 @@ public:
     _registeredTypeConverters[id] = std::move(typeConverter);
   }
 
-  std::unique_ptr<NodeImp> create(QString const &modelName);
+  std::unique_ptr<NodeDataModel> create(QString const &modelName);
 
   RegisteredModelCreatorsMap const &registeredModelCreators() const;
 

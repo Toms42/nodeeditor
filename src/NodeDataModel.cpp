@@ -1,17 +1,17 @@
-// NodeImp.cpp
+// NodeDataModel.cpp
 
-#include "NodeImp.hpp"
+#include "NodeDataModel.hpp"
 #include "StyleCollection.hpp"
 #include "checker.hpp"
 #include <utility>
 
 namespace QtNodes {
-NodeImp::NodeImp()
+NodeDataModel::NodeDataModel()
     : nodeStyle_{StyleCollection::nodeStyle()} {}
 
-NodeImp::~NodeImp() = default;
+NodeDataModel::~NodeDataModel() = default;
 
-bool NodeImp::addPort(PortType type, PortIndex index, Port port) {
+bool NodeDataModel::addPort(PortType type, PortIndex index, Port port) {
   switch (type) {
   case PortType::In:
     if (inPorts_.insert(std::pair(index, port)).second) {
@@ -31,7 +31,7 @@ bool NodeImp::addPort(PortType type, PortIndex index, Port port) {
   return false;
 }
 
-bool NodeImp::removePort(PortType type, PortIndex index) {
+bool NodeDataModel::removePort(PortType type, PortIndex index) {
   switch (type) {
   case PortType::In:
     if (inPorts_.erase(index)) {
@@ -51,40 +51,40 @@ bool NodeImp::removePort(PortType type, PortIndex index) {
   return false;
 }
 
-const NodeStyle &NodeImp::nodeStyle() const {
+const NodeStyle &NodeDataModel::nodeStyle() const {
   return nodeStyle_;
 }
 
-void NodeImp::setNodeStyle(const NodeStyle &style) {
+void NodeDataModel::setNodeStyle(const NodeStyle &style) {
   nodeStyle_ = style;
 }
 
-void NodeImp::setInData(std::shared_ptr<NodeData> data, PortIndex index) {
+void NodeDataModel::setInData(std::shared_ptr<NodeData> data, PortIndex index) {
   if (auto found = inPorts_.find(index); found != inPorts_.end()) {
     found->second.handle(std::move(data));
   }
 }
 
-std::shared_ptr<NodeData> NodeImp::outData(PortIndex index) {
+std::shared_ptr<NodeData> NodeDataModel::outData(PortIndex index) {
   if (auto found = outPorts_.find(index); found != outPorts_.end()) {
     return found->second.handle(nullptr);
   }
   return nullptr;
 }
 
-bool NodeImp::resizable() const {
+bool NodeDataModel::resizable() const {
   return true;
 }
 
-NodeValidationState NodeImp::validationState() const {
+NodeValidationState NodeDataModel::validationState() const {
   return NodeValidationState::Valid;
 }
 
-QString NodeImp::validationMessage() const {
+QString NodeDataModel::validationMessage() const {
   return "";
 }
 
-QJsonObject NodeImp::save() const {
+QJsonObject NodeDataModel::save() const {
   QJsonObject modelJson;
 
   modelJson["name"] = name();
@@ -92,7 +92,8 @@ QJsonObject NodeImp::save() const {
   return modelJson;
 }
 
-NodeDataType NodeImp::dataType(PortType portType, PortIndex portIndex) const {
+NodeDataType NodeDataModel::dataType(PortType  portType,
+                                     PortIndex portIndex) const {
   switch (portType) {
   case PortType::In:
     if (auto found = inPorts_.find(portIndex); found != inPorts_.end()) {
@@ -110,7 +111,7 @@ NodeDataType NodeImp::dataType(PortType portType, PortIndex portIndex) const {
   return NodeDataType();
 }
 
-unsigned int NodeImp::nPorts(PortType type) const {
+unsigned int NodeDataModel::nPorts(PortType type) const {
   switch (type) {
   case PortType::In:
     return inPorts_.size();
@@ -124,7 +125,7 @@ unsigned int NodeImp::nPorts(PortType type) const {
   return 0;
 }
 
-std::list<PortIndex> NodeImp::ports(PortType type) const {
+std::list<PortIndex> NodeDataModel::ports(PortType type) const {
   std::list<PortIndex> retval;
 
   const std::map<PortIndex, Port> *port_map{};
@@ -148,7 +149,7 @@ std::list<PortIndex> NodeImp::ports(PortType type) const {
   return retval;
 }
 
-QString NodeImp::portCaption(PortType type, PortIndex index) const {
+QString NodeDataModel::portCaption(PortType type, PortIndex index) const {
   switch (type) {
   case PortType::In:
     if (auto found = inPorts_.find(index); found != inPorts_.end()) {
@@ -166,7 +167,8 @@ QString NodeImp::portCaption(PortType type, PortIndex index) const {
   return "";
 }
 
-bool NodeImp::portCaptionVisibility(PortType type, PortIndex index) const {
+bool NodeDataModel::portCaptionVisibility(PortType  type,
+                                          PortIndex index) const {
   switch (type) {
   case PortType::In:
     if (auto found = inPorts_.find(index); found != inPorts_.end()) {
@@ -184,11 +186,11 @@ bool NodeImp::portCaptionVisibility(PortType type, PortIndex index) const {
   return false;
 }
 
-ConnectionPolicy NodeImp::portOutConnectionPolicy(PortIndex index) const {
+ConnectionPolicy NodeDataModel::portOutConnectionPolicy(PortIndex index) const {
   CHECK_OUT_OF_RANGE(return outPorts_.at(index).policy);
 }
 
-NodePainterDelegate *NodeImp::painterDelegate() const {
+NodePainterDelegate *NodeDataModel::painterDelegate() const {
   return nullptr;
 }
 

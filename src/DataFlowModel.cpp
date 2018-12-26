@@ -325,22 +325,25 @@ QUuid DataFlowModel::addNode(QString const &typeID,
   return addNode(std::move(model), location, nodeid);
 }
 
-QUuid DataFlowModel::addNode(std::unique_ptr<NodeImp> &&model,
-                             QPointF const &            location,
-                             QUuid const &              nodeid) {
-  connect(model.get(), &NodeImp::dataUpdated, this, [this, nodeid](PortIndex) {
-    emit nodeValidationUpdated(nodeIndex(nodeid));
-  });
+QUuid DataFlowModel::addNode(std::unique_ptr<NodeDataModel> &&model,
+                             QPointF const &                  location,
+                             QUuid const &                    nodeid) {
+  connect(model.get(),
+          &NodeDataModel::dataUpdated,
+          this,
+          [this, nodeid](PortIndex) {
+            emit nodeValidationUpdated(nodeIndex(nodeid));
+          });
 
   connect(model.get(),
-          &NodeImp::portRemoved,
+          &NodeDataModel::portRemoved,
           this,
           [this, nodeid](PortType pType, PortIndex pIndex) {
             this->removePort(nodeIndex(nodeid), pType, pIndex);
           });
 
   connect(model.get(),
-          &NodeImp::portAdded,
+          &NodeDataModel::portAdded,
           this,
           [this, nodeid](PortType pType, PortIndex pIndex) {
             this->addPort(nodeIndex(nodeid), pType, pIndex);

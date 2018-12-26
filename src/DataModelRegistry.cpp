@@ -1,5 +1,5 @@
 #include "DataModelRegistry.hpp"
-#include "FrameImp.hpp"
+#include "FrameDataModel.hpp"
 #include <QtCore/QFile>
 #include <QtWidgets/QMessageBox>
 
@@ -12,7 +12,7 @@ DataModelRegistry::DataModelRegistry() {
   registerModel<FrameImp>();
 }
 
-std::unique_ptr<QtNodes::NodeImp>
+std::unique_ptr<QtNodes::NodeDataModel>
 DataModelRegistry::create(QString const &modelName) {
   auto it = _registeredItemCreators.find(modelName);
 

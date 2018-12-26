@@ -74,7 +74,7 @@ void DataFlowScene::deleteConnection(Connection &connection) {
   Q_ASSERT(deleted);
 }
 
-Node &DataFlowScene::createNode(std::unique_ptr<NodeImp> &&dataModel) {
+Node &DataFlowScene::createNode(std::unique_ptr<NodeDataModel> &&dataModel) {
   auto uid = _dataFlowModel->addNode(std::move(dataModel), {0.0, 0.0});
 
   CHECK_OUT_OF_RANGE(return *_dataFlowModel->nodes().at(uid));
@@ -118,19 +118,19 @@ void DataFlowScene::iterateOverNodes(
 }
 
 void DataFlowScene::iterateOverNodeData(
-    std::function<void(NodeImp *)> const &visitor) {
+    std::function<void(NodeDataModel *)> const &visitor) {
   for (auto const &node : _dataFlowModel->nodes()) {
     visitor(node.second->nodeImp());
   }
 }
 
 void DataFlowScene::iterateOverNodeDataDependentOrder(
-    std::function<void(NodeImp *)> const &visitor) {
+    std::function<void(NodeDataModel *)> const &visitor) {
   std::set<QUuid> visitedNodesSet;
 
   // A leaf node is a node with no input ports, or all possible input ports
   // empty
-  auto isNodeLeaf = [](Node const &node, NodeImp const &model) {
+  auto isNodeLeaf = [](Node const &node, NodeDataModel const &model) {
     for (auto &i : model.ports(PortType::In)) {
       const auto &connections = node.connections(PortType::In, i);
       if (!connections.empty()) {
@@ -152,8 +152,8 @@ void DataFlowScene::iterateOverNodeDataDependentOrder(
     }
   }
 
-  auto areNodeInputsVisitedBefore = [&](Node const &   node,
-                                        NodeImp const &model) {
+  auto areNodeInputsVisitedBefore = [&](Node const &         node,
+                                        NodeDataModel const &model) {
     for (auto &i : model.ports(PortType::In)) {
       auto connections = node.connections(PortType::In, i);
 

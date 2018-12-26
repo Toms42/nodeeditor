@@ -8,18 +8,18 @@
 #include <QtWidgets/QLabel>
 #include <iostream>
 #include <nodes/DataModelRegistry.hpp>
-#include <nodes/NodeImp.hpp>
+#include <nodes/NodeDataModel.hpp>
 
 using QtNodes::NodeData;
+using QtNodes::NodeDataModel;
 using QtNodes::NodeDataType;
-using QtNodes::NodeImp;
 using QtNodes::NodeValidationState;
 using QtNodes::PortIndex;
 using QtNodes::PortType;
 
 /// The model dictates the number of inputs and outputs for the Node.
 /// In this example it has no logic.
-class ImageLoaderModel : public NodeImp {
+class ImageLoaderModel : public NodeDataModel {
   Q_OBJECT
 
 public:

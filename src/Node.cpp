@@ -3,8 +3,8 @@
 #include "ConnectionGraphicsObject.hpp"
 #include "ConnectionState.hpp"
 #include "FlowScene.hpp"
+#include "NodeDataModel.hpp"
 #include "NodeGraphicsObject.hpp"
-#include "NodeImp.hpp"
 #include "checker.hpp"
 #include <QtCore/QObject>
 #include <utility>
@@ -12,11 +12,12 @@
 using QtNodes::Connection;
 using QtNodes::Node;
 
-Node::Node(std::unique_ptr<NodeImp> &&nodeImp, QUuid const &id)
+Node::Node(std::unique_ptr<NodeDataModel> &&nodeImp, QUuid const &id)
     : _uid(id)
     , nodeImp_(std::move(nodeImp)) {
   // propagate data: model => node
-  connect(nodeImp_.get(), &NodeImp::dataUpdated, this, &Node::onDataUpdated);
+  connect(
+      nodeImp_.get(), &NodeDataModel::dataUpdated, this, &Node::onDataUpdated);
 
   for (const auto &i : nodeImp_->inPorts_) {
     _inConnections.insert(std::pair(i.first, std::vector<Connection *>()));
@@ -102,7 +103,7 @@ QUuid Node::id() const {
   return _uid;
 }
 
-QtNodes::NodeImp *Node::nodeImp() const {
+QtNodes::NodeDataModel *Node::nodeImp() const {
   return nodeImp_.get();
 }
 
