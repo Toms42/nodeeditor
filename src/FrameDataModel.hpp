@@ -13,6 +13,7 @@ public:
   FrameImp()
       : widget_{new QWidget} {}
   ~FrameImp() override { delete widget_; }
+  int      type() const override { return NodeDataModel::Frame; }
   QString  name() const override { return "Frame"; }
   QWidget *embeddedWidget() override { return widget_; }
   bool     resizable() const override { return true; }

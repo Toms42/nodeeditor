@@ -208,14 +208,12 @@ QPointF NodeGeometry::portScenePosition(PortIndex         index,
     result = QPointF(x, totalHeight);
     break;
   }
-
   case PortType::In: {
     double x = 0.0 - nodeStyle.ConnectionPointDiameter;
 
     result = QPointF(x, totalHeight);
     break;
   }
-
   default:
     break;
   }

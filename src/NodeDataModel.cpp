@@ -11,6 +11,10 @@ NodeDataModel::NodeDataModel()
 
 NodeDataModel::~NodeDataModel() = default;
 
+int NodeDataModel::type() const {
+  return None;
+}
+
 bool NodeDataModel::addPort(PortType type, PortIndex index, Port port) {
   switch (type) {
   case PortType::In:

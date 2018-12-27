@@ -3,6 +3,8 @@
 #include "Export.hpp"
 #include <QtWidgets/QGraphicsView>
 
+class QMenu;
+
 namespace QtNodes {
 
 class FlowScene;

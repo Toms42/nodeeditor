@@ -10,6 +10,8 @@
 #include <tuple>
 #include <unordered_map>
 
+class QMenu;
+
 namespace QtNodes {
 
 class FlowSceneModel;
@@ -44,6 +46,15 @@ public:
    */
   void setTemporaryConn(ConnectionGraphicsObject *conn);
 
+  /**\brief create context menu of scene
+   * \warning this menu dynamicaly allocated, so its have ot be deleted after
+   * use
+   */
+  QMenu *createContextMenu(QPointF scenePos);
+
+protected:
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *conn) override;
+
 private slots:
 
   void nodeRemoved(const QUuid &id);
@@ -72,6 +83,8 @@ private slots:
                         PortIndex        leftPortIndex,
                         const NodeIndex &rightNodeIndex,
                         PortIndex        rightPortIndex);
+
+  NodeComposite *createComposite(const NodeIndex &index);
 
 private:
   FlowSceneModel *_model;

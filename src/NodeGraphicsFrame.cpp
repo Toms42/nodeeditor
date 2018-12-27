@@ -5,7 +5,9 @@
 #include <QCursor>
 #include <QDebug>
 #include <QGraphicsProxyWidget>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QGraphicsSceneMouseEvent>
+#include <QMenu>
 
 namespace QtNodes {
 
@@ -18,8 +20,7 @@ NodeGraphicsFrame::NodeGraphicsFrame(FlowScene &      scene,
 
 NodeGraphicsFrame::~NodeGraphicsFrame() {
   for (auto &i : childItems()) {
-    i->setPos(mapToScene(i->pos()));
-    i->setParentItem(nullptr);
+    delete i;
   }
 }
 
@@ -31,14 +32,27 @@ bool NodeGraphicsFrame::canBeParent() const {
   return true;
 }
 
-void NodeGraphicsFrame::reactToPossibleConnection(PortType       portType,
-                                                  NodeDataType   dataType,
-                                                  const QPointF &scenePoint) {
-  Q_UNUSED(portType);
-  Q_UNUSED(dataType);
-  Q_UNUSED(scenePoint);
+void NodeGraphicsFrame::unloadAllChilds() {
+  for (auto &i : childItems()) {
+    if (i->type() > QGraphicsItem::UserType) {
+      i->setParentItem(nullptr);
+      i->setPos(mapToScene(i->pos()));
+    }
+  }
 }
 
-void NodeGraphicsFrame::resetReactionToConnection() {}
+void NodeGraphicsFrame::contextMenuEvent(
+    QGraphicsSceneContextMenuEvent *event) {
+  auto frameMenu    = flowScene().createContextMenu(event->scenePos());
+  auto unloadAction = new QAction("Unload all Nodes from Frame", frameMenu);
+  frameMenu->addAction(unloadAction);
+  connect(unloadAction, &QAction::triggered, this, [=]() {
+    unloadAllChilds();
+    frameMenu->close();
+  });
+  frameMenu->exec(event->screenPos());
+  frameMenu->deleteLater();
+  event->accept();
+}
 
 } // namespace QtNodes

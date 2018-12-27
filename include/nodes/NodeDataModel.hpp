@@ -28,6 +28,13 @@ public:
   NodeDataModel();
   ~NodeDataModel() override;
 
+  enum { None, Frame, UserType = 100 };
+
+  /**\brief return type of NodeDataModel. If you want to set you own type - use
+   * UserType. By default return None
+   */
+  virtual int type() const;
+
   virtual QString name() const = 0;
 
   /**\brief add new port in node

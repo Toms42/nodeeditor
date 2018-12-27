@@ -7,7 +7,14 @@
 #include "NodeGraphicsObject.hpp"
 #include "NodeIndex.hpp"
 #include "checker.hpp"
+#include <QGraphicsSceneContextMenuEvent>
+#include <QHeaderView>
+#include <QLineEdit>
+#include <QMenu>
+#include <QTreeWidget>
+#include <QWidgetAction>
 #include <algorithm>
+#include <iostream>
 
 using QtNodes::FlowScene;
 using QtNodes::NodeGraphicsObject;
@@ -77,6 +84,21 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
   }
 }
 
+FlowScene::~FlowScene() {
+  // here we delete items for guarante that no one item not be called after
+  // deleting the scene
+  for (auto &i : items()) {
+    removeItem(i);
+    delete i;
+  }
+  // for (auto &i : nodeComposites_) {
+  //  delete i.second;
+  //}
+  // for (auto &i : _connGraphicsObjects) {
+  //  delete i.second;
+  //}
+}
+
 QtNodes::ConnectionGraphicsObject *FlowScene::temporaryConn() const {
   return _temporaryConn;
 }
@@ -85,20 +107,6 @@ void FlowScene::setTemporaryConn(ConnectionGraphicsObject *obj) {
   _temporaryConn = obj;
   if (_temporaryConn) {
     addItem(_temporaryConn);
-  }
-}
-
-FlowScene::~FlowScene() {
-  // here we delete items for guarante that no one item not be called after
-  // deleting the scene
-  for (auto &i : items()) {
-    removeItem(i);
-  }
-  for (auto &i : nodeComposites_) {
-    delete i.second;
-  }
-  for (auto &i : _connGraphicsObjects) {
-    delete i.second;
   }
 }
 
@@ -144,13 +152,20 @@ void FlowScene::nodeRemoved(const QUuid &id) {
     }
 #endif
 
-    // just delete it
     delete ngo;
     auto erased = nodeComposites_.erase(id);
     Q_ASSERT(erased == 1);
   } catch (std::out_of_range &) {
     GET_INFO();
   }
+}
+
+QtNodes::NodeComposite *FlowScene::createComposite(const NodeIndex &index) {
+  if (reinterpret_cast<Node *>(index.internalPointer())->nodeImp()->type() ==
+      NodeDataModel::Frame) {
+    return new NodeGraphicsFrame(*this, index);
+  }
+  return new NodeGraphicsObject(*this, index);
 }
 
 void FlowScene::nodeAdded(const QUuid &newID) {
@@ -162,14 +177,7 @@ void FlowScene::nodeAdded(const QUuid &newID) {
   auto index = model()->nodeIndex(newID);
   Q_ASSERT(index.isValid());
 
-  NodeComposite *ngo{};
-  if (reinterpret_cast<Node *>(model()->nodeIndex(newID).internalPointer())
-          ->nodeImp()
-          ->name() == "Frame") {
-    ngo = new NodeGraphicsFrame(*this, index);
-  } else {
-    ngo = new NodeGraphicsObject(*this, index);
-  }
+  auto ngo = createComposite(index);
   addItem(ngo);
   Q_ASSERT(ngo->scene() == this);
 
@@ -431,6 +439,117 @@ void FlowScene::updateConnection(const NodeIndex &leftNodeIndex,
 
   // cgo
   CHECK_OUT_OF_RANGE(_connGraphicsObjects.at(id)->move());
+}
+
+QMenu *FlowScene::createContextMenu(QPointF scenePos) {
+  auto modelMenu = new QMenu;
+
+  auto skipText = QStringLiteral("skip me");
+
+  // Add filterbox to the context menu
+  auto *txtBox = new QLineEdit(modelMenu);
+
+  txtBox->setPlaceholderText(QStringLiteral("Filter"));
+  txtBox->setClearButtonEnabled(true);
+
+  auto *txtBoxAction = new QWidgetAction(modelMenu);
+  txtBoxAction->setDefaultWidget(txtBox);
+
+  modelMenu->addAction(txtBoxAction);
+
+  // Add result treeview to the context menu
+  auto *treeView = new QTreeWidget(modelMenu);
+  treeView->header()->close();
+
+  auto *treeViewAction = new QWidgetAction(modelMenu);
+  treeViewAction->setDefaultWidget(treeView);
+
+  modelMenu->addAction(treeViewAction);
+
+  QMap<QString, QTreeWidgetItem *> categoryItems;
+  for (auto const &modelName : model()->modelRegistry()) {
+    // get the category
+    auto category = model()->nodeTypeCategory(modelName);
+
+    // see if it's already in the map
+    auto iter = categoryItems.find(category);
+
+    // add it if it doesn't exist
+    if (iter == categoryItems.end()) {
+      auto item = new QTreeWidgetItem(treeView);
+      item->setText(0, category);
+      item->setData(0, Qt::UserRole, skipText);
+
+      iter = categoryItems.insert(category, item);
+    }
+
+    // this is the category item
+    auto parent = iter.value();
+
+    // add the item
+
+    auto item = new QTreeWidgetItem(parent);
+    item->setText(0, modelName);
+    item->setData(0, Qt::UserRole, modelName);
+  }
+
+  treeView->expandAll();
+
+  connect(treeView,
+          &QTreeWidget::itemClicked,
+          /*here we set by value, because referencies can be not valid*/
+          [this, modelMenu, skipText, scenePos](QTreeWidgetItem *item, int) {
+            QString modelName = item->data(0, Qt::UserRole).toString();
+
+            if (modelName == skipText) {
+              return;
+            }
+
+            // try to create the node
+            auto uuid = model()->addNode(modelName, scenePos);
+
+            // if the node creation failed, then don't add it
+            if (!uuid.isNull()) {
+              // move it to the cursor location
+              model()->moveNode(model()->nodeIndex(uuid), scenePos);
+            }
+
+            modelMenu->close();
+          });
+
+  // Setup filtering
+  connect(
+      /*here we set by value, because referencies can be not valid*/
+      txtBox,
+      &QLineEdit::textChanged,
+      [categoryItems](const QString &text) {
+        for (auto &topLvlItem : categoryItems) {
+          for (int i = 0; i < topLvlItem->childCount(); ++i) {
+            auto       child     = topLvlItem->child(i);
+            auto       modelName = child->data(0, Qt::UserRole).toString();
+            const bool match = (modelName.contains(text, Qt::CaseInsensitive));
+            child->setHidden(!match);
+          }
+        }
+      });
+
+  // make sure the text box gets focus so the user doesn't have to click on it
+  txtBox->setFocus();
+
+  return modelMenu;
+}
+
+void FlowScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+  if (itemAt(event->scenePos(), QTransform())) {
+    QGraphicsScene::contextMenuEvent(event);
+    return;
+  }
+
+  auto modelMenu = createContextMenu(event->scenePos());
+
+  modelMenu->exec(event->screenPos());
+  event->accept();
+  modelMenu->deleteLater();
 }
 
 } // namespace QtNodes

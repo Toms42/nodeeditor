@@ -3,7 +3,8 @@
 #include "DataModelRegistry.hpp"
 #include "FlowScene.hpp"
 #include "Node.hpp"
-#include "NodeGraphicsObject.hpp"
+#include "NodeComposite.hpp"
+#include "NodeGraphicsFrame.hpp"
 #include "StyleCollection.hpp"
 #include <QtCore/QPointF>
 #include <QtCore/QRectF>
@@ -82,104 +83,7 @@ void FlowView::setScene(FlowScene *scene) {
 }
 
 void FlowView::contextMenuEvent(QContextMenuEvent *event) {
-  if (auto item = itemAt(event->pos());
-      item && item->type() != NodeGraphicsObject::Frame) {
-    QGraphicsView::contextMenuEvent(event);
-    return;
-  }
-
-  QMenu modelMenu;
-
-  auto skipText = QStringLiteral("skip me");
-
-  // Add filterbox to the context menu
-  auto *txtBox = new QLineEdit(&modelMenu);
-
-  txtBox->setPlaceholderText(QStringLiteral("Filter"));
-  txtBox->setClearButtonEnabled(true);
-
-  auto *txtBoxAction = new QWidgetAction(&modelMenu);
-  txtBoxAction->setDefaultWidget(txtBox);
-
-  modelMenu.addAction(txtBoxAction);
-
-  // Add result treeview to the context menu
-  auto *treeView = new QTreeWidget(&modelMenu);
-  treeView->header()->close();
-
-  auto *treeViewAction = new QWidgetAction(&modelMenu);
-  treeViewAction->setDefaultWidget(treeView);
-
-  modelMenu.addAction(treeViewAction);
-
-  QMap<QString, QTreeWidgetItem *> categoryItems;
-  for (auto const &modelName : _scene->model()->modelRegistry()) {
-    // get the category
-    auto category = _scene->model()->nodeTypeCategory(modelName);
-
-    // see if it's already in the map
-    auto iter = categoryItems.find(category);
-
-    // add it if it doesn't exist
-    if (iter == categoryItems.end()) {
-      auto item = new QTreeWidgetItem(treeView);
-      item->setText(0, category);
-      item->setData(0, Qt::UserRole, skipText);
-
-      iter = categoryItems.insert(category, item);
-    }
-
-    // this is the category item
-    auto parent = iter.value();
-
-    // add the item
-
-    auto item = new QTreeWidgetItem(parent);
-    item->setText(0, modelName);
-    item->setData(0, Qt::UserRole, modelName);
-  }
-
-  treeView->expandAll();
-
-  connect(treeView, &QTreeWidget::itemClicked, [&](QTreeWidgetItem *item, int) {
-    QString modelName = item->data(0, Qt::UserRole).toString();
-
-    if (modelName == skipText) {
-      return;
-    }
-
-    QPoint pos = event->pos();
-
-    QPointF posView = this->mapToScene(pos);
-
-    // try to create the node
-    auto uuid = _scene->model()->addNode(modelName, posView);
-
-    // if the node creation failed, then don't add it
-    if (!uuid.isNull()) {
-      // move it to the cursor location
-      _scene->model()->moveNode(_scene->model()->nodeIndex(uuid), posView);
-    }
-
-    modelMenu.close();
-  });
-
-  // Setup filtering
-  connect(txtBox, &QLineEdit::textChanged, [&](const QString &text) {
-    for (auto &topLvlItem : categoryItems) {
-      for (int i = 0; i < topLvlItem->childCount(); ++i) {
-        auto       child     = topLvlItem->child(i);
-        auto       modelName = child->data(0, Qt::UserRole).toString();
-        const bool match     = (modelName.contains(text, Qt::CaseInsensitive));
-        child->setHidden(!match);
-      }
-    }
-  });
-
-  // make sure the text box gets focus so the user doesn't have to click on it
-  txtBox->setFocus();
-
-  modelMenu.exec(event->globalPos());
+  QGraphicsView::contextMenuEvent(event);
 }
 
 void FlowView::wheelEvent(QWheelEvent *event) {
@@ -240,7 +144,18 @@ void FlowView::deleteSelectedNodes() {
   // qgraphicsitem_cast<NodeGraphicsObject*>(item) could be a use-after-free
   // when a selected connection is deleted by deleting the node.
   for (QGraphicsItem *item : _scene->selectedItems()) {
-    if (auto n = qgraphicsitem_cast<NodeGraphicsObject *>(item)) {
+    if (auto n = qgraphicsitem_cast<NodeComposite *>(item)) {
+      // first remove all children
+      for (auto &child : n->childItems()) {
+        // delete only our items. In childs also is proxyWidget
+        if (child->type() > QGraphicsItem::UserType) {
+          if (auto composite = dynamic_cast<NodeComposite *>(child)) {
+            auto index = composite->nodeIndex();
+            scene()->model()->removeNodeWithConnections(index);
+          }
+        }
+      }
+      // second remove selected node
       auto index = n->nodeIndex();
 
       scene()->model()->removeNodeWithConnections(index);

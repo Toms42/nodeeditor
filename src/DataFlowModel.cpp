@@ -5,6 +5,7 @@
 #include "DataModelRegistry.hpp"
 #include "Node.hpp"
 #include "checker.hpp"
+#include <iostream>
 
 namespace QtNodes {
 

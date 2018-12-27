@@ -21,14 +21,9 @@ public:
 
   bool canBeParent() const override;
 
-  /**\brief void method
-   */
-  void reactToPossibleConnection(PortType       portType,
-                                 NodeDataType   dataType,
-                                 const QPointF &scenePoint) override;
+  void unloadAllChilds();
 
-  /**\brief void method
-   */
-  void resetReactionToConnection() override;
+protected:
+  void contextMenuEvent(QGraphicsSceneContextMenuEvent *event) override;
 };
 }; // namespace QtNodes

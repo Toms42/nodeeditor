@@ -204,9 +204,9 @@ void NodeComposite::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
         break;
       }
     }
-    if (!success && parentItem()) {
-      setPos(parentItem()->mapToScene(pos()));
+    if (auto parent = parentItem(); !success && parent) {
       setParentItem(nullptr);
+      setPos(parent->mapToScene(pos()));
     }
   }
   QGraphicsObject::mouseReleaseEvent(event);
