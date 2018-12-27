@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLineEdit>
 #include <iostream>
-#include <nodes/NodeDataModel>
+#include <nodes/NodeDataModel.hpp>
 
 class DecimalData;
 
@@ -22,13 +22,9 @@ class NumberSourceDataModel : public NodeDataModel {
 public:
   NumberSourceDataModel();
 
-  virtual ~NumberSourceDataModel() {}
+  virtual ~NumberSourceDataModel();
 
 public:
-  QString caption() const override { return QStringLiteral("Number Source"); }
-
-  bool captionVisible() const override { return false; }
-
   QString name() const override { return QStringLiteral("NumberSource"); }
 
 public:
@@ -37,14 +33,6 @@ public:
   void restore(QJsonObject const &p) override;
 
 public:
-  unsigned int nPorts(PortType portType) const override;
-
-  NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
-
-  std::shared_ptr<NodeData> outData(PortIndex port) override;
-
-  void setInData(std::shared_ptr<NodeData>, int) override {}
-
   QWidget *embeddedWidget() override { return _lineEdit; }
 
 private slots:

@@ -86,17 +86,12 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
 
 FlowScene::~FlowScene() {
   // here we delete items for guarante that no one item not be called after
-  // deleting the scene
+  // deleting the scene (itmes have reference to it, so they have to be deleted
+  // in the destuctor, or before)
   for (auto &i : items()) {
     removeItem(i);
     delete i;
   }
-  // for (auto &i : nodeComposites_) {
-  //  delete i.second;
-  //}
-  // for (auto &i : _connGraphicsObjects) {
-  //  delete i.second;
-  //}
 }
 
 QtNodes::ConnectionGraphicsObject *FlowScene::temporaryConn() const {
@@ -152,6 +147,14 @@ void FlowScene::nodeRemoved(const QUuid &id) {
     }
 #endif
 
+    for (auto &child : ngo->childItems()) {
+      if (child->type() > QGraphicsItem::UserType) {
+        if (auto composite = dynamic_cast<NodeComposite *>(child)) {
+          auto index = composite->nodeIndex();
+          model()->removeNodeWithConnections(index);
+        }
+      }
+    }
     delete ngo;
     auto erased = nodeComposites_.erase(id);
     Q_ASSERT(erased == 1);
@@ -161,8 +164,9 @@ void FlowScene::nodeRemoved(const QUuid &id) {
 }
 
 QtNodes::NodeComposite *FlowScene::createComposite(const NodeIndex &index) {
-  if (reinterpret_cast<Node *>(index.internalPointer())->nodeImp()->type() ==
-      NodeDataModel::Frame) {
+  if (reinterpret_cast<Node *>(index.internalPointer())
+          ->nodeDataModel()
+          ->type() == NodeDataModel::Frame) {
     return new NodeGraphicsFrame(*this, index);
   }
   return new NodeGraphicsObject(*this, index);
@@ -280,8 +284,6 @@ void FlowScene::nodeValidationUpdated(NodeIndex const &id) {
   // repaint
   auto ngo = nodeComposite(id);
   ngo->geometry().recalculateSize();
-  // TODO  check this
-  // ngo->moveConnections();
 }
 
 void FlowScene::connectionRemoved(NodeIndex const &leftNode,

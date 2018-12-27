@@ -9,12 +9,12 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QVBoxLayout>
-#include <nodes/ConnectionStyle>
-#include <nodes/DataFlowScene>
-#include <nodes/DataModelRegistry>
-#include <nodes/FlowView>
-#include <nodes/NodeData>
-#include <nodes/TypeConverter>
+#include <nodes/ConnectionStyle.hpp>
+#include <nodes/DataFlowScene.hpp>
+#include <nodes/DataModelRegistry.hpp>
+#include <nodes/FlowView.hpp>
+#include <nodes/NodeData.hpp>
+#include <nodes/TypeConverter.hpp>
 
 using QtNodes::ConnectionStyle;
 using QtNodes::DataFlowScene;
@@ -78,9 +78,10 @@ int main(int argc, char *argv[]) {
 
   QWidget mainWidget;
 
-  auto menuBar    = new QMenuBar();
-  auto saveAction = menuBar->addAction("Save..");
-  auto loadAction = menuBar->addAction("Load..");
+  auto menuBar    = new QMenuBar(&mainWidget);
+  auto menu       = menuBar->addMenu("menu");
+  auto saveAction = menu->addAction("Save..");
+  auto loadAction = menu->addAction("Load..");
 
   QVBoxLayout *l = new QVBoxLayout(&mainWidget);
 
@@ -98,7 +99,7 @@ int main(int argc, char *argv[]) {
 
   mainWidget.setWindowTitle("Dataflow tools: simplest calculator");
   mainWidget.resize(800, 600);
-  mainWidget.showNormal();
+  mainWidget.show();
 
   return app.exec();
 }

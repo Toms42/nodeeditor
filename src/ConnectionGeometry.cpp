@@ -15,7 +15,9 @@ ConnectionGeometry::ConnectionGeometry(QtNodes::ConnectionGraphicsObject &obj)
     , _hovered(false) {
   // TODO if style can change dynamicly, so it have to be unkomment
   // connect(&QtNodes::StyleCollection::instance(),
-  //        &StyleCollection::connectionStyleChanged, this, [&]() {
+  //        &StyleCollection::connectionStyleChanged,
+  //        this,
+  //        [&]() {
   //          _obj.prepareGeometryChange();
   //          _obj.boundingRect();
   //        });

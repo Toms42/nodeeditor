@@ -14,15 +14,17 @@ using QtNodes::Node;
 
 Node::Node(std::unique_ptr<NodeDataModel> &&nodeImp, QUuid const &id)
     : _uid(id)
-    , nodeImp_(std::move(nodeImp)) {
+    , _nodeDataModel(std::move(nodeImp)) {
   // propagate data: model => node
-  connect(
-      nodeImp_.get(), &NodeDataModel::dataUpdated, this, &Node::onDataUpdated);
+  connect(_nodeDataModel.get(),
+          &NodeDataModel::dataUpdated,
+          this,
+          &Node::onDataUpdated);
 
-  for (const auto &i : nodeImp_->inPorts_) {
+  for (const auto &i : _nodeDataModel->inPorts_) {
     _inConnections.insert(std::pair(i.first, std::vector<Connection *>()));
   }
-  for (const auto &i : nodeImp_->outPorts_) {
+  for (const auto &i : _nodeDataModel->outPorts_) {
     _outConnections.insert(std::pair(i.first, std::vector<Connection *>()));
   }
 }
@@ -81,7 +83,7 @@ QJsonObject Node::save() const {
 
   nodeJson["id"] = id().toString();
 
-  nodeJson["model"] = nodeImp_->save();
+  nodeJson["model"] = _nodeDataModel->save();
 
   QJsonObject obj;
   obj["x"]             = _pos.x();
@@ -96,15 +98,15 @@ void Node::restore(QJsonObject const &json) {
   QPointF     point(positionJson["x"].toDouble(), positionJson["y"].toDouble());
   setPosition(point);
 
-  nodeImp_->restore(json["model"].toObject());
+  _nodeDataModel->restore(json["model"].toObject());
 }
 
 QUuid Node::id() const {
   return _uid;
 }
 
-QtNodes::NodeDataModel *Node::nodeImp() const {
-  return nodeImp_.get();
+QtNodes::NodeDataModel *Node::nodeDataModel() const {
+  return _nodeDataModel.get();
 }
 
 QPointF Node::position() const {
@@ -130,11 +132,11 @@ std::vector<Connection *> &Node::connections(PortType pType, PortIndex idx) {
 
 void Node::propagateData(std::shared_ptr<NodeData> nodeData,
                          PortIndex                 inPortIndex) const {
-  nodeImp_->setInData(std::move(nodeData), inPortIndex);
+  _nodeDataModel->setInData(std::move(nodeData), inPortIndex);
 }
 
 void Node::onDataUpdated(PortIndex index) {
-  auto  nodeData = nodeImp_->outData(index);
+  auto  nodeData = _nodeDataModel->outData(index);
   auto &conns    = connections(PortType::Out, index);
 
   for (auto const &c : conns) {

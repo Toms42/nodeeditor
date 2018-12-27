@@ -22,23 +22,6 @@ using QtNodes::NodeState;
 NodeGraphicsObject::NodeGraphicsObject(FlowScene &scene, NodeIndex const &node)
     : NodeComposite{scene, node} {
   setZValue(1.);
-
-  // TODO here we set locatin to Node, and after get it and set position to it
-  // location - it is not good
-  //
-  // connect to the move signals
-  //
-  // auto onMoveSlot =
-  // [this] {
-  //  // ask the model to move it
-  //  if (!flowScene().model()->moveNode(index(), scenePos())) {
-  //    // set the location back
-  //    setPos(flowScene().model()->nodeLocation(index()));
-  //    moveConnections();
-  //  }
-  //};
-  // connect(this, &QGraphicsObject::xChanged, this, onMoveSlot);
-  // connect(this, &QGraphicsObject::yChanged, this, onMoveSlot);
 }
 
 NodeGraphicsObject::~NodeGraphicsObject() {}

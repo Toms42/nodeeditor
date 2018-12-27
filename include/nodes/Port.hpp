@@ -17,7 +17,9 @@ struct NODE_EDITOR_PUBLIC Port final {
       : captionVisible{true}
       , outPolicy{ConnectionPolicy::Many} {}
 
-  QString               caption;
+  QString caption;
+  /**\brief by default true
+   */
   bool                  captionVisible;
   QtNodes::NodeDataType dataType;
 

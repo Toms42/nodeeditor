@@ -1,36 +1,44 @@
 #include "MathOperationDataModel.hpp"
 #include "DecimalData.hpp"
 
-unsigned int MathOperationDataModel::nPorts(PortType portType) const {
-  unsigned int result;
+MathOperationDataModel::MathOperationDataModel() {
+  QtNodes::Port inPort1;
+  inPort1.captionVisible = false;
+  inPort1.dataType       = DecimalData().type();
+  inPort1.outPolicy      = QtNodes::ConnectionPolicy::Many;
+  inPort1.handle         = [this](std::shared_ptr<NodeData> data) {
+    auto numberData = std::dynamic_pointer_cast<DecimalData>(data);
 
-  if (portType == PortType::In)
-    result = 2;
-  else
-    result = 1;
-
-  return result;
-}
-
-NodeDataType MathOperationDataModel::dataType(PortType, PortIndex) const {
-  return DecimalData().type();
-}
-
-std::shared_ptr<NodeData> MathOperationDataModel::outData(PortIndex) {
-  return std::static_pointer_cast<NodeData>(_result);
-}
-
-void MathOperationDataModel::setInData(std::shared_ptr<NodeData> data,
-                                       PortIndex                 portIndex) {
-  auto numberData = std::dynamic_pointer_cast<DecimalData>(data);
-
-  if (portIndex == 0) {
     _number1 = numberData;
-  } else {
-    _number2 = numberData;
-  }
 
-  compute();
+    compute();
+    return nullptr;
+  };
+
+  QtNodes::Port inPort2;
+  inPort2.captionVisible = false;
+  inPort2.dataType       = DecimalData().type();
+  inPort2.outPolicy      = QtNodes::ConnectionPolicy::Many;
+  inPort2.handle         = [this](std::shared_ptr<NodeData> data) {
+    auto numberData = std::dynamic_pointer_cast<DecimalData>(data);
+
+    _number2 = numberData;
+
+    compute();
+    return nullptr;
+  };
+
+  QtNodes::Port outPort;
+  outPort.captionVisible = false;
+  outPort.dataType       = DecimalData().type();
+  outPort.outPolicy      = QtNodes::ConnectionPolicy::Many;
+  outPort.handle         = [this](std::shared_ptr<NodeData>) {
+    return std::static_pointer_cast<NodeData>(_result);
+  };
+
+  addPort(PortType::In, 1, inPort1);
+  addPort(PortType::In, 2, inPort2);
+  addPort(PortType::Out, 3, outPort);
 }
 
 NodeValidationState MathOperationDataModel::validationState() const {

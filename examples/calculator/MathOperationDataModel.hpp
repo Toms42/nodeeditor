@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
 #include <iostream>
-#include <nodes/NodeDataModel>
+#include <nodes/NodeDataModel.hpp>
 
 class DecimalData;
 
@@ -21,17 +21,10 @@ class MathOperationDataModel : public NodeDataModel {
   Q_OBJECT
 
 public:
+  MathOperationDataModel();
   virtual ~MathOperationDataModel() {}
 
 public:
-  unsigned int nPorts(PortType portType) const override;
-
-  NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
-
-  std::shared_ptr<NodeData> outData(PortIndex port) override;
-
-  void setInData(std::shared_ptr<NodeData> data, PortIndex portIndex) override;
-
   QWidget *embeddedWidget() override { return nullptr; }
 
   NodeValidationState validationState() const override;

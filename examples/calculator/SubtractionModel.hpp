@@ -4,7 +4,7 @@
 #include "MathOperationDataModel.hpp"
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
-#include <nodes/NodeDataModel>
+#include <nodes/NodeDataModel.hpp>
 
 /// The model dictates the number of inputs and outputs for the Node.
 /// In this example it has no logic.
@@ -13,41 +13,30 @@ public:
   virtual ~SubtractionModel() {}
 
 public:
-  QString caption() const override { return QStringLiteral("Subtraction"); }
+  // virtual QString portCaption(PortType  portType,
+  //                            PortIndex portIndex) const override {
+  //  switch (portType) {
+  //  case PortType::In:
+  //    if (portIndex == 0)
+  //      return QStringLiteral("Minuend");
+  //    else if (portIndex == 1)
+  //      return QStringLiteral("Subtrahend");
 
-  virtual bool portCaptionVisible(PortType  portType,
-                                  PortIndex portIndex) const override {
-    Q_UNUSED(portType);
-    Q_UNUSED(portIndex);
-    return true;
-  }
+  //    break;
 
-  virtual QString portCaption(PortType  portType,
-                              PortIndex portIndex) const override {
-    switch (portType) {
-    case PortType::In:
-      if (portIndex == 0)
-        return QStringLiteral("Minuend");
-      else if (portIndex == 1)
-        return QStringLiteral("Subtrahend");
+  //  case PortType::Out:
+  //    return QStringLiteral("Result");
 
-      break;
-
-    case PortType::Out:
-      return QStringLiteral("Result");
-
-    default:
-      break;
-    }
-    return QString();
-  }
+  //  default:
+  //    break;
+  //  }
+  //  return QString();
+  //}
 
   QString name() const override { return QStringLiteral("Subtraction"); }
 
 private:
   void compute() override {
-    PortIndex const outPortIndex = 0;
-
     auto n1 = _number1.lock();
     auto n2 = _number2.lock();
 
@@ -61,6 +50,8 @@ private:
       _result.reset();
     }
 
-    emit dataUpdated(outPortIndex);
+    for (auto &i : ports(PortType::Out)) {
+      emit dataUpdated(i);
+    }
   }
 };

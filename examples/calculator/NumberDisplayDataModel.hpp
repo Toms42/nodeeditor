@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
 #include <iostream>
-#include <nodes/NodeDataModel>
+#include <nodes/NodeDataModel.hpp>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataModel;
@@ -20,24 +20,12 @@ class NumberDisplayDataModel : public NodeDataModel {
 public:
   NumberDisplayDataModel();
 
-  virtual ~NumberDisplayDataModel() {}
+  virtual ~NumberDisplayDataModel();
 
 public:
-  QString caption() const override { return QStringLiteral("Result"); }
-
-  bool captionVisible() const override { return false; }
-
   QString name() const override { return QStringLiteral("Result"); }
 
 public:
-  unsigned int nPorts(PortType portType) const override;
-
-  NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
-
-  std::shared_ptr<NodeData> outData(PortIndex port) override;
-
-  void setInData(std::shared_ptr<NodeData> data, int) override;
-
   QWidget *embeddedWidget() override { return _label; }
 
   NodeValidationState validationState() const override;

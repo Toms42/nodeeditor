@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QLineEdit>
 #include <iostream>
-#include <nodes/NodeDataModel>
+#include <nodes/NodeDataModel.hpp>
 
 using QtNodes::NodeData;
 using QtNodes::NodeDataModel;
@@ -18,50 +18,17 @@ class ModuloModel : public NodeDataModel {
   Q_OBJECT
 
 public:
-  ModuloModel() = default;
+  ModuloModel();
 
   virtual ~ModuloModel() = default;
 
 public:
-  QString caption() const override { return QStringLiteral("Modulo"); }
-
-  bool captionVisible() const override { return true; }
-
-  bool portCaptionVisible(PortType, PortIndex) const override { return true; }
-
-  QString portCaption(PortType portType, PortIndex portIndex) const override {
-    switch (portType) {
-    case PortType::In:
-      if (portIndex == 0)
-        return QStringLiteral("Dividend");
-      else if (portIndex == 1)
-        return QStringLiteral("Divisor");
-
-      break;
-
-    case PortType::Out:
-      return QStringLiteral("Result");
-
-    default:
-      break;
-    }
-    return QString();
-  }
-
   QString name() const override { return QStringLiteral("Modulo"); }
 
 public:
   QJsonObject save() const override;
 
 public:
-  unsigned int nPorts(PortType portType) const override;
-
-  NodeDataType dataType(PortType portType, PortIndex portIndex) const override;
-
-  std::shared_ptr<NodeData> outData(PortIndex port) override;
-
-  void setInData(std::shared_ptr<NodeData>, int) override;
-
   QWidget *embeddedWidget() override { return nullptr; }
 
   NodeValidationState validationState() const override;

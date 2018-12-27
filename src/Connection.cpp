@@ -156,8 +156,8 @@ Node *&Connection::getNodePtrRef(PortType portType) {
 
 NodeDataType Connection::dataType(PortType portType) const {
   if (_inNode && _outNode) {
-    auto const &model =
-        (portType == PortType::In) ? _inNode->nodeImp() : _outNode->nodeImp();
+    auto const &model = (portType == PortType::In) ? _inNode->nodeDataModel()
+                                                   : _outNode->nodeDataModel();
     PortIndex index = (portType == PortType::In) ? _inPortIndex : _outPortIndex;
 
     return model->dataType(portType, index);
@@ -174,7 +174,7 @@ NodeDataType Connection::dataType(PortType portType) const {
   }
 
   if (validNode) {
-    auto const &model = validNode->nodeImp();
+    auto const &model = validNode->nodeDataModel();
 
     return model->dataType(portType, index);
   }

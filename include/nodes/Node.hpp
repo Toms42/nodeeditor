@@ -41,7 +41,7 @@ public:
   void setPosition(QPointF const &newPos);
 
 public:
-  NodeDataModel *nodeImp() const;
+  NodeDataModel *nodeDataModel() const;
 
   std::vector<Connection *> const &connections(PortType  pType,
                                                PortIndex pIdx) const;
@@ -80,7 +80,7 @@ private:
   QUuid _uid;
 
   // data
-  std::unique_ptr<NodeDataModel>                 nodeImp_;
+  std::unique_ptr<NodeDataModel>                 _nodeDataModel;
   std::map<PortIndex, std::vector<Connection *>> _inConnections;
   std::map<PortIndex, std::vector<Connection *>> _outConnections;
   QPointF                                        _pos;

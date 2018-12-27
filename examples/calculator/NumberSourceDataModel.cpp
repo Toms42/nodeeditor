@@ -5,7 +5,7 @@
 
 NumberSourceDataModel::NumberSourceDataModel()
     : _lineEdit(new QLineEdit()) {
-  _lineEdit->setValidator(new QDoubleValidator());
+  _lineEdit->setValidator(new QDoubleValidator(_lineEdit));
 
   _lineEdit->setMaximumSize(_lineEdit->sizeHint());
 
@@ -15,6 +15,16 @@ NumberSourceDataModel::NumberSourceDataModel()
           &NumberSourceDataModel::onTextEdited);
 
   _lineEdit->setText("0.0");
+
+  QtNodes::Port outPort;
+  outPort.dataType = DecimalData().type();
+  outPort.handle   = [this](std::shared_ptr<NodeData>) { return _number; };
+
+  addPort(PortType::Out, 1, outPort);
+}
+
+NumberSourceDataModel::~NumberSourceDataModel() {
+  delete _lineEdit;
 }
 
 QJsonObject NumberSourceDataModel::save() const {
@@ -41,24 +51,6 @@ void NumberSourceDataModel::restore(QJsonObject const &p) {
   }
 }
 
-unsigned int NumberSourceDataModel::nPorts(PortType portType) const {
-  unsigned int result = 1;
-
-  switch (portType) {
-  case PortType::In:
-    result = 0;
-    break;
-
-  case PortType::Out:
-    result = 1;
-
-  default:
-    break;
-  }
-
-  return result;
-}
-
 void NumberSourceDataModel::onTextEdited(QString const &string) {
   Q_UNUSED(string);
 
@@ -69,16 +61,12 @@ void NumberSourceDataModel::onTextEdited(QString const &string) {
   if (ok) {
     _number = std::make_shared<DecimalData>(number);
 
-    emit dataUpdated(0);
+    for (auto &i : this->ports(PortType::Out)) {
+      emit dataUpdated(i);
+    }
   } else {
-    emit dataInvalidated(0);
+    for (auto &i : this->ports(PortType::Out)) {
+      emit dataInvalidated(i);
+    }
   }
-}
-
-NodeDataType NumberSourceDataModel::dataType(PortType, PortIndex) const {
-  return DecimalData().type();
-}
-
-std::shared_ptr<NodeData> NumberSourceDataModel::outData(PortIndex) {
-  return _number;
 }

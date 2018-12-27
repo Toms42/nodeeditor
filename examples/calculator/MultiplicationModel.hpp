@@ -4,7 +4,7 @@
 #include "MathOperationDataModel.hpp"
 #include <QtCore/QObject>
 #include <QtWidgets/QLabel>
-#include <nodes/NodeDataModel>
+#include <nodes/NodeDataModel.hpp>
 
 /// The model dictates the number of inputs and outputs for the Node.
 /// In this example it has no logic.
@@ -13,14 +13,10 @@ public:
   virtual ~MultiplicationModel() {}
 
 public:
-  QString caption() const override { return QStringLiteral("Multiplication"); }
-
   QString name() const override { return QStringLiteral("Multiplication"); }
 
 private:
   void compute() override {
-    PortIndex const outPortIndex = 0;
-
     auto n1 = _number1.lock();
     auto n2 = _number2.lock();
 
@@ -34,6 +30,8 @@ private:
       _result.reset();
     }
 
-    emit dataUpdated(outPortIndex);
+    for (auto &i : ports(PortType::Out)) {
+      emit dataUpdated(i);
+    }
   }
 };

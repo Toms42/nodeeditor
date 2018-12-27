@@ -44,6 +44,17 @@ NodeComposite::NodeComposite(FlowScene &scene, const NodeIndex &nodeIndex)
   setZValue(0.);
 
   embedQWidget();
+
+  // connect to the move signals
+  // auto onMoveSlot = [this] {
+  //  // ask the model to move it
+  //  if (!flowScene().model()->moveNode(nodeIndex_, scenePos())) {
+  //    // set the location back
+  //    setPos(flowScene().model()->nodeLocation(nodeIndex_));
+  //  }
+  //};
+  // connect(this, &QGraphicsObject::xChanged, this, onMoveSlot);
+  // connect(this, &QGraphicsObject::yChanged, this, onMoveSlot);
 }
 
 int NodeComposite::type() const {
@@ -213,12 +224,11 @@ void NodeComposite::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void NodeComposite::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-  if (this->zValue() > 0) {
+  switch (this->type()) {
+  case NodeComposite::Node:
     // bring all the colliding nodes to background
-    QList<QGraphicsItem *> overlapItems = collidingItems();
-
-    for (QGraphicsItem *item : overlapItems) {
-      if (item->zValue() > 0.0) {
+    for (auto &item : collidingItems()) {
+      if (item->type() == NodeComposite::Node) {
         item->setZValue(0.0);
       }
     }
@@ -229,6 +239,19 @@ void NodeComposite::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     update();
     flowScene().model()->nodeHovered(nodeIndex(), event->screenPos(), true);
     event->accept();
+    break;
+  case NodeComposite::Frame:
+    for (auto &item : collidingItems()) {
+      if (item->type() == NodeComposite::Frame) {
+        item->setZValue(-1.0);
+      }
+    }
+    setZValue(-0.9);
+    flowScene().model()->nodeHovered(nodeIndex(), event->screenPos(), true);
+    event->accept();
+    break;
+  default:
+    break;
   }
 }
 
@@ -246,11 +269,20 @@ void NodeComposite::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void NodeComposite::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-  if (zValue() > 0) {
+  switch (this->type()) {
+  case NodeComposite::Node:
     geometry().setHovered(false);
     update();
     flowScene().model()->nodeHovered(nodeIndex(), event->screenPos(), false);
     event->accept();
+    break;
+  case NodeComposite::Frame:
+    setZValue(-1.0);
+    flowScene().model()->nodeHovered(nodeIndex(), event->screenPos(), false);
+    event->accept();
+    break;
+  default:
+    break;
   }
 }
 

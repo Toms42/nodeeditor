@@ -145,17 +145,6 @@ void FlowView::deleteSelectedNodes() {
   // when a selected connection is deleted by deleting the node.
   for (QGraphicsItem *item : _scene->selectedItems()) {
     if (auto n = qgraphicsitem_cast<NodeComposite *>(item)) {
-      // first remove all children
-      for (auto &child : n->childItems()) {
-        // delete only our items. In childs also is proxyWidget
-        if (child->type() > QGraphicsItem::UserType) {
-          if (auto composite = dynamic_cast<NodeComposite *>(child)) {
-            auto index = composite->nodeIndex();
-            scene()->model()->removeNodeWithConnections(index);
-          }
-        }
-      }
-      // second remove selected node
       auto index = n->nodeIndex();
 
       scene()->model()->removeNodeWithConnections(index);

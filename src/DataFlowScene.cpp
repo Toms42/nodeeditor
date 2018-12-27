@@ -120,7 +120,7 @@ void DataFlowScene::iterateOverNodes(
 void DataFlowScene::iterateOverNodeData(
     std::function<void(NodeDataModel *)> const &visitor) {
   for (auto const &node : _dataFlowModel->nodes()) {
-    visitor(node.second->nodeImp());
+    visitor(node.second->nodeDataModel());
   }
 }
 
@@ -144,7 +144,7 @@ void DataFlowScene::iterateOverNodeDataDependentOrder(
   // Iterate over "leaf" nodes
   for (auto const &_node : _dataFlowModel->nodes()) {
     auto const &node  = _node.second;
-    auto        model = node->nodeImp();
+    auto        model = node->nodeDataModel();
 
     if (isNodeLeaf(*node, *model)) {
       visitor(model);
@@ -176,7 +176,7 @@ void DataFlowScene::iterateOverNodeDataDependentOrder(
         continue;
       }
 
-      auto model = node->nodeImp();
+      auto model = node->nodeDataModel();
 
       if (areNodeInputsVisitedBefore(*node, *model)) {
         visitor(model);
@@ -241,6 +241,7 @@ void DataFlowScene::save() const {
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly)) {
       file.write(saveToMemory());
+      file.close();
     }
   }
 }
@@ -267,6 +268,7 @@ void DataFlowScene::load() {
   }
 
   QByteArray wholeFile = file.readAll();
+  file.close();
 
   loadFromMemory(wholeFile);
 }

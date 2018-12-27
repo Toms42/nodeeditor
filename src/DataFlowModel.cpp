@@ -59,7 +59,7 @@ QString DataFlowModel::nodeTypeIdentifier(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeImp()->name();
+  return node->nodeDataModel()->name();
 }
 QString DataFlowModel::nodeCaption(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
@@ -85,14 +85,14 @@ QWidget *DataFlowModel::nodeWidget(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeImp()->embeddedWidget();
+  return node->nodeDataModel()->embeddedWidget();
 }
 bool DataFlowModel::nodeResizable(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeImp()->resizable();
+  return node->nodeDataModel()->resizable();
 }
 NodeValidationState
 DataFlowModel::nodeValidationState(NodeIndex const &index) const {
@@ -100,7 +100,7 @@ DataFlowModel::nodeValidationState(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeImp()->validationState();
+  return node->nodeDataModel()->validationState();
 }
 
 QString DataFlowModel::nodeValidationMessage(NodeIndex const &index) const {
@@ -108,7 +108,7 @@ QString DataFlowModel::nodeValidationMessage(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeImp()->validationMessage();
+  return node->nodeDataModel()->validationMessage();
 }
 
 NodePainterDelegate *
@@ -117,7 +117,7 @@ DataFlowModel::nodePainterDelegate(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeImp()->painterDelegate();
+  return node->nodeDataModel()->painterDelegate();
 }
 
 bool DataFlowModel::addPort(const NodeIndex &nIndex,
@@ -137,14 +137,14 @@ unsigned int DataFlowModel::nodePortCount(NodeIndex const &index,
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeImp()->nPorts(portType);
+  return node->nodeDataModel()->nPorts(portType);
 }
 
 std::list<PortIndex> DataFlowModel::nodePortIndexes(const NodeIndex &index,
                                                     PortType portType) const {
   std::list<PortIndex> retval;
   auto *               node = reinterpret_cast<Node *>(index.internalPointer());
-  return node->nodeImp()->ports(portType);
+  return node->nodeDataModel()->ports(portType);
   ;
 }
 
@@ -155,8 +155,8 @@ QString DataFlowModel::nodePortCaption(NodeIndex const &index,
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  if (node->nodeImp()->portCaptionVisibility(portType, pIndex)) {
-    return node->nodeImp()->portCaption(portType, pIndex);
+  if (node->nodeDataModel()->portCaptionVisibility(portType, pIndex)) {
+    return node->nodeDataModel()->portCaption(portType, pIndex);
   }
   return "";
 }
@@ -168,7 +168,7 @@ NodeDataType DataFlowModel::nodePortDataType(NodeIndex const &index,
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeImp()->dataType(portType, pIndex);
+  return node->nodeDataModel()->dataType(portType, pIndex);
 }
 ConnectionPolicy DataFlowModel::nodePortConnectionPolicy(
     NodeIndex const &index, PortIndex pIndex, PortType portType) const {
@@ -179,7 +179,7 @@ ConnectionPolicy DataFlowModel::nodePortConnectionPolicy(
   if (portType == PortType::In) {
     return ConnectionPolicy::One;
   }
-  return node->nodeImp()->portOutConnectionPolicy(pIndex);
+  return node->nodeDataModel()->portOutConnectionPolicy(pIndex);
 }
 
 std::vector<std::pair<NodeIndex, PortIndex>> DataFlowModel::nodePortConnections(
