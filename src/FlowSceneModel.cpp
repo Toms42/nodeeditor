@@ -46,4 +46,8 @@ NodeIndex FlowSceneModel::createIndex(const QUuid &id,
   return NodeIndex(id, internalPointer, this);
 }
 
+NodeIndex FlowSceneModel::createNotValidIndex(const QUuid &id) const {
+  return NodeIndex(id, nullptr, nullptr);
+}
+
 } // namespace QtNodes

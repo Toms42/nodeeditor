@@ -16,19 +16,26 @@ NodeState::NodeState(NodeIndex const &index)
     , _reaction(NOT_REACTING)
     , _reactingPortType(PortType::None)
     , _resizing(false) {
-  for (auto &i : index.model()->nodePortIndexes(index, PortType::In)) {
-    _inConnections.insert(std::pair(i, ConnectionPtrVec{}));
-  }
-  for (auto &i : index.model()->nodePortIndexes(index, PortType::Out)) {
-    _outConnections.insert(std::pair(i, ConnectionPtrVec{}));
+  if (index.model()) {
+    for (auto &i : index.model()->nodePortIndexes(index, PortType::In)) {
+      _inConnections.insert(std::pair(i, ConnectionPtrVec{}));
+    }
+    for (auto &i : index.model()->nodePortIndexes(index, PortType::Out)) {
+      _outConnections.insert(std::pair(i, ConnectionPtrVec{}));
+    }
   }
 
   Node *node = reinterpret_cast<Node *>(nodeIndex_.internalPointer());
 
-  connect(node, &QtNodes::Node::portAdded, this, &QtNodes::NodeState::addPort);
+  if (node) {
+    connect(
+        node, &QtNodes::Node::portAdded, this, &QtNodes::NodeState::addPort);
 
-  connect(
-      node, &QtNodes::Node::portRemoved, this, &QtNodes::NodeState::removePort);
+    connect(node,
+            &QtNodes::Node::portRemoved,
+            this,
+            &QtNodes::NodeState::removePort);
+  }
 }
 
 void NodeState::addPort(PortType pType, PortIndex pIndex) {

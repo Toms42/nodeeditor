@@ -3,6 +3,7 @@
 #include "DataFlowModel.hpp"
 #include "DataModelRegistry.hpp"
 #include "Node.hpp"
+#include "NodeComposite.hpp"
 #include "checker.hpp"
 #include <QFileDialog>
 #include <QJsonArray>
@@ -75,7 +76,7 @@ void DataFlowScene::deleteConnection(Connection &connection) {
 }
 
 Node &DataFlowScene::createNode(std::unique_ptr<NodeDataModel> &&dataModel) {
-  auto uid = _dataFlowModel->addNode(std::move(dataModel), {0.0, 0.0});
+  auto uid = _dataFlowModel->addNode(std::move(dataModel));
 
   CHECK_OUT_OF_RANGE(return *_dataFlowModel->nodes().at(uid));
 }
@@ -85,8 +86,7 @@ Node &DataFlowScene::restoreNode(QJsonObject const &nodeJson) {
 
   auto uid = QUuid(nodeJson["id"].toString());
 
-  // set initial point to 0, 0, will be updated in Node::restore
-  _dataFlowModel->addNode(modelName, QPointF(0, 0), uid);
+  _dataFlowModel->addNode(modelName, uid);
 
   try {
     auto &node = *_dataFlowModel->nodes().at(uid);
@@ -98,9 +98,9 @@ Node &DataFlowScene::restoreNode(QJsonObject const &nodeJson) {
   }
 }
 
-void DataFlowScene::removeNode(Node &node) {
-  model()->removeNodeWithConnections(model()->nodeIndex(node.id()));
-}
+// void DataFlowScene::removeNode(Node &node) {
+//  model()->removeNodeWithConnections(model()->nodeIndex(node.id()));
+//}
 
 DataModelRegistry &DataFlowScene::registry() const {
   return _dataFlowModel->registry();
@@ -186,13 +186,13 @@ void DataFlowScene::iterateOverNodeDataDependentOrder(
   }
 }
 
-QPointF DataFlowScene::getNodePosition(Node const &node) const {
-  return _dataFlowModel->nodeLocation(_dataFlowModel->nodeIndex(node.id()));
-}
+// QPointF DataFlowScene::getNodePosition(Node const &node) const {
+//  return _dataFlowModel->nodeLocation(_dataFlowModel->nodeIndex(node.id()));
+//}
 
-void DataFlowScene::setNodePosition(Node &node, QPointF const &pos) const {
-  _dataFlowModel->moveNode(_dataFlowModel->nodeIndex(node.id()), pos);
-}
+// void DataFlowScene::setNodePosition(Node &node, QPointF const &pos) const {
+//  _dataFlowModel->moveNode(_dataFlowModel->nodeIndex(node.id()), pos);
+//}
 
 std::unordered_map<QUuid, std::unique_ptr<Node>> const &
 DataFlowScene::nodes() const {
@@ -221,8 +221,8 @@ std::vector<Node *> DataFlowScene::selectedNodes() const {
 
 void DataFlowScene::clearScene() {
   // delete all the nodes
-  while (!_dataFlowModel->nodes().empty()) {
-    removeNode(*_dataFlowModel->nodes().begin()->second);
+  for (auto &i : this->items()) {
+    recursivelyRemove(dynamic_cast<NodeComposite *>(i));
   }
 }
 

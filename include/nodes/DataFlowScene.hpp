@@ -38,28 +38,28 @@ public:
   std::shared_ptr<Connection>
   restoreConnection(QJsonObject const &connectionJson);
 
-  void deleteConnection(Connection &connection);
+  // void deleteConnection(Connection &connection);
 
-  Node &createNode(std::unique_ptr<NodeDataModel> &&dataModel);
+  // Node &createNode(std::unique_ptr<NodeDataModel> &&dataModel);
 
   Node &restoreNode(QJsonObject const &nodeJson);
-
-  void removeNode(Node &node);
 
   DataModelRegistry &registry() const;
 
   void setRegistry(std::shared_ptr<DataModelRegistry> registry);
 
-  void iterateOverNodes(std::function<void(Node *)> const &visitor);
+  // void iterateOverNodes(std::function<void(Node *)> const &visitor);
 
-  void iterateOverNodeData(std::function<void(NodeDataModel *)> const &visitor);
+  // void iterateOverNodeData(std::function<void(NodeDataModel *)> const
+  // &visitor);
 
-  void iterateOverNodeDataDependentOrder(
-      std::function<void(NodeDataModel *)> const &visitor);
+  // void iterateOverNodeDataDependentOrder(
+  //    std::function<void(NodeDataModel *)> const &visitor);
 
-  QPointF getNodePosition(Node const &node) const;
+  // TODO model haven't to know about this
+  // QPointF getNodePosition(Node const &node) const;
 
-  void setNodePosition(Node &node, QPointF const &pos) const;
+  // void setNodePosition(Node &node, QPointF const &pos) const;
 
 public:
   std::unordered_map<QUuid, std::unique_ptr<Node>> const &nodes() const;

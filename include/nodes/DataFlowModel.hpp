@@ -34,17 +34,22 @@ public:
 
   QList<QUuid> nodeUUids() const override;
 
+  /**\return if model contains node with @ID - return valid index, if not -
+   * return not valid NodeIndex with @ID
+   */
   NodeIndex nodeIndex(const QUuid &ID) const override;
 
   QString nodeTypeIdentifier(NodeIndex const &index) const override;
 
   QString nodeCaption(NodeIndex const &index) const override;
 
-  QPointF nodeLocation(NodeIndex const &index) const override;
+  // TODO model haven't to know about location!
+  // QPointF nodeLocation(NodeIndex const &index) const override;
 
   QWidget *nodeWidget(NodeIndex const &index) const override;
 
-  bool nodeResizable(NodeIndex const &index) const override;
+  // TODO model haven'to know about this
+  // bool nodeResizable(NodeIndex const &index) const override;
 
   NodeValidationState
   nodeValidationState(NodeIndex const &index) const override;
@@ -80,26 +85,29 @@ public:
                   PortIndex        index) override;
 
   // FlowSceneModel write interface
-  bool  removeConnection(NodeIndex const &leftNode,
-                         PortIndex        leftPortID,
-                         NodeIndex const &rightNode,
-                         PortIndex        rightPortID) override;
-  bool  addConnection(NodeIndex const &leftNode,
-                      PortIndex        leftPortID,
-                      NodeIndex const &rightNode,
-                      PortIndex        rightPortID) override;
-  bool  removeNode(NodeIndex const &index) override;
-  QUuid addNode(QString const &typeID, QPointF const &location) override;
-  bool  moveNode(NodeIndex const &index, QPointF newLocation) override;
+  bool removeConnection(NodeIndex const &leftNode,
+                        PortIndex        leftPortID,
+                        NodeIndex const &rightNode,
+                        PortIndex        rightPortID) override;
+  bool addConnection(NodeIndex const &leftNode,
+                     PortIndex        leftPortID,
+                     NodeIndex const &rightNode,
+                     PortIndex        rightPortID) override;
+
+  bool removeNode(NodeIndex const &index) override;
+
+public:
+  QUuid addNode(QString const &typeID) override;
+
+  // TODO model haven't to can move nodes
+  // bool  moveNode(NodeIndex const &index, QPointF newLocation) override;
 
   bool
   addPort(const NodeIndex &nIndex, PortType pType, PortIndex pIndex) override;
 
   // convenience functions
-  QUuid
-               addNode(QString const &typeID, QPointF const &location, QUuid const &uuid);
+  QUuid        addNode(QString const &typeID, QUuid const &uuid);
   QUuid        addNode(std::unique_ptr<NodeDataModel> &&model,
-                       QPointF const &                  location,
                        QUuid const &                    uuid = QUuid::createUuid());
   ConnectionID addConnection(Node *        left,
                              PortIndex     leftIdx,

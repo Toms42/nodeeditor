@@ -30,8 +30,6 @@ public slots:
 
   void scaleDown();
 
-  void deleteSelectedNodes();
-
 protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
 

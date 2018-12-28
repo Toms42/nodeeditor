@@ -49,19 +49,31 @@ ConnectionGraphicsObject::ConnectionGraphicsObject(NodeIndex const &leftNode,
     auto ngo = _scene.nodeComposite(leftNode);
     Q_ASSERT(ngo != nullptr);
 
-    geometry().moveEndPoint(
-        PortType::Out,
-        ngo->geometry().portScenePosition(
-            leftPortIndex, PortType::Out, ngo->sceneTransform()));
+    // TODO check this
+    try {
+      geometry().moveEndPoint(PortType::Out,
+                              dynamic_cast<NodeGeometry &>(ngo->geometry())
+                                  .portScenePosition(leftPortIndex,
+                                                     PortType::Out,
+                                                     ngo->sceneTransform()));
+    } catch (std::bad_alloc &) {
+      GET_INFO();
+    }
   }
   if (rightNode.isValid()) {
     auto ngo = _scene.nodeComposite(rightNode);
     Q_ASSERT(ngo != nullptr);
 
-    geometry().moveEndPoint(
-        PortType::In,
-        ngo->geometry().portScenePosition(
-            rightPortIndex, PortType::In, ngo->sceneTransform()));
+    // TODO check this
+    try {
+      geometry().moveEndPoint(PortType::In,
+                              dynamic_cast<NodeGeometry &>(ngo->geometry())
+                                  .portScenePosition(rightPortIndex,
+                                                     PortType::In,
+                                                     ngo->sceneTransform()));
+    } catch (std::bad_alloc &) {
+      GET_INFO()
+    }
   }
 }
 
@@ -146,16 +158,22 @@ void ConnectionGraphicsObject::move() {
       if (temp) {
         auto const &nodeGraphics = *temp;
 
-        auto const &nodeGeom = nodeGraphics.geometry();
+        // TODO check this
+        try {
+          auto const &nodeGeom =
+              dynamic_cast<const NodeGeometry &>(nodeGraphics.geometry());
 
-        QPointF scenePos = nodeGeom.portScenePosition(
-            portIndex(portType), portType, nodeGraphics.sceneTransform());
+          QPointF scenePos = nodeGeom.portScenePosition(
+              portIndex(portType), portType, nodeGraphics.sceneTransform());
 
-        QTransform sceneTransform = this->sceneTransform();
+          QTransform sceneTransform = this->sceneTransform();
 
-        QPointF connectionPos = sceneTransform.inverted().map(scenePos);
+          QPointF connectionPos = sceneTransform.inverted().map(scenePos);
 
-        geometry().setEndPoint(portType, connectionPos);
+          geometry().setEndPoint(portType, connectionPos);
+        } catch (std::bad_alloc &) {
+          GET_INFO();
+        }
       } else {
         GET_INFO();
       }
@@ -254,12 +272,13 @@ void ConnectionGraphicsObject::hoverEnterEvent(
 
   update();
 
-  flowScene().model()->connectionHovered(_leftNode,
-                                         _leftPortIndex,
-                                         _rightNode,
-                                         _rightPortIndex,
-                                         event->screenPos(),
-                                         true);
+  // TODO this do nothing
+  // flowScene().model()->connectionHovered(_leftNode,
+  //                                       _leftPortIndex,
+  //                                       _rightNode,
+  //                                       _rightPortIndex,
+  //                                       event->screenPos(),
+  //                                       true);
 
   event->accept();
 }
@@ -269,12 +288,13 @@ void ConnectionGraphicsObject::hoverLeaveEvent(
   geometry().setHovered(false);
 
   update();
-  flowScene().model()->connectionHovered(_leftNode,
-                                         _leftPortIndex,
-                                         _rightNode,
-                                         _rightPortIndex,
-                                         event->screenPos(),
-                                         false);
+  // TODO this do nothing
+  // flowScene().model()->connectionHovered(_leftNode,
+  //                                       _leftPortIndex,
+  //                                       _rightNode,
+  //                                       _rightPortIndex,
+  //                                       event->screenPos(),
+  //                                       false);
   event->accept();
 }
 

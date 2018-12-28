@@ -12,7 +12,7 @@ class FlowScene;
 
 class NodePainter {
 public:
-  NodePainter();
+  NodePainter() = default;
 
 public:
   static void paint(QPainter *painter, NodeComposite const &graphicsObject);

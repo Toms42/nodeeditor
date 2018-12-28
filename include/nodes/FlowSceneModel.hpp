@@ -6,7 +6,6 @@
 #include "types.hpp"
 #include <QList>
 #include <QObject>
-#include <QPointF>
 #include <QString>
 #include <QUuid>
 #include <cstddef>
@@ -53,13 +52,13 @@ public:
   virtual QString nodeCaption(NodeIndex const &index) const = 0;
 
   /// Get the location of a node
-  virtual QPointF nodeLocation(NodeIndex const &index) const = 0;
+  // virtual QPointF nodeLocation(NodeIndex const &index) const = 0;
 
   /// Get the embedded widget
   virtual QWidget *nodeWidget(NodeIndex const &index) const = 0;
 
   /// Get if it's resizable
-  virtual bool nodeResizable(NodeIndex const &index) const = 0;
+  // virtual bool nodeResizable(NodeIndex const &index) const = 0;
 
   /// Get the validation state
   virtual NodeValidationState
@@ -104,12 +103,14 @@ public:
   // Mutation functions
   /////////////////////
 
+public slots:
   /// Remove a connection
   virtual bool removeConnection(NodeIndex const & /*leftNode*/,
                                 PortIndex /*leftPortID*/,
                                 NodeIndex const & /*rightNode*/,
                                 PortIndex /*rightPortID*/) = 0;
 
+public:
   virtual bool removePort(const NodeIndex &nodeIndex,
                           PortType         portType,
                           PortIndex        portIndex) = 0;
@@ -123,20 +124,20 @@ public:
   /// Remove a node
   virtual bool removeNode(NodeIndex const & /*index*/) = 0;
 
+public:
   /// Add a  -- return {} if it fails
-  virtual QUuid addNode(QString const & /*typeID*/, QPointF const & /*pos*/) {
-    return QUuid{};
-  }
+  virtual QUuid addNode(QString const & /*typeID*/) { return QUuid{}; }
 
   virtual bool
   addPort(const NodeIndex &nIndex, PortType pType, PortIndex pIndex) = 0;
 
   /// Move a node to a new location
-  virtual bool moveNode(NodeIndex const & /*index*/, QPointF /*newLocation*/) {
-    return false;
-  }
+  // virtual bool moveNode(NodeIndex const & /*index*/, QPointF /*newLocation*/)
+  // {
+  //  return false;
+  //}
 
-public:
+public slots:
   /// Helper functions
   ////////////////////
 
@@ -147,22 +148,23 @@ public:
   /// Notifications
   /////////////////
 
-  virtual void connectionHovered(NodeIndex const & /*lhs*/,
-                                 PortIndex /*lPortIndex*/,
-                                 NodeIndex const & /*rhs*/,
-                                 PortIndex /*rPortIndex*/,
-                                 QPoint const & /*pos*/,
-                                 bool /*entered*/) {}
+  // TODO all this have to do scene - not model
+  // virtual void connectionHovered(NodeIndex const & /*lhs*/,
+  //                               PortIndex /*lPortIndex*/,
+  //                               NodeIndex const & /*rhs*/,
+  //                               PortIndex /*rPortIndex*/,
+  //                               QPoint const & /*pos*/,
+  //                               bool /*entered*/) {}
 
-  virtual void nodeHovered(NodeIndex const & /*index*/,
-                           QPoint const & /*pos*/,
-                           bool /*entered*/) {}
+  // virtual void nodeHovered(NodeIndex const & /*index*/,
+  //                         QPoint const & /*pos*/,
+  //                         bool /*entered*/) {}
 
-  virtual void nodeDoubleClicked(NodeIndex const & /*index*/,
-                                 QPoint const & /*pos*/) {}
+  // virtual void nodeDoubleClicked(NodeIndex const & /*index*/,
+  //                               QPoint const & /*pos*/) {}
 
-  virtual void nodeContextMenu(NodeIndex const & /*index*/,
-                               QPoint const & /*pos*/) {}
+  // virtual void nodeContextMenu(NodeIndex const & /*index*/,
+  //                             QPoint const & /*pos*/) {}
 
 signals:
 
@@ -178,7 +180,8 @@ signals:
                        PortIndex        leftPortID,
                        NodeIndex const &rightNode,
                        PortIndex        rightPortID);
-  void nodeMoved(NodeIndex const &index);
+  // TODO model haven't to know about this
+  // void nodeMoved(NodeIndex const &index);
   void connectionsRemoved(PortType type, PortIndex index);
   void updateNode(const NodeIndex &nodeIndex);
   void updateConnection(const NodeIndex &leftNodeIndex,
@@ -188,6 +191,9 @@ signals:
 
 protected:
   NodeIndex createIndex(const QUuid &id, void *internalPointer) const;
+  /**\brief create not valid index with @id
+   */
+  NodeIndex createNotValidIndex(const QUuid &id) const;
 };
 
 } // namespace QtNodes

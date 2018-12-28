@@ -1,5 +1,4 @@
 #include "DataModelRegistry.hpp"
-#include "FrameDataModel.hpp"
 #include <QtCore/QFile>
 #include <QtWidgets/QMessageBox>
 
@@ -8,9 +7,7 @@ using QtNodes::DataModelRegistry;
 using QtNodes::NodeDataType;
 using QtNodes::TypeConverter;
 
-DataModelRegistry::DataModelRegistry() {
-  registerModel<FrameImp>();
-}
+DataModelRegistry::DataModelRegistry() {}
 
 std::unique_ptr<QtNodes::NodeDataModel>
 DataModelRegistry::create(QString const &modelName) {

@@ -50,6 +50,7 @@ set(INC_SRC
   )
 
 set(CPP_SOURCE_FILES
+  src/CompositeGeometry.cpp
   src/Connection.cpp
   src/ConnectionBlurEffect.cpp
   src/ConnectionGeometry.cpp
@@ -64,6 +65,8 @@ set(CPP_SOURCE_FILES
   src/DataFlowScene.cpp
   src/FlowView.cpp
   src/FlowViewStyle.cpp
+  src/FrameGeometry.cpp
+  src/FramePainter.cpp
   src/Node.cpp
   src/NodeComposite.cpp
   src/NodeConnectionInteraction.cpp

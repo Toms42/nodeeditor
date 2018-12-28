@@ -85,20 +85,7 @@ QJsonObject Node::save() const {
 
   nodeJson["model"] = _nodeDataModel->save();
 
-  QJsonObject obj;
-  obj["x"]             = _pos.x();
-  obj["y"]             = _pos.y();
-  nodeJson["position"] = obj;
-
   return nodeJson;
-}
-
-void Node::restore(QJsonObject const &json) {
-  QJsonObject positionJson = json["position"].toObject();
-  QPointF     point(positionJson["x"].toDouble(), positionJson["y"].toDouble());
-  setPosition(point);
-
-  _nodeDataModel->restore(json["model"].toObject());
 }
 
 QUuid Node::id() const {
@@ -107,16 +94,6 @@ QUuid Node::id() const {
 
 QtNodes::NodeDataModel *Node::nodeDataModel() const {
   return _nodeDataModel.get();
-}
-
-QPointF Node::position() const {
-  return _pos;
-}
-
-void Node::setPosition(QPointF const &newPos) {
-  _pos = newPos;
-
-  emit positionChanged(newPos);
 }
 
 std::vector<Connection *> const &Node::connections(PortType  pType,

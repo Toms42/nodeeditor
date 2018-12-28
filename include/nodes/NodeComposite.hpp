@@ -2,8 +2,8 @@
 
 #pragma once
 
+#include "CompositeGeometry.hpp"
 #include "Export.hpp"
-#include "NodeGeometry.hpp"
 #include "NodeIndex.hpp"
 #include "NodeState.hpp"
 #include "types.hpp"
@@ -17,7 +17,7 @@ class FlowScene;
 class NODE_EDITOR_PUBLIC NodeComposite : public QGraphicsObject {
   Q_OBJECT
 
-  friend void NodeGeometry::prepareGeometryChange() const;
+  friend void CompositeGeometry::prepareGeometryChange() const;
 
 public:
   /**\brief by default setOpacity like in current style, ZValue = 0, and
@@ -26,15 +26,11 @@ public:
   NodeComposite(FlowScene &scene, const NodeIndex &nodeIndex);
   ~NodeComposite() override = default;
 
-  /**\return by default - false
-   * \brief this method uses for add childs to Composite
+  /**\brief for example this can be used for set parrent to @obj. By default do
+   * nothing
+   * \return by default - false
    */
-  virtual bool canBeParent() const;
-
-  /**\retunr by default - true
-   * \brief this method uses for add childs to Composite
-   */
-  virtual bool canBeChild() const;
+  virtual bool interractWith(NodeComposite *obj);
 
   enum { Composite = UserType + 1, Frame, Node, OtherType = UserType + 20 };
   /**\brief specify type of node. Use OtherType, for specify new type
@@ -55,8 +51,8 @@ public:
 
   /**\return object, which describe geometry of current node
    */
-  virtual NodeGeometry &      geometry();
-  virtual const NodeGeometry &geometry() const;
+  virtual CompositeGeometry &      geometry()       = 0;
+  virtual const CompositeGeometry &geometry() const = 0;
 
   /**\return NodeIndex of current node
    */
@@ -77,25 +73,7 @@ public:
   virtual void lock(bool locked);
   virtual bool isLocked() const;
 
-  /**\return proxyWidget of current node
-   */
-  virtual QGraphicsProxyWidget *      proxyWidget();
-  virtual const QGraphicsProxyWidget *proxyWidget() const;
-
 protected:
-  void paint(QPainter *                      painter,
-             const QStyleOptionGraphicsItem *option,
-             QWidget *                       widget = nullptr) override;
-
-  /**\brief set proxyWidget.
-   * \warning uses in konstructor - don't override this
-   */
-  void embedQWidget();
-
-  /**\brief this method uses only prepareGeometryChange for rith recalclulate
-   * boundingRect of Node
-   */
-
   /**\brief supports resizing and selecting nodes
    */
   void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
@@ -119,14 +97,14 @@ protected:
    */
   void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
+  void focusInEvent(QFocusEvent *event) override;
+
+  void focusOutEvent(QFocusEvent *event) override;
+
 private:
-  FlowScene &  scene_;
-  NodeIndex    nodeIndex_;
-  NodeGeometry geometry_;
-  /**\brief by default set opacity = 1, ItemIgnoresParentOpacity
-   */
-  QGraphicsProxyWidget *proxyWidget_;
-  NodeState             nodeState_;
-  bool                  locked_;
+  FlowScene &scene_;
+  NodeIndex  nodeIndex_;
+  NodeState  nodeState_;
+  bool       locked_;
 };
 }; // namespace QtNodes

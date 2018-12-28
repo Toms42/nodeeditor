@@ -77,8 +77,8 @@ void FlowView::setScene(FlowScene *scene) {
   _deleteSelectionAction->setShortcut(Qt::Key_Delete);
   connect(_deleteSelectionAction,
           &QAction::triggered,
-          this,
-          &FlowView::deleteSelectedNodes);
+          _scene,
+          &FlowScene::deleteSelectedNodes);
   addAction(_deleteSelectionAction);
 }
 
@@ -121,35 +121,6 @@ void FlowView::scaleDown() {
   double const factor = std::pow(step, -1.0);
 
   scale(factor, factor);
-}
-
-void FlowView::deleteSelectedNodes() {
-  // Delete the selected connections first, ensuring that they won't be
-  // automatically deleted when selected nodes are deleted (deleting a node
-  // deletes some connections as well)
-  for (QGraphicsItem *item : _scene->selectedItems()) {
-    if (item->type() == ConnectionGraphicsObject::Connection) {
-      if (auto c = qgraphicsitem_cast<ConnectionGraphicsObject *>(item)) {
-        // does't matter if it works or doesn't, at least we tried
-        scene()->model()->removeConnection(c->node(PortType::Out),
-                                           c->portIndex(PortType::Out),
-                                           c->node(PortType::In),
-                                           c->portIndex(PortType::In));
-      }
-    }
-  }
-
-  // Delete the nodes; this will delete many of the connections.
-  // Selected connections were already deleted prior to this loop, otherwise
-  // qgraphicsitem_cast<NodeGraphicsObject*>(item) could be a use-after-free
-  // when a selected connection is deleted by deleting the node.
-  for (QGraphicsItem *item : _scene->selectedItems()) {
-    if (auto n = qgraphicsitem_cast<NodeComposite *>(item)) {
-      auto index = n->nodeIndex();
-
-      scene()->model()->removeNodeWithConnections(index);
-    }
-  }
 }
 
 void FlowView::keyPressEvent(QKeyEvent *event) {

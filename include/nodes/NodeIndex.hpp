@@ -23,7 +23,6 @@ private:
       , _internalPointer{internalPtr}
       , _model{model} {
     Q_ASSERT(!_id.isNull());
-    Q_ASSERT(_model != nullptr);
   }
 
 public:

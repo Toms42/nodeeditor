@@ -4,19 +4,16 @@
 #include "FlowScene.hpp"
 #include "FlowSceneModel.hpp"
 #include "NodePainter.hpp"
+#include <QCursor>
 #include <QGraphicsEffect>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneMouseEvent>
-#include <QPainter>
-#include <QStyleOptionGraphicsItem>
 
 namespace QtNodes {
 NodeComposite::NodeComposite(FlowScene &scene, const NodeIndex &nodeIndex)
     : scene_{scene}
     , nodeIndex_{nodeIndex}
-    , geometry_{nodeIndex, *this}
-    , proxyWidget_{nullptr}
     , nodeState_{nodeIndex}
     , locked_{false} {
   setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
@@ -43,8 +40,6 @@ NodeComposite::NodeComposite(FlowScene &scene, const NodeIndex &nodeIndex)
 
   setZValue(0.);
 
-  embedQWidget();
-
   // connect to the move signals
   // auto onMoveSlot = [this] {
   //  // ask the model to move it
@@ -61,12 +56,8 @@ int NodeComposite::type() const {
   return NodeComposite::Composite;
 }
 
-bool NodeComposite::canBeParent() const {
+bool NodeComposite::interractWith(NodeComposite *) {
   return false;
-}
-
-bool NodeComposite::canBeChild() const {
-  return true;
 }
 
 void NodeComposite::reactToPossibleConnection(PortType,
@@ -76,15 +67,7 @@ void NodeComposite::reactToPossibleConnection(PortType,
 void NodeComposite::resetReactionToConnection() {}
 
 QRectF NodeComposite::boundingRect() const {
-  return geometry_.boundingRect();
-}
-
-NodeGeometry &NodeComposite::geometry() {
-  return geometry_;
-}
-
-const NodeGeometry &NodeComposite::geometry() const {
-  return geometry_;
+  return geometry().boundingRect();
 }
 
 NodeIndex NodeComposite::nodeIndex() const {
@@ -118,39 +101,6 @@ bool NodeComposite::isLocked() const {
   return locked_;
 }
 
-void NodeComposite::paint(QPainter *                      painter,
-                          QStyleOptionGraphicsItem const *option,
-                          QWidget *) {
-  painter->setClipRect(option->exposedRect);
-
-  NodePainter::paint(painter, *this);
-}
-
-void NodeComposite::embedQWidget() {
-  if (auto w = scene_.model()->nodeWidget(nodeIndex_)) {
-    proxyWidget_ = new QGraphicsProxyWidget(this);
-
-    proxyWidget_->setWidget(w);
-
-    proxyWidget_->setPreferredWidth(5);
-
-    geometry_.recalculateSize();
-
-    proxyWidget_->setPos(geometry().widgetPosition());
-
-    proxyWidget_->setOpacity(1.0);
-    proxyWidget_->setFlag(QGraphicsItem::ItemIgnoresParentOpacity);
-  }
-}
-
-QGraphicsProxyWidget *NodeComposite::proxyWidget() {
-  return proxyWidget_;
-}
-
-const QGraphicsProxyWidget *NodeComposite::proxyWidget() const {
-  return proxyWidget_;
-}
-
 void NodeComposite::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   if (isLocked()) {
     event->ignore();
@@ -171,27 +121,27 @@ void NodeComposite::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
   if (nodeState().resizing()) {
     auto diff = event->pos() - event->lastPos();
 
-    if (auto w = flowScene().model()->nodeWidget(nodeIndex())) {
-      auto oldSize = w->size();
+    geometry().setWidth(geometry().width() + diff.x());
+    geometry().setHeight(geometry().height() + diff.y());
+    //    auto oldSize = w->size();
 
-      oldSize += QSize(diff.x(), diff.y());
-      if (auto sizeHint = w->minimumSizeHint();
-          oldSize.height() < sizeHint.height() ||
-          oldSize.width() < sizeHint.width()) {
-        return;
-      }
+    //    oldSize += QSize(diff.x(), diff.y());
+    //    if (auto sizeHint = w->minimumSizeHint();
+    //        oldSize.height() < sizeHint.height() ||
+    //        oldSize.width() < sizeHint.width()) {
+    //      return;
+    //    }
 
-      w->setFixedSize(oldSize);
+    //    w->setFixedSize(oldSize);
 
-      // We have to recalculdate size before set widgetPosition in proxyWidget
-      geometry().recalculateSize();
+    // We have to recalculate size before set widgetPosition in proxyWidget
+    geometry().recalculateSize();
 
-      proxyWidget()->setMinimumSize(oldSize);
-      proxyWidget()->setMaximumSize(oldSize);
-      proxyWidget()->setPos(geometry().widgetPosition());
+    //    proxyWidget()->setMinimumSize(oldSize);
+    //    proxyWidget()->setMaximumSize(oldSize);
+    //    proxyWidget()->setPos(geometry().widgetPosition());
 
-      event->accept();
-    }
+    event->accept();
   } else {
     QGraphicsObject::mouseMoveEvent(event);
 
@@ -201,25 +151,6 @@ void NodeComposite::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
 void NodeComposite::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   nodeState().setResizing(false);
-  bool success{false};
-  if (canBeChild()) {
-    for (auto &i : collidingItems(Qt::ItemSelectionMode::ContainsItemShape)) {
-      if (auto *item = dynamic_cast<NodeComposite *>(i);
-          item && item->canBeParent()) {
-        if (i != parentItem()) {
-          auto position = scenePos();
-          setParentItem(i);
-          setPos(i->mapFromScene(position));
-        }
-        success = true;
-        break;
-      }
-    }
-    if (auto parent = parentItem(); !success && parent) {
-      setParentItem(nullptr);
-      setPos(parent->mapToScene(pos()));
-    }
-  }
   QGraphicsObject::mouseReleaseEvent(event);
 }
 
@@ -237,7 +168,6 @@ void NodeComposite::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 
     geometry().setHovered(true);
     update();
-    flowScene().model()->nodeHovered(nodeIndex(), event->screenPos(), true);
     event->accept();
     break;
   case NodeComposite::Frame:
@@ -247,7 +177,6 @@ void NodeComposite::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
       }
     }
     setZValue(-0.9);
-    flowScene().model()->nodeHovered(nodeIndex(), event->screenPos(), true);
     event->accept();
     break;
   default:
@@ -258,7 +187,7 @@ void NodeComposite::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 void NodeComposite::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
   auto pos = event->pos();
 
-  if (flowScene().model()->nodeResizable(nodeIndex()) &&
+  if (/*flowScene().model()->nodeResizable(nodeIndex()) &&*/
       geometry().resizeRect().contains(QPoint(pos.x(), pos.y()))) {
     setCursor(QCursor(Qt::SizeFDiagCursor));
   } else {
@@ -273,17 +202,27 @@ void NodeComposite::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
   case NodeComposite::Node:
     geometry().setHovered(false);
     update();
-    flowScene().model()->nodeHovered(nodeIndex(), event->screenPos(), false);
     event->accept();
     break;
   case NodeComposite::Frame:
     setZValue(-1.0);
-    flowScene().model()->nodeHovered(nodeIndex(), event->screenPos(), false);
     event->accept();
     break;
   default:
     break;
   }
+}
+
+void NodeComposite::focusInEvent(QFocusEvent *event) {
+  geometry().setHovered(true);
+  update();
+  event->accept();
+}
+
+void NodeComposite::focusOutEvent(QFocusEvent *event) {
+  geometry().setHovered(false);
+  update();
+  event->accept();
 }
 
 }; // namespace QtNodes

@@ -31,14 +31,14 @@ public:
 public:
   QJsonObject save() const override;
 
-  void restore(QJsonObject const &json) override;
-
 public:
   QUuid id() const;
 
-  QPointF position() const;
+  // TODO node haven't to now about this
+  // QPointF position() const;
 
-  void setPosition(QPointF const &newPos);
+  // TODO node haven't to now about this
+  // void setPosition(QPointF const &newPos);
 
 public:
   NodeDataModel *nodeDataModel() const;
@@ -68,7 +68,8 @@ public slots: // data propagation
 
 signals:
 
-  void positionChanged(QPointF const &newPos);
+  // TODO node haven't to know about this
+  // void positionChanged(QPointF const &newPos);
 
   void portAdded(PortType pType, PortIndex pIndex);
 
@@ -83,6 +84,7 @@ private:
   std::unique_ptr<NodeDataModel>                 _nodeDataModel;
   std::map<PortIndex, std::vector<Connection *>> _inConnections;
   std::map<PortIndex, std::vector<Connection *>> _outConnections;
-  QPointF                                        _pos;
+  // TODO node haven't to know about this
+  // QPointF                                        _pos;
 };
 } // namespace QtNodes

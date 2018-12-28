@@ -55,6 +55,23 @@ public:
 protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *conn) override;
 
+  /**\brief recursively remove items from model
+   */
+  void recursivelyRemove(NodeComposite *obj);
+
+signals:
+  /**\brief send signal to model for remove item
+   */
+  void removeNode(const NodeIndex &index);
+
+  void removeConnection(const NodeIndex &leftNode,
+                        PortIndex        leftPortID,
+                        const NodeIndex &rightNode,
+                        PortIndex        rightPortID);
+
+public slots:
+  void deleteSelectedNodes();
+
 private slots:
 
   void nodeRemoved(const QUuid &id);
@@ -74,8 +91,6 @@ private slots:
                        PortIndex        leftPortID,
                        NodeIndex const &rightNode,
                        PortIndex        rightPortID);
-
-  void nodeMoved(NodeIndex const &index);
 
   void updateNode(const NodeIndex &nodeIndex);
 

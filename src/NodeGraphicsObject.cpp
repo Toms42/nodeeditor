@@ -20,8 +20,9 @@ using QtNodes::NodeIndex;
 using QtNodes::NodeState;
 
 NodeGraphicsObject::NodeGraphicsObject(FlowScene &scene, NodeIndex const &node)
-    : NodeComposite{scene, node} {
-  setZValue(1.);
+    : NodeComposite{scene, node}
+    , geometry_{*this} {
+  embedQWidget();
 }
 
 NodeGraphicsObject::~NodeGraphicsObject() {}
@@ -78,7 +79,7 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
   for (PortType portToCheck : {PortType::In, PortType::Out}) {
     // TODO do not pass sceneTransform
-    PortIndex portIndex = geometry().checkHitScenePoint(
+    PortIndex portIndex = geometry_.checkHitScenePoint(
         portToCheck, event->scenePos(), sceneTransform());
     if (portIndex != INVALID) {
       std::vector<ConnectionGraphicsObject *> connections =
@@ -144,16 +145,72 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event) {
   }
 }
 
+void NodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
+  NodeComposite::mouseReleaseEvent(event);
+  bool success{false};
+  for (auto &i : collidingItems(Qt::ItemSelectionMode::ContainsItemShape)) {
+    if (auto *item = dynamic_cast<NodeComposite *>(i); item) {
+      if (item->interractWith(this)) {
+        success = true;
+        break;
+      }
+    }
+  }
+  if (auto parent = parentItem(); !success && parent) {
+    setParentItem(nullptr);
+    setPos(parent->mapToScene(pos()));
+  }
+
+  event->accept();
+}
+
 void NodeGraphicsObject::mouseDoubleClickEvent(
     QGraphicsSceneMouseEvent *event) {
   QGraphicsItem::mouseDoubleClickEvent(event);
-
-  flowScene().model()->nodeDoubleClicked(nodeIndex(), event->screenPos());
 }
 
 void NodeGraphicsObject::contextMenuEvent(
     QGraphicsSceneContextMenuEvent *event) {
   QGraphicsItem::contextMenuEvent(event);
+}
 
-  flowScene().model()->nodeContextMenu(nodeIndex(), event->screenPos());
+void NodeGraphicsObject::embedQWidget() {
+  if (auto w = flowScene().model()->nodeWidget(nodeIndex())) {
+    proxyWidget_ = new QGraphicsProxyWidget(this);
+
+    proxyWidget_->setWidget(w);
+
+    proxyWidget_->setPreferredWidth(5);
+
+    geometry().recalculateSize();
+
+    proxyWidget_->setPos(geometry_.widgetPosition());
+
+    proxyWidget_->setOpacity(1.0);
+    proxyWidget_->setFlag(QGraphicsItem::ItemIgnoresParentOpacity);
+  }
+}
+
+QGraphicsProxyWidget *NodeGraphicsObject::proxyWidget() {
+  return proxyWidget_;
+}
+
+const QGraphicsProxyWidget *NodeGraphicsObject::proxyWidget() const {
+  return proxyWidget_;
+}
+
+QtNodes::CompositeGeometry &NodeGraphicsObject::geometry() {
+  return geometry_;
+}
+
+const QtNodes::CompositeGeometry &NodeGraphicsObject::geometry() const {
+  return geometry_;
+}
+
+void NodeGraphicsObject::paint(QPainter *                      painter,
+                               QStyleOptionGraphicsItem const *option,
+                               QWidget *) {
+  painter->setClipRect(option->exposedRect);
+
+  NodePainter::paint(painter, *this);
 }

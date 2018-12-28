@@ -3,6 +3,7 @@
 #include "DataModelRegistry.hpp"
 #include "FlowScene.hpp"
 #include "NodeComposite.hpp"
+#include "NodeGeometry.hpp"
 #include "checker.hpp"
 
 using QtNodes::NodeConnectionInteraction;
@@ -123,23 +124,33 @@ NodeConnectionInteraction::nodePortScenePosition(PortType  portType,
                                                  PortIndex portIndex) const {
   NodeComposite const &ngo = *_connection->flowScene().nodeComposite(_node);
 
-  NodeGeometry const &geom = ngo.geometry();
+  // TODO check this
+  try {
+    auto &geom = dynamic_cast<const NodeGeometry &>(ngo.geometry());
 
-  QPointF p = geom.portScenePosition(portIndex, portType);
+    QPointF p = geom.portScenePosition(portIndex, portType);
 
-  return ngo.sceneTransform().map(p);
+    return ngo.sceneTransform().map(p);
+  } catch (std::bad_alloc &) {
+    GET_INFO()
+  }
 }
 
 PortIndex NodeConnectionInteraction::nodePortIndexUnderScenePoint(
     PortType portType, QPointF const &scenePoint) const {
   NodeComposite const &ngo = *_connection->flowScene().nodeComposite(_node);
-  NodeGeometry const & nodeGeom = ngo.geometry();
+  // TODO check this
+  try {
+    NodeGeometry const &nodeGeom =
+        dynamic_cast<const NodeGeometry &>(ngo.geometry());
+    QTransform sceneTransform = ngo.sceneTransform();
 
-  QTransform sceneTransform = ngo.sceneTransform();
-
-  PortIndex portIndex =
-      nodeGeom.checkHitScenePoint(portType, scenePoint, sceneTransform);
-  return portIndex;
+    PortIndex portIndex =
+        nodeGeom.checkHitScenePoint(portType, scenePoint, sceneTransform);
+    return portIndex;
+  } catch (std::bad_alloc &) {
+    GET_INFO();
+  }
 }
 
 bool NodeConnectionInteraction::nodePortIsEmpty(PortType  portType,

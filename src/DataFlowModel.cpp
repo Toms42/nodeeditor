@@ -49,7 +49,7 @@ QList<QUuid> DataFlowModel::nodeUUids() const {
 NodeIndex DataFlowModel::nodeIndex(const QUuid &ID) const {
   auto iter = _nodes.find(ID);
   if (iter == _nodes.end()) {
-    return {};
+    return createNotValidIndex(ID);
   }
 
   return createIndex(ID, iter->second.get());
@@ -73,13 +73,14 @@ QString DataFlowModel::nodeCaption(NodeIndex const &index) const {
   // return node->nodeDataModel()->caption();
 }
 
-QPointF DataFlowModel::nodeLocation(NodeIndex const &index) const {
-  Q_ASSERT(index.isValid());
+// QPointF DataFlowModel::nodeLocation(NodeIndex const &index) const {
+//  Q_ASSERT(index.isValid());
 
-  auto *node = reinterpret_cast<Node *>(index.internalPointer());
+//  auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->position();
-}
+//  return node->position();
+//}
+
 QWidget *DataFlowModel::nodeWidget(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
@@ -87,13 +88,15 @@ QWidget *DataFlowModel::nodeWidget(NodeIndex const &index) const {
 
   return node->nodeDataModel()->embeddedWidget();
 }
-bool DataFlowModel::nodeResizable(NodeIndex const &index) const {
-  Q_ASSERT(index.isValid());
 
-  auto *node = reinterpret_cast<Node *>(index.internalPointer());
+// bool DataFlowModel::nodeResizable(NodeIndex const &index) const {
+//  Q_ASSERT(index.isValid());
 
-  return node->nodeDataModel()->resizable();
-}
+//  auto *node = reinterpret_cast<Node *>(index.internalPointer());
+
+//  return node->nodeDataModel()->resizable();
+//}
+
 NodeValidationState
 DataFlowModel::nodeValidationState(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
@@ -309,25 +312,22 @@ bool DataFlowModel::removeNode(NodeIndex const &index) {
 
   return true;
 }
-QUuid DataFlowModel::addNode(const QString &typeID, QPointF const &location) {
+QUuid DataFlowModel::addNode(const QString &typeID) {
   auto nodeid = QUuid::createUuid();
-  addNode(typeID, location, nodeid);
+  addNode(typeID, nodeid);
   return nodeid;
 }
 
-QUuid DataFlowModel::addNode(QString const &typeID,
-                             QPointF const &location,
-                             QUuid const &  nodeid) {
+QUuid DataFlowModel::addNode(QString const &typeID, QUuid const &nodeid) {
   // create the NodeDataModel
   auto model = _registry->create(typeID);
   if (!model) {
     return {};
   }
-  return addNode(std::move(model), location, nodeid);
+  return addNode(std::move(model), nodeid);
 }
 
 QUuid DataFlowModel::addNode(std::unique_ptr<NodeDataModel> &&model,
-                             QPointF const &                  location,
                              QUuid const &                    nodeid) {
   connect(model.get(),
           &NodeDataModel::dataUpdated,
@@ -353,10 +353,10 @@ QUuid DataFlowModel::addNode(std::unique_ptr<NodeDataModel> &&model,
   // create a node
   auto node = std::make_unique<Node>(std::move(model), nodeid);
 
-  node->setPosition(location);
+  // node->setPosition(location);
 
   // cache the pointer so the connection can be made
-  auto nodePtr = node.get();
+  // auto nodePtr = node.get();
 
   // add it to the map
   if (!_nodes.insert(std::make_pair(nodeid, std::move(node))).second) {
@@ -364,10 +364,10 @@ QUuid DataFlowModel::addNode(std::unique_ptr<NodeDataModel> &&model,
   }
 
   // connect to the geometry gets updated
-  connect(
-      nodePtr, &Node::positionChanged, this, [this, nodeid](QPointF const &) {
-        emit nodeMoved(nodeIndex(nodeid));
-      });
+  // connect(
+  //    nodePtr, &Node::positionChanged, this, [this, nodeid](QPointF const &) {
+  //      emit nodeMoved(nodeIndex(nodeid));
+  //    });
 
   // tell the view
   emit nodeAdded(nodeid);
@@ -410,15 +410,15 @@ ConnectionID DataFlowModel::addConnection(Node *        leftNode,
   return connID;
 }
 
-bool DataFlowModel::moveNode(NodeIndex const &index, QPointF newLocation) {
-  Q_ASSERT(index.isValid());
+// bool DataFlowModel::moveNode(NodeIndex const &index, QPointF newLocation) {
+//  Q_ASSERT(index.isValid());
 
-  auto *node = reinterpret_cast<Node *>(index.internalPointer());
-  node->setPosition(newLocation);
+//  auto *node = reinterpret_cast<Node *>(index.internalPointer());
+//  node->setPosition(newLocation);
 
-  // no need to emit, it's done by the function already
-  return true;
-}
+//  // no need to emit, it's done by the function already
+//  return true;
+//}
 
 std::unordered_map<ConnectionID, QtNodes::DataFlowModel::SharedConnection> &
 DataFlowModel::connections() {

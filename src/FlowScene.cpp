@@ -20,10 +20,21 @@ using QtNodes::FlowScene;
 using QtNodes::NodeGraphicsObject;
 using QtNodes::NodeIndex;
 
+namespace QtNodes {
 FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
     : QGraphicsScene(parent)
     , _model(model) {
   Q_ASSERT(model != nullptr);
+
+  connect(this,
+          &FlowScene::removeNode,
+          model,
+          &FlowSceneModel::removeNodeWithConnections);
+
+  connect(this,
+          &FlowScene::removeConnection,
+          model,
+          &FlowSceneModel::removeConnection);
 
   connect(model, &FlowSceneModel::nodeRemoved, this, &FlowScene::nodeRemoved);
   connect(model, &FlowSceneModel::nodeAdded, this, &FlowScene::nodeAdded);
@@ -43,7 +54,7 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
           &FlowSceneModel::connectionAdded,
           this,
           &FlowScene::connectionAdded);
-  connect(model, &FlowSceneModel::nodeMoved, this, &FlowScene::nodeMoved);
+  // connect(model, &FlowSceneModel::nodeMoved, this, &FlowScene::nodeMoved);
   connect(model, &FlowSceneModel::updateNode, this, &FlowScene::updateNode);
   connect(model,
           &FlowSceneModel::updateConnection,
@@ -79,8 +90,6 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
   for (const auto &n : model->nodeUUids()) {
     auto ngo = nodeComposite(model->nodeIndex(n));
     ngo->geometry().recalculateSize();
-    // TODO check this
-    // ngo->moveConnections();
   }
 }
 
@@ -137,24 +146,7 @@ void FlowScene::nodeRemoved(const QUuid &id) {
 
   try {
     auto ngo = nodeComposites_.at(id);
-#ifndef QT_NO_DEBUG
-    // make sure there are no connections left
-    for (const auto &connPtrSet : ngo->nodeState().getEntries(PortType::In)) {
-      Q_ASSERT(connPtrSet.second.size() == 0);
-    }
-    for (const auto &connPtrSet : ngo->nodeState().getEntries(PortType::Out)) {
-      Q_ASSERT(connPtrSet.second.size() == 0);
-    }
-#endif
 
-    for (auto &child : ngo->childItems()) {
-      if (child->type() > QGraphicsItem::UserType) {
-        if (auto composite = dynamic_cast<NodeComposite *>(child)) {
-          auto index = composite->nodeIndex();
-          model()->removeNodeWithConnections(index);
-        }
-      }
-    }
     delete ngo;
     auto erased = nodeComposites_.erase(id);
     Q_ASSERT(erased == 1);
@@ -164,12 +156,14 @@ void FlowScene::nodeRemoved(const QUuid &id) {
 }
 
 QtNodes::NodeComposite *FlowScene::createComposite(const NodeIndex &index) {
-  if (reinterpret_cast<Node *>(index.internalPointer())
-          ->nodeDataModel()
-          ->type() == NodeDataModel::Frame) {
-    return new NodeGraphicsFrame(*this, index);
+  NodeComposite *obj{};
+  if (index.isValid()) {
+    obj = new NodeGraphicsObject(*this, index);
+  } else {
+    obj = new NodeGraphicsFrame(*this, index);
   }
-  return new NodeGraphicsObject(*this, index);
+  addItem(obj);
+  return obj;
 }
 
 void FlowScene::nodeAdded(const QUuid &newID) {
@@ -179,20 +173,13 @@ void FlowScene::nodeAdded(const QUuid &newID) {
   Q_ASSERT(nodeComposites_.find(newID) == nodeComposites_.end());
 
   auto index = model()->nodeIndex(newID);
-  Q_ASSERT(index.isValid());
 
   auto ngo = createComposite(index);
-  addItem(ngo);
   Q_ASSERT(ngo->scene() == this);
 
-  if (!nodeComposites_.insert(std::pair(index.id(), ngo)).second) {
+  if (!nodeComposites_.insert(std::pair(newID, ngo)).second) {
     GET_INFO();
   }
-
-  nodeMoved(index);
-
-  // TODO (not worked) if node created in frame - frame will be set as parent
-  // nodeGraphicsObject(index)->checkParent();
 }
 
 // TODO not work correctly!
@@ -242,8 +229,6 @@ void FlowScene::nodePortUpdated(NodeIndex const &id) {
   if (!nodeComposites_.insert(std::pair(id.id(), ngo)).second) {
     GET_INFO();
   }
-
-  nodeMoved(id);
 
   // add the connections back
   for (auto ty : {PortType::In, PortType::Out}) {
@@ -389,13 +374,7 @@ void FlowScene::connectionAdded(NodeIndex const &leftNode,
   _connGraphicsObjects.insert(std::pair(cgo->id(), cgo));
 }
 
-void FlowScene::nodeMoved(NodeIndex const &index) {
-  CHECK_OUT_OF_RANGE(
-      nodeComposites_.at(index.id())->setPos(model()->nodeLocation(index)));
-}
-
 //------------------------------------------------------------------------------
-namespace QtNodes {
 
 NodeComposite *locateNodeAt(QPointF           scenePoint,
                             FlowScene &       scene,
@@ -508,14 +487,17 @@ QMenu *FlowScene::createContextMenu(QPointF scenePos) {
             }
 
             // try to create the node
-            auto uuid = model()->addNode(modelName, scenePos);
+            auto uuid = model()->addNode(modelName);
 
+            NodeComposite *node{};
             // if the node creation failed, then don't add it
             if (!uuid.isNull()) {
               // move it to the cursor location
-              model()->moveNode(model()->nodeIndex(uuid), scenePos);
+              CHECK_OUT_OF_RANGE(node = nodeComposites_.at(uuid));
+              node->setPos(scenePos);
             }
 
+            setFocusItem(node);
             modelMenu->close();
           });
 
@@ -538,6 +520,18 @@ QMenu *FlowScene::createContextMenu(QPointF scenePos) {
   // make sure the text box gets focus so the user doesn't have to click on it
   txtBox->setFocus();
 
+  auto *frameAction = modelMenu->addAction("Frame");
+  connect(
+      frameAction, &QAction::triggered, this, [this, scenePos, modelMenu]() {
+        auto uuid = QUuid::createUuid();
+        nodeAdded(uuid);
+        NodeComposite *item{};
+        CHECK_OUT_OF_RANGE(item = nodeComposites_.at(uuid));
+        item->setPos(scenePos);
+        setFocusItem(item);
+        modelMenu->close();
+      });
+
   return modelMenu;
 }
 
@@ -552,6 +546,48 @@ void FlowScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
   modelMenu->exec(event->screenPos());
   event->accept();
   modelMenu->deleteLater();
+}
+
+void FlowScene::deleteSelectedNodes() {
+  // Delete the selected connections first, ensuring that they won't be
+  // automatically deleted when selected nodes are deleted (deleting a node
+  // deletes some connections as well)
+  for (QGraphicsItem *item : selectedItems()) {
+    if (item->type() == ConnectionGraphicsObject::Connection) {
+      if (auto c = qgraphicsitem_cast<ConnectionGraphicsObject *>(item)) {
+        // does't matter if it works or doesn't, at least we tried
+        emit removeConnection(c->node(PortType::Out),
+                              c->portIndex(PortType::Out),
+                              c->node(PortType::In),
+                              c->portIndex(PortType::In));
+      }
+    }
+  }
+
+  // Delete the nodes; this will delete many of the connections.
+  // Selected connections were already deleted prior to this loop, otherwise
+  // qgraphicsitem_cast<NodeGraphicsObject*>(item) could be a use-after-free
+  // when a selected connection is deleted by deleting the node.
+  for (QGraphicsItem *item : selectedItems()) {
+    if (auto n = qgraphicsitem_cast<NodeComposite *>(item)) {
+      recursivelyRemove(n);
+    }
+  }
+}
+
+void FlowScene::recursivelyRemove(NodeComposite *obj) {
+  // if nodeIndex is not valid - this means that this item is only in scene
+  if (!obj) {
+    return;
+  }
+  if (auto index = obj->nodeIndex(); index.isValid()) {
+    emit removeNode(index);
+  } else {
+    for (auto &i : obj->childItems()) {
+      recursivelyRemove(dynamic_cast<NodeComposite *>(i));
+    }
+    CHECK_OUT_OF_RANGE(delete nodeComposites_.at(index.id()));
+  }
 }
 
 } // namespace QtNodes
