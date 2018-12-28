@@ -39,10 +39,6 @@ QWidget *ReceiverNode::embeddedWidget() {
   return widget_;
 }
 
-bool ReceiverNode::resizable() const {
-  return true;
-}
-
 QtNodes::NodeValidationState ReceiverNode::validationState() const {
   return validationState_;
 }

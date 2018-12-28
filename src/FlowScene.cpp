@@ -26,6 +26,8 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
     , _model(model) {
   Q_ASSERT(model != nullptr);
 
+  connect(this, &FlowScene::addNode, model, &FlowSceneModel::addNode);
+
   connect(this,
           &FlowScene::removeNode,
           model,
@@ -180,6 +182,8 @@ void FlowScene::nodeAdded(const QUuid &newID) {
   if (!nodeComposites_.insert(std::pair(newID, ngo)).second) {
     GET_INFO();
   }
+
+  ngo->setPos(lastPos_);
 }
 
 // TODO not work correctly!
@@ -422,7 +426,7 @@ void FlowScene::updateConnection(const NodeIndex &leftNodeIndex,
   CHECK_OUT_OF_RANGE(_connGraphicsObjects.at(id)->move());
 }
 
-QMenu *FlowScene::createContextMenu(QPointF scenePos) {
+QMenu *FlowScene::createContextMenu() {
   auto modelMenu = new QMenu;
 
   auto skipText = QStringLiteral("skip me");
@@ -479,25 +483,15 @@ QMenu *FlowScene::createContextMenu(QPointF scenePos) {
   connect(treeView,
           &QTreeWidget::itemClicked,
           /*here we set by value, because referencies can be not valid*/
-          [this, modelMenu, skipText, scenePos](QTreeWidgetItem *item, int) {
+          [this, modelMenu, skipText](QTreeWidgetItem *item, int) {
             QString modelName = item->data(0, Qt::UserRole).toString();
 
             if (modelName == skipText) {
               return;
             }
 
-            // try to create the node
-            auto uuid = model()->addNode(modelName);
+            emit addNode(modelName);
 
-            NodeComposite *node{};
-            // if the node creation failed, then don't add it
-            if (!uuid.isNull()) {
-              // move it to the cursor location
-              CHECK_OUT_OF_RANGE(node = nodeComposites_.at(uuid));
-              node->setPos(scenePos);
-            }
-
-            setFocusItem(node);
             modelMenu->close();
           });
 
@@ -521,27 +515,27 @@ QMenu *FlowScene::createContextMenu(QPointF scenePos) {
   txtBox->setFocus();
 
   auto *frameAction = modelMenu->addAction("Frame");
-  connect(
-      frameAction, &QAction::triggered, this, [this, scenePos, modelMenu]() {
-        auto uuid = QUuid::createUuid();
-        nodeAdded(uuid);
-        NodeComposite *item{};
-        CHECK_OUT_OF_RANGE(item = nodeComposites_.at(uuid));
-        item->setPos(scenePos);
-        setFocusItem(item);
-        modelMenu->close();
-      });
+  connect(frameAction, &QAction::triggered, this, [this, modelMenu]() {
+    auto uuid = QUuid::createUuid();
+    nodeAdded(uuid);
+    // NodeComposite *item{};
+    // CHECK_OUT_OF_RANGE(item = nodeComposites_.at(uuid));
+    // item->setPos(lastPos_);
+    // setFocusItem(item);
+    modelMenu->close();
+  });
 
   return modelMenu;
 }
 
 void FlowScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *event) {
+  lastPos_ = event->scenePos();
   if (itemAt(event->scenePos(), QTransform())) {
     QGraphicsScene::contextMenuEvent(event);
     return;
   }
 
-  auto modelMenu = createContextMenu(event->scenePos());
+  auto modelMenu = createContextMenu();
 
   modelMenu->exec(event->screenPos());
   event->accept();

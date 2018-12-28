@@ -53,7 +53,7 @@ void NodeGraphicsFrame::unloadAllChilds() {
 
 void NodeGraphicsFrame::contextMenuEvent(
     QGraphicsSceneContextMenuEvent *event) {
-  auto frameMenu    = flowScene().createContextMenu(event->scenePos());
+  auto frameMenu    = flowScene().createContextMenu();
   auto unloadAction = new QAction("Unload all Nodes from Frame", frameMenu);
   frameMenu->addAction(unloadAction);
   connect(unloadAction, &QAction::triggered, this, [this, frameMenu]() {

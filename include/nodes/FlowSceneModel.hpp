@@ -125,9 +125,6 @@ public:
   virtual bool removeNode(NodeIndex const & /*index*/) = 0;
 
 public:
-  /// Add a  -- return {} if it fails
-  virtual QUuid addNode(QString const & /*typeID*/) { return QUuid{}; }
-
   virtual bool
   addPort(const NodeIndex &nIndex, PortType pType, PortIndex pIndex) = 0;
 
@@ -143,6 +140,9 @@ public slots:
 
   // try to remove all connections and then the node
   bool removeNodeWithConnections(NodeIndex const &index);
+
+  /// Add a  -- return {} if it fails
+  virtual QUuid addNode(QString const & /*typeID*/) { return QUuid{}; }
 
 public:
   /// Notifications

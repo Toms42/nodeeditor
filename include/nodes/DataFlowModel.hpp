@@ -43,13 +43,7 @@ public:
 
   QString nodeCaption(NodeIndex const &index) const override;
 
-  // TODO model haven't to know about location!
-  // QPointF nodeLocation(NodeIndex const &index) const override;
-
   QWidget *nodeWidget(NodeIndex const &index) const override;
-
-  // TODO model haven'to know about this
-  // bool nodeResizable(NodeIndex const &index) const override;
 
   NodeValidationState
   nodeValidationState(NodeIndex const &index) const override;
@@ -96,12 +90,10 @@ public:
 
   bool removeNode(NodeIndex const &index) override;
 
-public:
+public slots:
   QUuid addNode(QString const &typeID) override;
 
-  // TODO model haven't to can move nodes
-  // bool  moveNode(NodeIndex const &index, QPointF newLocation) override;
-
+public:
   bool
   addPort(const NodeIndex &nIndex, PortType pType, PortIndex pIndex) override;
 

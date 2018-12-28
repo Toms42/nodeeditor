@@ -76,10 +76,6 @@ std::shared_ptr<NodeData> NodeDataModel::outData(PortIndex index) {
   return nullptr;
 }
 
-bool NodeDataModel::resizable() const {
-  return true;
-}
-
 NodeValidationState NodeDataModel::validationState() const {
   return NodeValidationState::Valid;
 }

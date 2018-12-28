@@ -30,10 +30,6 @@ QWidget *SenderNode::embeddedWidget() {
   return widget_;
 }
 
-bool SenderNode::resizable() const {
-  return true;
-}
-
 QtNodes::NodeValidationState SenderNode::validationState() const {
   return validationState_;
 }

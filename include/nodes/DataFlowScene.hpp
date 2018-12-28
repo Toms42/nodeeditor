@@ -28,21 +28,21 @@ public:
 
   ~DataFlowScene() override;
 
-  std::shared_ptr<Connection>
-  createConnection(Node &               nodeIn,
-                   PortIndex            portIndexIn,
-                   Node &               nodeOut,
-                   PortIndex            portIndexOut,
-                   TypeConverter const &converter = TypeConverter());
+  // std::shared_ptr<Connection>
+  // createConnection(Node &               nodeIn,
+  //                 PortIndex            portIndexIn,
+  //                 Node &               nodeOut,
+  //                 PortIndex            portIndexOut,
+  //                 TypeConverter const &converter = TypeConverter());
 
-  std::shared_ptr<Connection>
-  restoreConnection(QJsonObject const &connectionJson);
+  // std::shared_ptr<Connection>
+  // restoreConnection(QJsonObject const &connectionJson);
 
   // void deleteConnection(Connection &connection);
 
   // Node &createNode(std::unique_ptr<NodeDataModel> &&dataModel);
 
-  Node &restoreNode(QJsonObject const &nodeJson);
+  // Node &restoreNode(QJsonObject const &nodeJson);
 
   DataModelRegistry &registry() const;
 
@@ -62,12 +62,12 @@ public:
   // void setNodePosition(Node &node, QPointF const &pos) const;
 
 public:
-  std::unordered_map<QUuid, std::unique_ptr<Node>> const &nodes() const;
+  // std::unordered_map<QUuid, std::unique_ptr<Node>> const &nodes() const;
 
-  std::unordered_map<ConnectionID, std::shared_ptr<Connection>> const &
-  connections() const;
+  // std::unordered_map<ConnectionID, std::shared_ptr<Connection>> const &
+  // connections() const;
 
-  std::vector<Node *> selectedNodes() const;
+  // std::vector<Node *> selectedNodes() const;
 
 public:
   void clearScene();

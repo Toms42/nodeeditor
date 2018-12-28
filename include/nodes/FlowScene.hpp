@@ -50,7 +50,7 @@ public:
    * \warning this menu dynamicaly allocated, so its have ot be deleted after
    * use
    */
-  QMenu *createContextMenu(QPointF scenePos);
+  QMenu *createContextMenu();
 
 protected:
   void contextMenuEvent(QGraphicsSceneContextMenuEvent *conn) override;
@@ -60,6 +60,8 @@ protected:
   void recursivelyRemove(NodeComposite *obj);
 
 signals:
+  void addNode(QString modelName);
+
   /**\brief send signal to model for remove item
    */
   void removeNode(const NodeIndex &index);
@@ -111,6 +113,8 @@ private:
 
   // This is for when you're creating a connection
   ConnectionGraphicsObject *_temporaryConn = nullptr;
+
+  QPointF lastPos_;
 };
 
 NodeComposite *locateNodeAt(QPointF           scenePoint,

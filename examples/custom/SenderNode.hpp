@@ -13,7 +13,6 @@ public:
   ~SenderNode() override;
   QString                      name() const override;
   QWidget *                    embeddedWidget() override;
-  bool                         resizable() const override;
   QtNodes::NodeValidationState validationState() const override;
   QString                      validationMessage() const override;
 

@@ -29,6 +29,9 @@ unsigned int NodeGeometry::nSinks() const {
 void NodeGeometry::recalculateSize() const {
   prepareGeometryChange();
 
+  auto bWidth  = width();
+  auto bHeight = height();
+
   entryHeight_ = fontMetrics_.height();
 
   {
@@ -64,6 +67,13 @@ void NodeGeometry::recalculateSize() const {
       NodeValidationState::Valid) {
     width_ = std::max(width(), validationWidth());
     height_ += validationHeight() + spacing();
+  }
+
+  // TODO if size of object change we touch position for moveconnections
+  if (bWidth != width() || bHeight != height()) {
+    auto pos = obj_.pos();
+    obj_.setPos({0, 0});
+    obj_.setPos(pos);
   }
 }
 

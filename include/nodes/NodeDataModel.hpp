@@ -63,10 +63,6 @@ public:
    */
   virtual QWidget *embeddedWidget() = 0;
 
-  /**\return by default true
-   */
-  virtual bool resizable() const;
-
   /**\return current validation state of node. By default Valid
    */
   virtual NodeValidationState validationState() const;
