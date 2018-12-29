@@ -23,6 +23,7 @@ using QtNodes::NodeState;
 
 NodeGraphicsObject::NodeGraphicsObject(FlowScene &scene, NodeIndex const &node)
     : NodeComposite{scene, node}
+    , proxyWidget_{new QGraphicsProxyWidget(this)}
     , geometry_{*this} {
   embedQWidget();
 }
@@ -183,8 +184,6 @@ void NodeGraphicsObject::embedQWidget() {
   }
   if (auto w = reinterpret_cast<class Node *>(nodeIndex().internalPointer())
                    ->nodeWidget()) {
-    proxyWidget_ = new QGraphicsProxyWidget(this);
-
     proxyWidget_->setWidget(w);
 
     proxyWidget_->setPreferredWidth(5);

@@ -165,3 +165,7 @@ void Node::onDataUpdated(PortIndex index) {
     c->propagateData(nodeData);
   }
 }
+
+void Node::restore(const QJsonObject &obj) {
+  _nodeDataModel->restore(obj["model"].toObject());
+}

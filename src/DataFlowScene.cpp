@@ -89,48 +89,11 @@ void DataFlowScene::load() {
 }
 
 QByteArray DataFlowScene::saveToMemory() const {
-  QJsonObject sceneJson;
-
-  // QJsonArray nodesJsonArray;
-
-  // for (auto const &pair : _dataFlowModel->nodes()) {
-  //  auto const &node = pair.second;
-
-  //  nodesJsonArray.append(node->save());
-  //}
-
-  // sceneJson["nodes"] = nodesJsonArray;
-
-  // QJsonArray connectionJsonArray;
-  // for (auto const &pair : _dataFlowModel->connections()) {
-  //  auto const &connection = pair.second;
-
-  //  QJsonObject connectionJson = connection->save();
-
-  //  if (!connectionJson.isEmpty()) {
-  //    connectionJsonArray.append(connectionJson);
-  //  }
-  //}
-
-  // sceneJson["connections"] = connectionJsonArray;
-
-  QJsonDocument document(sceneJson);
-
-  return document.toJson();
+  // QJsonObject sceneJson;
+  // QJsonArray posJsonArray;
+  return _dataFlowModel->saveToMemory();
 }
 
 void DataFlowScene::loadFromMemory(const QByteArray &data) {
-  QJsonObject const jsonDocument = QJsonDocument::fromJson(data).object();
-
-  QJsonArray nodesJsonArray = jsonDocument["nodes"].toArray();
-
-  for (int i = 0; i < nodesJsonArray.size(); ++i) {
-    //  restoreNode(nodesJsonArray[i].toObject());
-  }
-
-  QJsonArray connectionJsonArray = jsonDocument["connections"].toArray();
-
-  for (int i = 0; i < connectionJsonArray.size(); ++i) {
-    //  restoreConnection(connectionJsonArray[i].toObject());
-  }
+  _dataFlowModel->loadFromMemory(data);
 }

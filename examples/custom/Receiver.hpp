@@ -15,6 +15,12 @@ public:
   ~Receiver() override;
   void setInfo(const QString &data);
 
+protected:
+  void contextMenuEvent(QContextMenuEvent *event) override;
+
+signals:
+  void toModel();
+
 private:
   Ui::Receiver *ui_;
 };

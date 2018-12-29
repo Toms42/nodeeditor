@@ -94,6 +94,14 @@ public:
 
   bool removeNode(QUuid uuid) override;
 
+  QByteArray saveToMemory() const;
+
+  void loadFromMemory(const QByteArray &data);
+
+  void restoreNode(const QJsonObject &data);
+
+  void restoreConnection(const QJsonObject &data);
+
 public slots:
   QUuid addNode(QString const &typeID) override;
 

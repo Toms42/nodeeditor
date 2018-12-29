@@ -5,6 +5,9 @@
 #include "DataModelRegistry.hpp"
 #include "Node.hpp"
 #include "checker.hpp"
+#include <QDebug>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <iostream>
 
 namespace QtNodes {
@@ -438,6 +441,83 @@ DataModelRegistry &DataFlowModel::registry() {
 
 void DataFlowModel::setRegistry(std::shared_ptr<DataModelRegistry> registry) {
   _registry = std::move(registry);
+}
+
+QByteArray DataFlowModel::saveToMemory() const {
+  QJsonObject modelJson;
+
+  QJsonArray nodesJsonArray;
+
+  for (auto const &pair : _nodes) {
+    auto const &node = pair.second;
+
+    nodesJsonArray.append(node->save());
+  }
+
+  modelJson["nodes"] = nodesJsonArray;
+
+  QJsonArray connectionJsonArray;
+  for (auto const &pair : _connections) {
+    auto const &connection = pair.second;
+
+    QJsonObject connectionJson = connection->save();
+
+    if (!connectionJson.isEmpty()) {
+      connectionJsonArray.append(connectionJson);
+    }
+  }
+
+  modelJson["connections"] = connectionJsonArray;
+
+  QJsonDocument document(modelJson);
+
+  return document.toJson();
+}
+
+void DataFlowModel::loadFromMemory(const QByteArray &data) {
+  QJsonObject const jsonDocument = QJsonDocument::fromJson(data).object();
+
+  QJsonArray nodesJsonArray = jsonDocument["nodes"].toArray();
+
+  for (int i = 0; i < nodesJsonArray.size(); ++i) {
+    restoreNode(nodesJsonArray[i].toObject());
+  }
+
+  QJsonArray connectionJsonArray = jsonDocument["connections"].toArray();
+
+  for (int i = 0; i < connectionJsonArray.size(); ++i) {
+    restoreConnection(connectionJsonArray[i].toObject());
+  }
+}
+
+void DataFlowModel::restoreNode(const QJsonObject &nodeJson) {
+  QString modelName = nodeJson["model"].toObject()["name"].toString();
+
+  auto uid = QUuid(nodeJson["id"].toString());
+
+  addNode(modelName, uid);
+
+  CHECK_OUT_OF_RANGE(auto &node = *_nodes.at(uid); node.restore(nodeJson));
+}
+
+void DataFlowModel::restoreConnection(const QJsonObject &connectionJson) {
+  QUuid nodeInId  = QUuid(connectionJson["in_id"].toString());
+  QUuid nodeOutId = QUuid(connectionJson["out_id"].toString());
+
+  PortIndex portIndexIn  = connectionJson["in_index"].toInt();
+  PortIndex portIndexOut = connectionJson["out_index"].toInt();
+
+  ConnectionID connId;
+  connId.lNodeID = nodeOutId;
+  connId.rNodeID = nodeInId;
+
+  connId.lPortID = portIndexOut;
+  connId.rPortID = portIndexIn;
+
+  addConnection(nodeIndex(nodeOutId),
+                connId.lPortID,
+                nodeIndex(nodeInId),
+                connId.rPortID);
 }
 
 } // namespace QtNodes

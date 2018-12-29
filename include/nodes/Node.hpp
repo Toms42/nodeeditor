@@ -32,6 +32,8 @@ public:
 public:
   QJsonObject save() const override;
 
+  void restore(const QJsonObject &obj) override;
+
 public:
   QUuid id() const;
 

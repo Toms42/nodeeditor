@@ -1,6 +1,7 @@
 #include "DataModelRegistry.hpp"
 #include <QtCore/QFile>
 #include <QtWidgets/QMessageBox>
+#include <iostream>
 
 using QtNodes::DataModelRegistry;
 // using QtNodes::NodeDataModel;

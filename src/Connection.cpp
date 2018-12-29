@@ -32,12 +32,7 @@ Connection::Connection(Node &        nodeIn,
   setNodeToPort(nodeOut, PortType::Out, portIndexOut);
 }
 
-Connection::~Connection() {
-  // TODO when call destructor for connection objects, which recive this data,
-  // already deleted
-
-  // propagateEmptyData();
-}
+Connection::~Connection() {}
 
 QJsonObject Connection::save() const {
   QJsonObject connectionJson;
