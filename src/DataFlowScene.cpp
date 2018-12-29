@@ -19,15 +19,12 @@ using QtNodes::Node;
 using QtNodes::NodeIndex;
 using QtNodes::PortIndex;
 
-DataFlowScene::DataFlowScene(std::shared_ptr<DataModelRegistry> registry,
-                             QObject *                          parent)
-    : FlowScene(new DataFlowModel(std::move(registry)), parent) {
-  _dataFlowModel = reinterpret_cast<DataFlowModel *>(model());
+DataFlowScene::DataFlowScene(DataFlowModel *model, QObject *parent)
+    : FlowScene(model, parent) {
+  _dataFlowModel = model;
 }
 
-DataFlowScene::~DataFlowScene() {
-  delete _dataFlowModel;
-}
+DataFlowScene::~DataFlowScene() {}
 
 DataModelRegistry &DataFlowScene::registry() const {
   return _dataFlowModel->registry();

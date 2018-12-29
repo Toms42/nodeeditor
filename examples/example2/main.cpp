@@ -1,5 +1,6 @@
 #include "TextDisplayDataModel.hpp"
 #include "TextSourceDataModel.hpp"
+#include "nodes/DataFlowModel.hpp"
 #include <QtWidgets/QApplication>
 #include <nodes/DataFlowScene.hpp>
 #include <nodes/DataModelRegistry.hpp>
@@ -23,7 +24,8 @@ static std::shared_ptr<DataModelRegistry> registerDataModels() {
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
-  DataFlowScene scene(registerDataModels());
+  QtNodes::DataFlowModel model(registerDataModels());
+  DataFlowScene          scene(&model);
 
   FlowView view(&scene);
 

@@ -19,7 +19,7 @@ class TextDisplayDataModel : public NodeDataModel {
 public:
   TextDisplayDataModel();
 
-  ~TextDisplayDataModel() override { delete _label; }
+  ~TextDisplayDataModel() override { _label->deleteLater(); }
 
 public:
   static QString Name() { return QString("TextDisplayDataModel"); }

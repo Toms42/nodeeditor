@@ -19,7 +19,7 @@ class TextSourceDataModel : public NodeDataModel {
 public:
   TextSourceDataModel();
 
-  ~TextSourceDataModel() override { delete _lineEdit; }
+  ~TextSourceDataModel() override { _lineEdit->deleteLater(); }
 
 public:
   static QString Name() { return QString("TextSourceDataModel"); }

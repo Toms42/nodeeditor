@@ -3,6 +3,7 @@
 #include "ConnectionState.hpp"
 #include "FlowScene.hpp"
 #include "FlowSceneModel.hpp"
+#include "Node.hpp"
 #include "NodeConnectionInteraction.hpp"
 #include "NodeIndex.hpp"
 #include "NodePainter.hpp"
@@ -10,6 +11,7 @@
 #include <QtWidgets/QGraphicsEffect>
 #include <QtWidgets/QtWidgets>
 #include <cstdlib>
+#include <iostream>
 #include <utility>
 
 using QtNodes::ConnectionPolicy;
@@ -87,8 +89,9 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
       // start dragging existing connection
       if (!connections.empty() &&
-          flowScene().model()->nodePortConnectionPolicy(
-              nodeIndex(), portIndex, portToCheck) == ConnectionPolicy::One) {
+          reinterpret_cast<class Node *>(nodeIndex().internalPointer())
+                  ->nodePortConnectionPolicy(portToCheck, portIndex) ==
+              ConnectionPolicy::One) {
         Q_ASSERT(connections.size() == 1);
 
         auto con = *connections.begin();
@@ -118,10 +121,10 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event) {
         flowScene().temporaryConn()->grabMouse();
 
         // past create new connection by existing, we remove already existing
-        flowScene().model()->removeConnection(con->node(PortType::Out),
-                                              con->portIndex(PortType::Out),
-                                              con->node(PortType::In),
-                                              con->portIndex(PortType::In));
+        emit flowScene().removeConnection(con->node(PortType::Out),
+                                          con->portIndex(PortType::Out),
+                                          con->node(PortType::In),
+                                          con->portIndex(PortType::In));
 
       } else // initialize new Connection
       {
@@ -175,7 +178,11 @@ void NodeGraphicsObject::contextMenuEvent(
 }
 
 void NodeGraphicsObject::embedQWidget() {
-  if (auto w = flowScene().model()->nodeWidget(nodeIndex())) {
+  if (!nodeIndex().internalPointer()) {
+    return;
+  }
+  if (auto w = reinterpret_cast<class Node *>(nodeIndex().internalPointer())
+                   ->nodeWidget()) {
     proxyWidget_ = new QGraphicsProxyWidget(this);
 
     proxyWidget_->setWidget(w);

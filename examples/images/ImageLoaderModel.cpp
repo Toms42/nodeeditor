@@ -28,7 +28,7 @@ ImageLoaderModel::ImageLoaderModel()
 }
 
 ImageLoaderModel::~ImageLoaderModel() {
-  delete _label;
+  _label->deleteLater();
 }
 
 bool ImageLoaderModel::eventFilter(QObject *object, QEvent *event) {

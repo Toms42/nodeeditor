@@ -36,6 +36,7 @@ set(INC_SRC
   include/nodes/Connection.hpp
   include/nodes/ConnectionGeometry.hpp
   include/nodes/ConnectionGraphicsObject.hpp
+  include/nodes/DataFlowModel.hpp
   include/nodes/DataFlowScene.hpp
   include/nodes/FlowScene.hpp
   include/nodes/FlowSceneModel.hpp

@@ -28,7 +28,7 @@ ReceiverNode::ReceiverNode()
 }
 
 ReceiverNode::~ReceiverNode() {
-  delete widget_;
+  widget_->deleteLater();
 }
 
 QString ReceiverNode::name() const {

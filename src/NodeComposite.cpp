@@ -24,7 +24,7 @@ NodeComposite::NodeComposite(FlowScene &scene, const NodeIndex &nodeIndex)
 
   setCacheMode(QGraphicsItem::DeviceCoordinateCache);
 
-  auto const nodeStyle = scene_.model()->nodeStyle(nodeIndex_);
+  auto const nodeStyle = NodeStyle{};
   {
     auto effect = new QGraphicsDropShadowEffect;
     effect->setOffset(4, 4);
@@ -39,17 +39,6 @@ NodeComposite::NodeComposite(FlowScene &scene, const NodeIndex &nodeIndex)
   setAcceptHoverEvents(true);
 
   setZValue(0.);
-
-  // connect to the move signals
-  // auto onMoveSlot = [this] {
-  //  // ask the model to move it
-  //  if (!flowScene().model()->moveNode(nodeIndex_, scenePos())) {
-  //    // set the location back
-  //    setPos(flowScene().model()->nodeLocation(nodeIndex_));
-  //  }
-  //};
-  // connect(this, &QGraphicsObject::xChanged, this, onMoveSlot);
-  // connect(this, &QGraphicsObject::yChanged, this, onMoveSlot);
 }
 
 int NodeComposite::type() const {
@@ -187,8 +176,7 @@ void NodeComposite::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 void NodeComposite::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
   auto pos = event->pos();
 
-  if (/*flowScene().model()->nodeResizable(nodeIndex()) &&*/
-      geometry().resizeRect().contains(QPoint(pos.x(), pos.y()))) {
+  if (geometry().resizeRect().contains(QPoint(pos.x(), pos.y()))) {
     setCursor(QCursor(Qt::SizeFDiagCursor));
   } else {
     setCursor(QCursor());

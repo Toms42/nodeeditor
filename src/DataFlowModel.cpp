@@ -9,8 +9,12 @@
 
 namespace QtNodes {
 
-DataFlowModel::DataFlowModel(std::shared_ptr<DataModelRegistry> registry)
-    : _registry(std::move(registry)) {}
+DataFlowModel::DataFlowModel(std::shared_ptr<DataModelRegistry> registry,
+                             QObject *                          parent)
+    : FlowSceneModel{parent}
+    , _registry(std::move(registry)) {}
+
+DataFlowModel::~DataFlowModel() {}
 
 // FlowSceneModel read interface
 QStringList DataFlowModel::modelRegistry() const {
@@ -301,14 +305,12 @@ bool DataFlowModel::addConnection(NodeIndex const &leftNodeIdx,
   return true;
 }
 
-bool DataFlowModel::removeNode(NodeIndex const &index) {
-  Q_ASSERT(index.isValid());
-
+bool DataFlowModel::removeNode(QUuid index) {
   // remove it from the map
-  _nodes.erase(index.id());
-
-  // tell the view
-  emit nodeRemoved(index.id());
+  if (_nodes.erase(index)) {
+    // tell the view
+    emit nodeRemoved(index);
+  }
 
   return true;
 }

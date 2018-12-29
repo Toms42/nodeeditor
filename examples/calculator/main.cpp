@@ -6,6 +6,7 @@
 #include "NumberDisplayDataModel.hpp"
 #include "NumberSourceDataModel.hpp"
 #include "SubtractionModel.hpp"
+#include "nodes/DataFlowModel.hpp"
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QVBoxLayout>
@@ -86,7 +87,8 @@ int main(int argc, char *argv[]) {
   QVBoxLayout *l = new QVBoxLayout(&mainWidget);
 
   l->addWidget(menuBar);
-  auto scene = new DataFlowScene(registerDataModels(), &mainWidget);
+  auto model = new QtNodes::DataFlowModel(registerDataModels(), &mainWidget);
+  auto scene = new DataFlowScene(model, &mainWidget);
   l->addWidget(new FlowView(scene));
   l->setContentsMargins(0, 0, 0, 0);
   l->setSpacing(0);
@@ -100,6 +102,13 @@ int main(int argc, char *argv[]) {
   mainWidget.setWindowTitle("Dataflow tools: simplest calculator");
   mainWidget.resize(800, 600);
   mainWidget.show();
+
+  FlowView newViewForOldScene(scene);
+  newViewForOldScene.show();
+
+  auto     newScene = new DataFlowScene(model);
+  FlowView newViewOldModel(newScene);
+  newViewOldModel.show();
 
   return app.exec();
 }

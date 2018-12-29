@@ -52,7 +52,7 @@ ImageShowModel::ImageShowModel()
 }
 
 ImageShowModel::~ImageShowModel() {
-  delete _label;
+  _label->deleteLater();
 }
 
 bool ImageShowModel::eventFilter(QObject *object, QEvent *event) {

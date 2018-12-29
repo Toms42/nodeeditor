@@ -29,7 +29,7 @@ NumberDisplayDataModel::NumberDisplayDataModel()
 }
 
 NumberDisplayDataModel::~NumberDisplayDataModel() {
-  delete _label;
+  _label->deleteLater();
 }
 
 NodeValidationState NumberDisplayDataModel::validationState() const {

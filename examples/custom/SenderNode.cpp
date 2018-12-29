@@ -3,6 +3,7 @@
 #include "SenderNode.hpp"
 #include "FormData.hpp"
 #include "Sender.hpp"
+#include <iostream>
 
 SenderNode::SenderNode()
     : widget_{new Sender}
@@ -19,7 +20,7 @@ SenderNode::SenderNode()
 }
 
 SenderNode::~SenderNode() {
-  delete widget_;
+  widget_->deleteLater();
 }
 
 QString SenderNode::name() const {

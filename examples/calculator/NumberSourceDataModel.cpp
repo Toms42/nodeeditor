@@ -24,7 +24,7 @@ NumberSourceDataModel::NumberSourceDataModel()
 }
 
 NumberSourceDataModel::~NumberSourceDataModel() {
-  delete _lineEdit;
+  _lineEdit->deleteLater();
 }
 
 QJsonObject NumberSourceDataModel::save() const {

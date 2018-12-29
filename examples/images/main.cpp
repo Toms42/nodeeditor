@@ -1,9 +1,9 @@
 #include "ImageLoaderModel.hpp"
 #include "ImageShowModel.hpp"
+#include "nodes/DataFlowModel.hpp"
 #include <QtWidgets/QApplication>
 #include <nodes/DataFlowScene.hpp>
 #include <nodes/FlowView.hpp>
-#include <nodes/NodeData.hpp>
 
 using QtNodes::DataFlowScene;
 using QtNodes::DataModelRegistry;
@@ -21,7 +21,8 @@ static std::shared_ptr<DataModelRegistry> registerDataModels() {
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
-  DataFlowScene scene(registerDataModels());
+  QtNodes::DataFlowModel model(registerDataModels());
+  DataFlowScene          scene(&model);
 
   FlowView view(&scene);
 

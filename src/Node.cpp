@@ -31,6 +31,51 @@ Node::Node(std::unique_ptr<NodeDataModel> &&nodeImp, QUuid const &id)
 
 Node::~Node() = default;
 
+QWidget *Node::nodeWidget() const {
+  return _nodeDataModel->embeddedWidget();
+}
+
+QtNodes::ConnectionPolicy
+Node::nodePortConnectionPolicy(PortType type, PortIndex index) const {
+  switch (type) {
+  case PortType::In:
+    return ConnectionPolicy::One;
+    break;
+  case PortType::Out:
+    return _nodeDataModel->portOutConnectionPolicy(index);
+    break;
+  default:
+    break;
+  }
+  // TODO I think this is not right, this shuld return error in this case
+  return ConnectionPolicy::Many;
+}
+
+QtNodes::NodeDataType Node::nodePortDataType(PortType  type,
+                                             PortIndex index) const {
+  return _nodeDataModel->dataType(type, index);
+}
+
+QString Node::nodeCaption() const {
+  return _nodeDataModel->name();
+}
+
+QString Node::nodePortCaption(PortType type, PortIndex index) const {
+  return _nodeDataModel->portCaption(type, index);
+}
+
+QtNodes::NodeValidationState Node::nodeValidationState() const {
+  return _nodeDataModel->validationState();
+}
+
+QString Node::nodeValidationMessage() const {
+  return _nodeDataModel->validationMessage();
+}
+
+QtNodes::NodePainterDelegate *Node::nodePainterDelegate() const {
+  return _nodeDataModel->painterDelegate();
+}
+
 bool Node::addPort(PortType pType, PortIndex pIndex) {
   switch (pType) {
   case PortType::In:

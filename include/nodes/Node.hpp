@@ -16,6 +16,7 @@ class ConnectionState;
 class NodeGraphicsObject;
 class NodeDataModel;
 class NodeData;
+class NodePainterDelegate;
 
 class NODE_EDITOR_PUBLIC Node
     : public QObject
@@ -42,6 +43,23 @@ public:
 
 public:
   NodeDataModel *nodeDataModel() const;
+
+  QWidget *nodeWidget() const;
+
+  ConnectionPolicy nodePortConnectionPolicy(PortType  type,
+                                            PortIndex index) const;
+
+  NodeDataType nodePortDataType(PortType type, PortIndex portIndex) const;
+
+  QString nodeCaption() const;
+
+  QString nodePortCaption(PortType type, PortIndex index) const;
+
+  NodeValidationState nodeValidationState() const;
+
+  QString nodeValidationMessage() const;
+
+  NodePainterDelegate *nodePainterDelegate() const;
 
   std::vector<Connection *> const &connections(PortType  pType,
                                                PortIndex pIdx) const;

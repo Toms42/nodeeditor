@@ -20,7 +20,8 @@ class NODE_EDITOR_PUBLIC FlowSceneModel : public QObject {
   Q_OBJECT
 
 public:
-  FlowSceneModel() = default;
+  FlowSceneModel(QObject *parent = nullptr);
+  virtual ~FlowSceneModel() = default;
 
   // Scene specific functions
   virtual QStringList modelRegistry() const = 0;
@@ -71,9 +72,6 @@ public:
   virtual NodePainterDelegate *
   nodePainterDelegate(NodeIndex const &index) const = 0;
 
-  /// Get the style - {} for default
-  virtual NodeStyle nodeStyle(NodeIndex const & /*index*/) const { return {}; }
-
   /// Get the count of DataPorts
   virtual unsigned int nodePortCount(NodeIndex const &index,
                                      PortType         portType) const = 0;
@@ -122,7 +120,7 @@ public:
                              PortIndex /*rightPortID*/) = 0;
 
   /// Remove a node
-  virtual bool removeNode(NodeIndex const & /*index*/) = 0;
+  virtual bool removeNode(QUuid /*index*/) = 0;
 
 public:
   virtual bool
@@ -139,7 +137,7 @@ public slots:
   ////////////////////
 
   // try to remove all connections and then the node
-  bool removeNodeWithConnections(NodeIndex const &index);
+  bool removeNodeWithConnections(QUuid index);
 
   /// Add a  -- return {} if it fails
   virtual QUuid addNode(QString const & /*typeID*/) { return QUuid{}; }
@@ -170,7 +168,8 @@ signals:
 
   void nodeRemoved(const QUuid &id);
   void nodeAdded(const QUuid &newID);
-  void nodePortUpdated(NodeIndex const &id);
+  // TODO not uses
+  // void nodePortUpdated(NodeIndex const &id);
   void nodeValidationUpdated(NodeIndex const &id);
   void connectionRemoved(NodeIndex const &leftNode,
                          PortIndex        leftPortID,

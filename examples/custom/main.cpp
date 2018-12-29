@@ -2,6 +2,7 @@
 
 #include "ReceiverNode.hpp"
 #include "SenderNode.hpp"
+#include "nodes/DataFlowModel.hpp"
 #include "nodes/DataFlowScene.hpp"
 #include "nodes/DataModelRegistry.hpp"
 #include "nodes/FlowView.hpp"
@@ -14,7 +15,8 @@ int main(int argc, char *argv[]) {
   dmRegistry->registerModel<SenderNode>();
   dmRegistry->registerModel<ReceiverNode>();
 
-  QtNodes::DataFlowScene scene(dmRegistry);
+  QtNodes::DataFlowModel model(dmRegistry);
+  QtNodes::DataFlowScene scene(&model);
 
   QtNodes::FlowView view{&scene};
 

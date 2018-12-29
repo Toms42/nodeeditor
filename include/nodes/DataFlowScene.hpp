@@ -22,9 +22,7 @@ class NODE_EDITOR_PUBLIC DataFlowScene : public FlowScene {
   Q_OBJECT
 
 public:
-  explicit DataFlowScene(std::shared_ptr<DataModelRegistry> registry =
-                             std::make_shared<DataModelRegistry>(),
-                         QObject *parent = Q_NULLPTR);
+  explicit DataFlowScene(DataFlowModel *model, QObject *parent = Q_NULLPTR);
 
   ~DataFlowScene() override;
 

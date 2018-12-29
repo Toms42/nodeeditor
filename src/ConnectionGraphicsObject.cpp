@@ -5,6 +5,7 @@
 #include "ConnectionState.hpp"
 #include "FlowScene.hpp"
 #include "FlowSceneModel.hpp"
+#include "Node.hpp"
 #include "NodeConnectionInteraction.hpp"
 #include "NodeGraphicsObject.hpp"
 #include "checker.hpp"
@@ -145,7 +146,8 @@ NodeDataType ConnectionGraphicsObject::dataType(PortType ty) const {
   auto n = node(ty);
   Q_ASSERT(n.isValid());
 
-  return _scene.model()->nodePortDataType(n, portIndex(ty), ty);
+  return reinterpret_cast<class Node *>(n.internalPointer())
+      ->nodePortDataType(ty, portIndex(ty));
 }
 
 void ConnectionGraphicsObject::move() {
@@ -174,9 +176,11 @@ void ConnectionGraphicsObject::move() {
         } catch (std::bad_alloc &) {
           GET_INFO();
         }
-      } else {
-        GET_INFO();
       }
+      // TODO check this. I think we can't move connections after delete node,
+      // but we can.. Why? else {
+      //   GET_INFO();
+      // }
     }
   }
 }
@@ -272,14 +276,6 @@ void ConnectionGraphicsObject::hoverEnterEvent(
 
   update();
 
-  // TODO this do nothing
-  // flowScene().model()->connectionHovered(_leftNode,
-  //                                       _leftPortIndex,
-  //                                       _rightNode,
-  //                                       _rightPortIndex,
-  //                                       event->screenPos(),
-  //                                       true);
-
   event->accept();
 }
 
@@ -288,13 +284,6 @@ void ConnectionGraphicsObject::hoverLeaveEvent(
   geometry().setHovered(false);
 
   update();
-  // TODO this do nothing
-  // flowScene().model()->connectionHovered(_leftNode,
-  //                                       _leftPortIndex,
-  //                                       _rightNode,
-  //                                       _rightPortIndex,
-  //                                       event->screenPos(),
-  //                                       false);
   event->accept();
 }
 

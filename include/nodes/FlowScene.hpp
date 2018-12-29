@@ -64,7 +64,7 @@ signals:
 
   /**\brief send signal to model for remove item
    */
-  void removeNode(const NodeIndex &index);
+  void removeNode(QUuid index);
 
   void removeConnection(const NodeIndex &leftNode,
                         PortIndex        leftPortID,
@@ -80,7 +80,7 @@ private slots:
 
   void nodeAdded(const QUuid &newID);
 
-  void nodePortUpdated(NodeIndex const &id);
+  // void nodePortUpdated(NodeIndex const &id);
 
   void nodeValidationUpdated(NodeIndex const &id);
 

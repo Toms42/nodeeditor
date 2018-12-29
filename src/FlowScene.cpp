@@ -40,10 +40,10 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
 
   connect(model, &FlowSceneModel::nodeRemoved, this, &FlowScene::nodeRemoved);
   connect(model, &FlowSceneModel::nodeAdded, this, &FlowScene::nodeAdded);
-  connect(model,
-          &FlowSceneModel::nodePortUpdated,
-          this,
-          &FlowScene::nodePortUpdated);
+  // connect(model,
+  //        &FlowSceneModel::nodePortUpdated,
+  //        this,
+  //        &FlowScene::nodePortUpdated);
   connect(model,
           &FlowSceneModel::nodeValidationUpdated,
           this,
@@ -90,8 +90,7 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
 
   // for some reason these end up in the wrong spot, fix that
   for (const auto &n : model->nodeUUids()) {
-    auto ngo = nodeComposite(model->nodeIndex(n));
-    ngo->geometry().recalculateSize();
+    nodeComposite(model->nodeIndex(n))->update();
   }
 }
 
@@ -99,9 +98,11 @@ FlowScene::~FlowScene() {
   // here we delete items for guarante that no one item not be called after
   // deleting the scene (itmes have reference to it, so they have to be deleted
   // in the destuctor, or before)
-  for (auto &i : items()) {
-    removeItem(i);
-    delete i;
+  while (!_connGraphicsObjects.empty()) {
+    _connGraphicsObjects.erase(_connGraphicsObjects.begin());
+  }
+  while (!nodeComposites_.empty()) {
+    nodeRemoved(nodeComposites_.begin()->first);
   }
 }
 
@@ -187,92 +188,91 @@ void FlowScene::nodeAdded(const QUuid &newID) {
 }
 
 // TODO not work correctly!
-void FlowScene::nodePortUpdated(NodeIndex const &id) {
-  Q_ASSERT(!id.id().isNull());
+// void FlowScene::nodePortUpdated(NodeIndex const &id) {
+//  Q_ASSERT(!id.id().isNull());
 
-  auto thisNodeNGO = nodeComposite(id);
-  Q_ASSERT(thisNodeNGO != Q_NULLPTR);
+//  auto thisNodeNGO = nodeComposite(id);
+//  Q_ASSERT(thisNodeNGO != Q_NULLPTR);
 
-  // remove all the connections
-  for (auto ty : {PortType::In, PortType::Out}) {
-    for (auto &i : thisNodeNGO->nodeState().getEntries(ty)) {
-      try {
-        while (!thisNodeNGO->nodeState().getEntries(ty).at(i.first).empty()) {
-          auto conn = thisNodeNGO->nodeState().getEntries(ty).at(i.first)[0];
-          // remove it from the nodes
-          auto &otherNgo = *nodeComposite(conn->node(oppositePort(ty)));
-          otherNgo.nodeState().eraseConnection(
-              oppositePort(ty), conn->portIndex(oppositePort(ty)), *conn);
+//  // remove all the connections
+//  for (auto ty : {PortType::In, PortType::Out}) {
+//    for (auto &i : thisNodeNGO->nodeState().getEntries(ty)) {
+//      try {
+//        while (!thisNodeNGO->nodeState().getEntries(ty).at(i.first).empty()) {
+//          auto conn = thisNodeNGO->nodeState().getEntries(ty).at(i.first)[0];
+//          // remove it from the nodes
+//          auto &otherNgo = *nodeComposite(conn->node(oppositePort(ty)));
+//          otherNgo.nodeState().eraseConnection(
+//              oppositePort(ty), conn->portIndex(oppositePort(ty)), *conn);
 
-          auto &thisNgo = *nodeComposite(conn->node(ty));
-          thisNgo.nodeState().eraseConnection(ty, conn->portIndex(ty), *conn);
+//          auto &thisNgo = *nodeComposite(conn->node(ty));
+//          thisNgo.nodeState().eraseConnection(ty, conn->portIndex(ty), *conn);
 
-          // remove the ConnectionGraphicsObject
-          auto erased = _connGraphicsObjects.erase(conn->id());
-          conn->deleteLater();
-          Q_ASSERT(erased == 1);
-        }
-      } catch (std::out_of_range &) {
-        GET_INFO();
-      }
-    }
-  }
+//          // remove the ConnectionGraphicsObject
+//          auto erased = _connGraphicsObjects.erase(conn->id());
+//          conn->deleteLater();
+//          Q_ASSERT(erased == 1);
+//        }
+//      } catch (std::out_of_range &) {
+//        GET_INFO();
+//      }
+//    }
+//  }
 
-  // recreate the NGO
+//  // recreate the NGO
 
-  // just delete it
-  delete thisNodeNGO;
-  auto erased = nodeComposites_.erase(id.id());
+//  // just delete it
+//  delete thisNodeNGO;
+//  auto erased = nodeComposites_.erase(id.id());
 
-  Q_ASSERT(erased == 1);
+//  Q_ASSERT(erased == 1);
 
-  // create it
-  auto ngo = new NodeGraphicsObject(*this, id);
-  Q_ASSERT(ngo->scene() == this);
+//  // create it
+//  auto ngo = new NodeGraphicsObject(*this, id);
+//  Q_ASSERT(ngo->scene() == this);
 
-  if (!nodeComposites_.insert(std::pair(id.id(), ngo)).second) {
-    GET_INFO();
-  }
+//  if (!nodeComposites_.insert(std::pair(id.id(), ngo)).second) {
+//    GET_INFO();
+//  }
 
-  // add the connections back
-  for (auto ty : {PortType::In, PortType::Out}) {
-    for (auto &i : model()->nodePortIndexes(id, ty)) {
-      auto connections = model()->nodePortConnections(id, i, ty);
-#ifndef QT_NO_DEBUG
-      for (auto conn : connections) {
-        auto remoteConns = model()->nodePortConnections(
-            conn.first, conn.second, oppositePort(ty));
+//  // add the connections back
+//  for (auto ty : {PortType::In, PortType::Out}) {
+//    for (auto &i : model()->nodePortIndexes(id, ty)) {
+//      auto connections = model()->nodePortConnections(id, i, ty);
+//#ifndef QT_NO_DEBUG
+//      for (auto conn : connections) {
+//        auto remoteConns = model()->nodePortConnections(
+//            conn.first, conn.second, oppositePort(ty));
 
-        // if you fail here, your connections aren't self-consistent
-        //      Q_ASSERT(std::any_of(remoteConns.begin(), remoteConns.end(),
-        //                           [&](std::pair<NodeIndex, PortIndex>
-        //                           this_conn) {
-        //                             return this_conn.first == id &&
-        //                                    (size_t)this_conn.second == i;
-        //                           }));
-      }
-#endif
-      // validate the sanity of the model--make sure if it is marked as one
-      // connection per port then there is no more than one connection
-      Q_ASSERT(model()->nodePortConnectionPolicy(id, i, ty) ==
-                   ConnectionPolicy::Many ||
-               connections.size() <= 1);
+//        // if you fail here, your connections aren't self-consistent
+//        //      Q_ASSERT(std::any_of(remoteConns.begin(), remoteConns.end(),
+//        //                           [&](std::pair<NodeIndex, PortIndex>
+//        //                           this_conn) {
+//        //                             return this_conn.first == id &&
+//        //                                    (size_t)this_conn.second == i;
+//        //                           }));
+//      }
+//#endif
+//      // validate the sanity of the model--make sure if it is marked as one
+//      // connection per port then there is no more than one connection
+//      Q_ASSERT(model()->nodePortConnectionPolicy(id, i, ty) ==
+//                   ConnectionPolicy::Many ||
+//               connections.size() <= 1);
 
-      for (const auto &conn : connections) {
-        if (ty == PortType::Out) {
-          connectionAdded(id, i, conn.first, conn.second);
-        } else {
-          connectionAdded(conn.first, conn.second, id, i);
-        }
-      }
-    }
-  }
-}
+//      for (const auto &conn : connections) {
+//        if (ty == PortType::Out) {
+//          connectionAdded(id, i, conn.first, conn.second);
+//        } else {
+//          connectionAdded(conn.first, conn.second, id, i);
+//        }
+//      }
+//    }
+//  }
+//}
 
 void FlowScene::nodeValidationUpdated(NodeIndex const &id) {
   // repaint
-  auto ngo = nodeComposite(id);
-  ngo->geometry().recalculateSize();
+  nodeComposite(id)->update();
 }
 
 void FlowScene::connectionRemoved(NodeIndex const &leftNode,
@@ -575,12 +575,13 @@ void FlowScene::recursivelyRemove(NodeComposite *obj) {
     return;
   }
   if (auto index = obj->nodeIndex(); index.isValid()) {
-    emit removeNode(index);
+    emit removeNode(index.id());
   } else {
     for (auto &i : obj->childItems()) {
       recursivelyRemove(dynamic_cast<NodeComposite *>(i));
     }
     CHECK_OUT_OF_RANGE(delete nodeComposites_.at(index.id()));
+    nodeComposites_.erase(index.id());
   }
 }
 

@@ -5,6 +5,7 @@
 #include "ConnectionID.hpp"
 #include "Export.hpp"
 #include "FlowSceneModel.hpp"
+#include "Node.hpp"
 #include "NodeIndex.hpp"
 #include "QUuidStdHash.hpp"
 #include "TypeConverter.hpp"
@@ -21,9 +22,12 @@ class Node;
 
 /// Model for simple data flow
 class NODE_EDITOR_PUBLIC DataFlowModel : public FlowSceneModel {
+  Q_OBJECT
+
 public:
-  DataFlowModel(std::shared_ptr<DataModelRegistry> reg);
-  ~DataFlowModel() override = default;
+  DataFlowModel(std::shared_ptr<DataModelRegistry> reg,
+                QObject *                          parent = nullptr);
+  ~DataFlowModel() override;
 
   // FlowSceneModel read interface
   QStringList modelRegistry() const override;
@@ -88,7 +92,7 @@ public:
                      NodeIndex const &rightNode,
                      PortIndex        rightPortID) override;
 
-  bool removeNode(NodeIndex const &index) override;
+  bool removeNode(QUuid uuid) override;
 
 public slots:
   QUuid addNode(QString const &typeID) override;
