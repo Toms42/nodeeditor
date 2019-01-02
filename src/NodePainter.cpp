@@ -51,7 +51,7 @@ void NodePainter::paint(QPainter *           painter,
 
 void NodePainter::drawNodeRect(QPainter *           painter,
                                NodeComposite const &graphicsObject) {
-  auto  nodeStyle = NodeStyle{};
+  auto &nodeStyle = StyleCollection::nodeStyle();
   auto &geom      = graphicsObject.geometry();
 
   auto color = graphicsObject.isSelected() ? nodeStyle.SelectedBoundaryColor
@@ -86,7 +86,7 @@ void NodePainter::drawNodeRect(QPainter *           painter,
 
 void NodePainter::drawConnectionPoints(QPainter *           painter,
                                        NodeComposite const &graphicsObject) {
-  auto             nodeStyle       = NodeStyle{};
+  auto &           nodeStyle       = StyleCollection::nodeStyle();
   auto const &     connectionStyle = StyleCollection::connectionStyle();
   NodeState const &state           = graphicsObject.nodeState();
   // TODO check this
@@ -155,7 +155,7 @@ void NodePainter::drawConnectionPoints(QPainter *           painter,
 
 void NodePainter::drawFilledConnectionPoints(
     QPainter *painter, NodeComposite const &graphicsObject) {
-  auto             nodeStyle       = NodeStyle{};
+  auto &           nodeStyle       = StyleCollection::nodeStyle();
   auto const &     connectionStyle = StyleCollection::connectionStyle();
   NodeState const &state           = graphicsObject.nodeState();
   // TODO check this
@@ -194,7 +194,7 @@ void NodePainter::drawFilledConnectionPoints(
 
 void NodePainter::drawModelName(QPainter *           painter,
                                 NodeComposite const &graphicsObject) {
-  auto  nodeStyle = NodeStyle{};
+  auto &nodeStyle = StyleCollection::nodeStyle();
   auto &geom      = graphicsObject.geometry();
 
   QString const &name = reinterpret_cast<class Node *>(
@@ -228,11 +228,10 @@ void NodePainter::drawEntryLabels(QPainter *           painter,
   // TODO check this
   try {
     auto &geom = dynamic_cast<const NodeGeometry &>(graphicsObject.geometry());
-    QFontMetrics const &metrics = painter->fontMetrics();
+    QFontMetrics const &metrics   = painter->fontMetrics();
+    auto &              nodeStyle = StyleCollection::nodeStyle();
 
     for (PortType portType : {PortType::Out, PortType::In}) {
-      auto nodeStyle = NodeStyle{};
-
       for (auto &i : state.getEntries(portType)) {
         QPointF p = geom.portScenePosition(i.first, portType);
 
@@ -295,7 +294,7 @@ void NodePainter::drawValidationRect(QPainter *           painter,
                                   ->nodeValidationState();
 
   if (modelValidationState != NodeValidationState::Valid) {
-    auto nodeStyle = NodeStyle{};
+    auto &nodeStyle = StyleCollection::nodeStyle();
 
     auto color = graphicsObject.isSelected() ? nodeStyle.SelectedBoundaryColor
                                              : nodeStyle.NormalBoundaryColor;

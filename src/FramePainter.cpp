@@ -4,6 +4,7 @@
 #include "FlowSceneModel.hpp"
 #include "NodeComposite.hpp"
 #include "NodeStyle.hpp"
+#include "StyleCollection.hpp"
 #include <QPainter>
 
 namespace QtNodes {
@@ -15,7 +16,7 @@ void FramePainter::paint(QPainter *painter, const NodeComposite &obj) {
 void FramePainter::drawNodeRect(QPainter *painter, const NodeComposite &obj) {
   auto &geom = obj.geometry();
 
-  auto nodeStyle = NodeStyle{};
+  auto nodeStyle = StyleCollection::nodeStyle();
   auto color     = obj.isSelected() ? nodeStyle.SelectedBoundaryColor
                                 : nodeStyle.NormalBoundaryColor;
 

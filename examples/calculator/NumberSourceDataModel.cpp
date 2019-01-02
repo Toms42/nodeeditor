@@ -66,7 +66,7 @@ void NumberSourceDataModel::onTextEdited(QString const &string) {
     }
   } else {
     for (auto &i : this->ports(PortType::Out)) {
-      emit dataInvalidated(i);
+      emit dataUpdated(i);
     }
   }
 }

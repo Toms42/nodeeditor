@@ -3,6 +3,7 @@
 #include "SenderNode.hpp"
 #include "FormData.hpp"
 #include "Sender.hpp"
+#include <QJsonArray>
 #include <iostream>
 
 SenderNode::SenderNode()
@@ -47,7 +48,6 @@ bool SenderNode::addPort(const QString &caption, unsigned int index) {
   port.outPolicy      = QtNodes::ConnectionPolicy::One;
   port.handle         = [this](std::shared_ptr<QtNodes::NodeData>) {
     return std::make_shared<FormData>(widget_->getInfo());
-    emit
   };
 
   return QtNodes::NodeDataModel::addPort(QtNodes::PortType::Out, index, port);
@@ -55,4 +55,22 @@ bool SenderNode::addPort(const QString &caption, unsigned int index) {
 
 bool SenderNode::SenderNode::removePort(unsigned int index) {
   return QtNodes::NodeDataModel::removePort(QtNodes::PortType::Out, index);
+}
+
+QJsonObject SenderNode::save() const {
+  QJsonObject jsonObj = NodeDataModel::save();
+  QJsonArray  jsonArr;
+  for (const auto &i : ports(QtNodes::PortType::Out)) {
+    jsonArr.push_back(i);
+  }
+  jsonObj["out_ports"] = jsonArr;
+  jsonObj["info"]      = widget_->getInfo();
+  return jsonObj;
+}
+
+void SenderNode::restore(const QJsonObject &jsonObj) {
+  for (const auto &i : jsonObj["out_ports"].toArray()) {
+    addPort("", i.toInt());
+  }
+  widget_->setInfo(jsonObj["info"].toString());
 }

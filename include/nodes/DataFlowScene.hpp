@@ -2,6 +2,7 @@
 
 #include "Export.hpp"
 #include "FlowScene.hpp"
+#include "NodeGraphicsData.hpp"
 #include "PortType.hpp"
 #include "TypeConverter.hpp"
 #include <functional>
@@ -99,8 +100,12 @@ signals:
 
   void nodeHoverLeft(Node &n);
 
+private slots:
+  void nodeAdded(const QUuid &uuid) override;
+
 private:
-  DataFlowModel *_dataFlowModel;
+  DataFlowModel *                   _dataFlowModel;
+  std::map<QUuid, NodeGraphicsData> loadedDatas_;
 };
 
 } // namespace QtNodes

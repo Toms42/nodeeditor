@@ -99,7 +99,15 @@ FlowScene::~FlowScene() {
   // deleting the scene (itmes have reference to it, so they have to be deleted
   // in the destuctor, or before)
   while (!_connGraphicsObjects.empty()) {
-    _connGraphicsObjects.erase(_connGraphicsObjects.begin());
+    auto connId = _connGraphicsObjects.begin()->first;
+    try {
+      connectionRemoved(nodeComposites_.at(connId.lNodeID)->nodeIndex(),
+                        connId.lPortID,
+                        nodeComposites_.at(connId.rNodeID)->nodeIndex(),
+                        connId.rPortID);
+    } catch (std::out_of_range &) {
+      GET_INFO();
+    }
   }
   while (!nodeComposites_.empty()) {
     nodeRemoved(nodeComposites_.begin()->first);
@@ -281,18 +289,18 @@ void FlowScene::connectionRemoved(NodeIndex const &leftNode,
                                   PortIndex        rightPortID) {
   // check the model's sanity
 #ifndef QT_NO_DEBUG
-  for (const auto &conn :
-       model()->nodePortConnections(leftNode, leftPortID, PortType::Out)) {
-    // if you fail here, then you're emitting connectionRemoved on a connection
-    // that is in the model
-    Q_ASSERT(conn.first != rightNode || conn.second != rightPortID);
-  }
-  for (const auto &conn :
-       model()->nodePortConnections(rightNode, rightPortID, PortType::In)) {
-    // if you fail here, then you're emitting connectionRemoved on a connection
-    // that is in the model
-    Q_ASSERT(conn.first != leftNode || conn.second != leftPortID);
-  }
+// for (const auto &conn :
+//     model()->nodePortConnections(leftNode, leftPortID, PortType::Out)) {
+//  // if you fail here, then you're emitting connectionRemoved on a connection
+//  // that is in the model
+//  Q_ASSERT(conn.first != rightNode || conn.second != rightPortID);
+//}
+// for (const auto &conn :
+//     model()->nodePortConnections(rightNode, rightPortID, PortType::In)) {
+//  // if you fail here, then you're emitting connectionRemoved on a connection
+//  // that is in the model
+//  Q_ASSERT(conn.first != leftNode || conn.second != leftPortID);
+//}
 #endif
 
   // create a connection ID
@@ -518,10 +526,6 @@ QMenu *FlowScene::createContextMenu() {
   connect(frameAction, &QAction::triggered, this, [this, modelMenu]() {
     auto uuid = QUuid::createUuid();
     nodeAdded(uuid);
-    // NodeComposite *item{};
-    // CHECK_OUT_OF_RANGE(item = nodeComposites_.at(uuid));
-    // item->setPos(lastPos_);
-    // setFocusItem(item);
     modelMenu->close();
   });
 
@@ -583,6 +587,13 @@ void FlowScene::recursivelyRemove(NodeComposite *obj) {
     CHECK_OUT_OF_RANGE(delete nodeComposites_.at(index.id()));
     nodeComposites_.erase(index.id());
   }
+}
+
+NodeComposite *FlowScene::nodeComposite(const QUuid &uuid) {
+  if (auto found = nodeComposites_.find(uuid); found != nodeComposites_.end()) {
+    return found->second;
+  }
+  return nullptr;
 }
 
 } // namespace QtNodes

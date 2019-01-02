@@ -20,11 +20,11 @@ public:
 
   unsigned int height() const;
 
-  void setHeight(unsigned int h);
+  virtual void setHeight(unsigned int h);
 
   unsigned int width() const;
 
-  void setWidth(unsigned int w);
+  virtual void setWidth(unsigned int w);
 
   unsigned int entryHeight() const;
 

@@ -6,8 +6,7 @@
 #include <utility>
 
 namespace QtNodes {
-NodeDataModel::NodeDataModel()
-    : nodeStyle_{StyleCollection::nodeStyle()} {}
+NodeDataModel::NodeDataModel() {}
 
 NodeDataModel::~NodeDataModel() = default;
 
@@ -53,14 +52,6 @@ bool NodeDataModel::removePort(PortType type, PortIndex index) {
     break;
   }
   return false;
-}
-
-const NodeStyle &NodeDataModel::nodeStyle() const {
-  return nodeStyle_;
-}
-
-void NodeDataModel::setNodeStyle(const NodeStyle &style) {
-  nodeStyle_ = style;
 }
 
 void NodeDataModel::setInData(std::shared_ptr<NodeData> data, PortIndex index) {

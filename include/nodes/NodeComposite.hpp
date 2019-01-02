@@ -73,6 +73,11 @@ public:
   virtual void lock(bool locked);
   virtual bool isLocked() const;
 
+  /**\brief uses geometry for set size
+   */
+  virtual void  setSize(QSize size);
+  virtual QSize size() const;
+
 protected:
   /**\brief supports resizing and selecting nodes
    */

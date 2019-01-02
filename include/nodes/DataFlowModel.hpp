@@ -94,7 +94,7 @@ public:
 
   bool removeNode(QUuid uuid) override;
 
-  QByteArray saveToMemory() const;
+  QJsonObject saveToMemory() const;
 
   void loadFromMemory(const QByteArray &data);
 

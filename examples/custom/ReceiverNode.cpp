@@ -1,11 +1,13 @@
 // ReceiverNode.cpp
 
 #include "ReceiverNode.hpp"
+#include "CustomLabel.hpp"
 #include "FormData.hpp"
 #include "Receiver.hpp"
 
 ReceiverNode::ReceiverNode()
     : widget_{new Receiver}
+    , label_{new CustomLabel}
     , validationState_{QtNodes::NodeValidationState::Warning}
     , validationMessage_{"Data not set"} {
   QtNodes::Port port;
@@ -25,10 +27,23 @@ ReceiverNode::ReceiverNode()
     return nullptr;
   };
   addPort(QtNodes::PortType::In, 5, port);
+
+  connect(widget_, &Receiver::toModel, this, [this]() {
+    check_ = !check_;
+    emit widgetChanged();
+  });
+
+  connect(label_, &CustomLabel::toModel, this, [this]() {
+    check_ = !check_;
+    emit widgetChanged();
+  });
+
+  label_->setText("this is another widget");
 }
 
 ReceiverNode::~ReceiverNode() {
   widget_->deleteLater();
+  delete label_;
 }
 
 QString ReceiverNode::name() const {
@@ -36,7 +51,11 @@ QString ReceiverNode::name() const {
 }
 
 QWidget *ReceiverNode::embeddedWidget() {
-  return widget_;
+  if (!check_) {
+    return widget_;
+  } else {
+    return label_;
+  }
 }
 
 QtNodes::NodeValidationState ReceiverNode::validationState() const {
@@ -46,3 +65,9 @@ QtNodes::NodeValidationState ReceiverNode::validationState() const {
 QString ReceiverNode::validationMessage() const {
   return validationMessage_;
 }
+
+QJsonObject ReceiverNode::save() const {
+  return NodeDataModel::save();
+}
+
+void ReceiverNode::restore(const QJsonObject &) {}

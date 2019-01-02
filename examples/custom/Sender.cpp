@@ -40,3 +40,7 @@ Sender::~Sender() {
 QString Sender::getInfo() const {
   return ui_->textEdit->toPlainText();
 }
+
+void Sender::setInfo(const QString &str) {
+  ui_->textEdit->setText(str);
+}

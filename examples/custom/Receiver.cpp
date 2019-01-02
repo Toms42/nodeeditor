@@ -17,6 +17,6 @@ void Receiver::setInfo(const QString &data) {
   ui_->textBrowser->setText(data);
 }
 
-void Receiver::contextMenuEvent(QContextMenuEvent *event) {
+void Receiver::contextMenuEvent(QContextMenuEvent *) {
   emit toModel();
 }

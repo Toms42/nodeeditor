@@ -368,12 +368,6 @@ QUuid DataFlowModel::addNode(std::unique_ptr<NodeDataModel> &&model,
     GET_INFO();
   }
 
-  // connect to the geometry gets updated
-  // connect(
-  //    nodePtr, &Node::positionChanged, this, [this, nodeid](QPointF const &) {
-  //      emit nodeMoved(nodeIndex(nodeid));
-  //    });
-
   // tell the view
   emit nodeAdded(nodeid);
 
@@ -443,7 +437,7 @@ void DataFlowModel::setRegistry(std::shared_ptr<DataModelRegistry> registry) {
   _registry = std::move(registry);
 }
 
-QByteArray DataFlowModel::saveToMemory() const {
+QJsonObject DataFlowModel::saveToMemory() const {
   QJsonObject modelJson;
 
   QJsonArray nodesJsonArray;
@@ -471,7 +465,7 @@ QByteArray DataFlowModel::saveToMemory() const {
 
   QJsonDocument document(modelJson);
 
-  return document.toJson();
+  return modelJson;
 }
 
 void DataFlowModel::loadFromMemory(const QByteArray &data) {

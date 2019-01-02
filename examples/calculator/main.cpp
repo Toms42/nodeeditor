@@ -103,12 +103,12 @@ int main(int argc, char *argv[]) {
   mainWidget.resize(800, 600);
   mainWidget.show();
 
-  FlowView newViewForOldScene(scene);
-  newViewForOldScene.show();
+  // FlowView newViewForOldScene(scene);
+  // newViewForOldScene.show();
 
-  auto     newScene = new DataFlowScene(model);
-  FlowView newViewOldModel(newScene);
-  newViewOldModel.show();
+  // auto     newScene = new DataFlowScene(model);
+  // FlowView newViewOldModel(newScene);
+  // newViewOldModel.show();
 
   return app.exec();
 }

@@ -21,6 +21,11 @@ Node::Node(std::unique_ptr<NodeDataModel> &&nodeImp, QUuid const &id)
           this,
           &Node::onDataUpdated);
 
+  connect(_nodeDataModel.get(),
+          &NodeDataModel::widgetChanged,
+          this,
+          &Node::widgetChanged);
+
   for (const auto &i : _nodeDataModel->inPorts_) {
     _inConnections.insert(std::pair(i.first, std::vector<Connection *>()));
   }
@@ -168,4 +173,12 @@ void Node::onDataUpdated(PortIndex index) {
 
 void Node::restore(const QJsonObject &obj) {
   _nodeDataModel->restore(obj["model"].toObject());
+}
+
+unsigned Node::nodePortCount(PortType type) {
+  return _nodeDataModel->nPorts(type);
+}
+
+std::list<QtNodes::PortIndex> Node::nodePortIndexes(PortType type) {
+  return _nodeDataModel->ports(type);
 }

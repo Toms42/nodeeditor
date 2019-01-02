@@ -16,6 +16,10 @@ public:
   QtNodes::NodeValidationState validationState() const override;
   QString                      validationMessage() const override;
 
+private:
+  QJsonObject save() const override;
+  void        restore(const QJsonObject &jsonObj) override;
+
 private slots:
   bool addPort(const QString &caption, unsigned int index);
   bool removePort(unsigned int index);

@@ -1,5 +1,5 @@
 #include "NodeGeometry.hpp"
-#include "FlowSceneModel.hpp"
+#include "Node.hpp"
 #include "NodeComposite.hpp"
 #include "NodeIndex.hpp"
 #include "PortType.hpp"
@@ -17,13 +17,13 @@ NodeGeometry::NodeGeometry(NodeComposite &obj)
     , _outputPortWidth(70) {}
 
 unsigned int NodeGeometry::nSources() const {
-  return obj_.nodeIndex().model()->nodePortCount(obj_.nodeIndex(),
-                                                 PortType::Out);
+  return reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+      ->nodePortCount(PortType::Out);
 }
 
 unsigned int NodeGeometry::nSinks() const {
-  return obj_.nodeIndex().model()->nodePortCount(obj_.nodeIndex(),
-                                                 PortType::In);
+  return reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+      ->nodePortCount(PortType::In);
 }
 
 void NodeGeometry::recalculateSize() const {
@@ -40,7 +40,9 @@ void NodeGeometry::recalculateSize() const {
     height_                      = step * maxNumOfEntries;
   }
 
-  QWidget *w = obj_.nodeIndex().model()->nodeWidget(obj_.nodeIndex());
+  QWidget *w =
+      reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+          ->nodeWidget();
   if (w) {
     height_ = std::max(height_, static_cast<unsigned>(w->height()));
     // if port was be dynamicly added, then current _height will be greather
@@ -63,8 +65,8 @@ void NodeGeometry::recalculateSize() const {
 
   width_ = std::max(width(), captionWidth());
 
-  if (obj_.nodeIndex().model()->nodeValidationState(obj_.nodeIndex()) !=
-      NodeValidationState::Valid) {
+  if (reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+          ->nodeValidationState() != NodeValidationState::Valid) {
     width_ = std::max(width(), validationWidth());
     height_ += validationHeight() + spacing();
   }
@@ -91,7 +93,8 @@ QPointF NodeGeometry::portScenePosition(PortIndex         index,
   totalHeight += captionHeight();
 
   auto indexes =
-      obj_.nodeIndex().model()->nodePortIndexes(obj_.nodeIndex(), portType);
+      reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+          ->nodePortIndexes(portType);
 
   if (auto found = std::find(std::begin(indexes), std::end(indexes), index);
       found != std::end(indexes)) {
@@ -137,7 +140,8 @@ NodeGeometry::checkHitScenePoint(PortType          portType,
   double const tolerance = 2.0 * nodeStyle.ConnectionPointDiameter;
 
   auto items =
-      obj_.nodeIndex().model()->nodePortIndexes(obj_.nodeIndex(), portType);
+      reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+          ->nodePortIndexes(portType);
 
   for (auto i : items) {
     auto pp = portScenePosition(i, portType, sceneTransform);
@@ -155,9 +159,11 @@ NodeGeometry::checkHitScenePoint(PortType          portType,
 }
 
 QPointF NodeGeometry::widgetPosition() const {
-  if (auto *w = obj_.nodeIndex().model()->nodeWidget(obj_.nodeIndex())) {
-    if (obj_.nodeIndex().model()->nodeValidationState(obj_.nodeIndex()) !=
-        NodeValidationState::Valid) {
+  if (auto *w =
+          reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+              ->nodeWidget()) {
+    if (reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+            ->nodeValidationState() != NodeValidationState::Valid) {
       return QPointF(spacing() + portWidth(PortType::In),
                      (captionHeight() + height() - validationHeight() -
                       spacing() - w->height()) /
@@ -172,27 +178,33 @@ QPointF NodeGeometry::widgetPosition() const {
 }
 
 unsigned int NodeGeometry::captionHeight() const {
-  QString name = obj_.nodeIndex().model()->nodeCaption(obj_.nodeIndex());
+  QString name =
+      reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+          ->nodeCaption();
 
   return boldFontMetrics_.boundingRect(name).height();
 }
 
 unsigned int NodeGeometry::captionWidth() const {
-  QString name = obj_.nodeIndex().model()->nodeCaption(obj_.nodeIndex());
+  QString name =
+      reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+          ->nodeCaption();
 
   return boldFontMetrics_.boundingRect(name).width();
 }
 
 unsigned int NodeGeometry::validationHeight() const {
   QString msg =
-      obj_.nodeIndex().model()->nodeValidationMessage(obj_.nodeIndex());
+      reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+          ->nodeValidationMessage();
 
   return boldFontMetrics_.boundingRect(msg).height();
 }
 
 unsigned int NodeGeometry::validationWidth() const {
   QString msg =
-      obj_.nodeIndex().model()->nodeValidationMessage(obj_.nodeIndex());
+      reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+          ->nodeValidationMessage();
 
   return boldFontMetrics_.boundingRect(msg).width();
 }
@@ -237,14 +249,15 @@ unsigned int NodeGeometry::portWidth(PortType portType) const {
   unsigned width = 0;
 
   for (auto &i :
-       obj_.nodeIndex().model()->nodePortIndexes(obj_.nodeIndex(), portType)) {
-    QString name = obj_.nodeIndex().model()->nodePortCaption(
-        obj_.nodeIndex(), i, portType);
+       reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+           ->nodePortIndexes(portType)) {
+    QString name =
+        reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+            ->nodePortCaption(portType, i);
 
     if (name.isEmpty()) {
-      name = obj_.nodeIndex()
-                 .model()
-                 ->nodePortDataType(obj_.nodeIndex(), i, portType)
+      name = reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+                 ->nodePortDataType(portType, i)
                  .name;
     }
 
@@ -252,6 +265,32 @@ unsigned int NodeGeometry::portWidth(PortType portType) const {
   }
 
   return width;
+}
+
+void NodeGeometry::setWidth(unsigned width) {
+  int diff = static_cast<int>(width) - static_cast<int>(this->width());
+
+  auto w = reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+               ->nodeWidget();
+
+  if (w && w->width() + diff >= w->minimumSizeHint().width()) {
+    w->setFixedWidth(w->width() + diff);
+  }
+
+  CompositeGeometry::setWidth(width);
+}
+
+void NodeGeometry::setHeight(unsigned height) {
+  int diff = static_cast<int>(height) - static_cast<int>(this->height());
+
+  auto w = reinterpret_cast<class Node *>(obj_.nodeIndex().internalPointer())
+               ->nodeWidget();
+
+  if (w && w->height() + diff >= w->minimumSizeHint().height()) {
+    w->setFixedHeight(w->height() + diff);
+  }
+
+  CompositeGeometry::setHeight(height);
 }
 
 } // namespace QtNodes

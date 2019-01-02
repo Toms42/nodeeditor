@@ -112,23 +112,6 @@ void NodeComposite::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
 
     geometry().setWidth(geometry().width() + diff.x());
     geometry().setHeight(geometry().height() + diff.y());
-    //    auto oldSize = w->size();
-
-    //    oldSize += QSize(diff.x(), diff.y());
-    //    if (auto sizeHint = w->minimumSizeHint();
-    //        oldSize.height() < sizeHint.height() ||
-    //        oldSize.width() < sizeHint.width()) {
-    //      return;
-    //    }
-
-    //    w->setFixedSize(oldSize);
-
-    // We have to recalculate size before set widgetPosition in proxyWidget
-    geometry().recalculateSize();
-
-    //    proxyWidget()->setMinimumSize(oldSize);
-    //    proxyWidget()->setMaximumSize(oldSize);
-    //    proxyWidget()->setPos(geometry().widgetPosition());
 
     event->accept();
   } else {
@@ -211,6 +194,15 @@ void NodeComposite::focusOutEvent(QFocusEvent *event) {
   geometry().setHovered(false);
   update();
   event->accept();
+}
+
+void NodeComposite::setSize(QSize size) {
+  geometry().setWidth(size.width());
+  geometry().setHeight(size.height());
+}
+
+QSize NodeComposite::size() const {
+  return QSize(geometry().width(), geometry().height());
 }
 
 }; // namespace QtNodes

@@ -35,6 +35,8 @@ public:
 
   NodeComposite *nodeComposite(const NodeIndex &index);
 
+  NodeComposite *nodeComposite(const QUuid &uuid);
+
   std::vector<NodeIndex> selectedNodes() const;
 
   /**\return temp connection. Only one exempljar per time
@@ -74,11 +76,12 @@ signals:
 public slots:
   void deleteSelectedNodes();
 
-private slots:
+protected slots:
 
   void nodeRemoved(const QUuid &id);
 
-  void nodeAdded(const QUuid &newID);
+  // this slot we overload in DataFlowScene, and set pos and size for its
+  virtual void nodeAdded(const QUuid &newID);
 
   // void nodePortUpdated(NodeIndex const &id);
 

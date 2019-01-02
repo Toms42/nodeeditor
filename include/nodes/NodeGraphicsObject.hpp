@@ -44,6 +44,7 @@ protected:
              const QStyleOptionGraphicsItem *option,
              QWidget *                       widget = nullptr) override;
 
+protected slots:
   void embedQWidget();
 
 protected:

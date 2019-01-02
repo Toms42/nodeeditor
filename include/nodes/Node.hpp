@@ -51,6 +51,10 @@ public:
   ConnectionPolicy nodePortConnectionPolicy(PortType  type,
                                             PortIndex index) const;
 
+  unsigned nodePortCount(PortType type);
+
+  std::list<PortIndex> nodePortIndexes(PortType type);
+
   NodeDataType nodePortDataType(PortType type, PortIndex portIndex) const;
 
   QString nodeCaption() const;
@@ -88,12 +92,11 @@ public slots: // data propagation
 
 signals:
 
-  // TODO node haven't to know about this
-  // void positionChanged(QPointF const &newPos);
-
   void portAdded(PortType pType, PortIndex pIndex);
 
   void portRemoved(PortType pType, PortIndex pIndex);
+
+  void widgetChanged();
 
 private:
   // addressing

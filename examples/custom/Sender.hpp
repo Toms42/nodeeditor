@@ -16,6 +16,7 @@ public:
   explicit Sender(QWidget *parent = nullptr);
   ~Sender() override;
   QString getInfo() const;
+  void    setInfo(const QString &str);
 
 signals:
   void dataIsReady();

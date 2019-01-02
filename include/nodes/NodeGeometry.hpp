@@ -44,6 +44,10 @@ public:
                                         NodeComposite const &sourceNode,
                                         NodeGeometry const & newNodeGeom);
 
+  void setWidth(unsigned width) override;
+
+  void setHeight(unsigned height) override;
+
 private:
   unsigned int captionHeight() const;
 

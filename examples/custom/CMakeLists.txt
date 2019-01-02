@@ -10,6 +10,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(custom_SRC
+  CustomLabel.cpp
   Receiver.cpp
   ReceiverNode.cpp
   Sender.cpp

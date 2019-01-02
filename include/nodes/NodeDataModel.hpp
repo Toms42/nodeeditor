@@ -47,9 +47,6 @@ public:
    */
   bool removePort(PortType type, PortIndex index);
 
-  const NodeStyle &nodeStyle() const;
-  void             setNodeStyle(const NodeStyle &style);
-
   /**\brief this method uses Port::handle for handle input data
    */
   void setInData(std::shared_ptr<NodeData> nodeData, PortIndex index);
@@ -98,18 +95,13 @@ public:
 signals:
   void dataUpdated(PortIndex index);
 
-  void dataInvalidated(PortIndex index);
-
-  void computingStarted();
-
-  void computingFinished();
-
   void portAdded(PortType type, PortIndex index);
 
   void portRemoved(PortType type, PortIndex index);
 
+  void widgetChanged();
+
 private:
-  NodeStyle                 nodeStyle_;
   std::map<PortIndex, Port> inPorts_;
   std::map<PortIndex, Port> outPorts_;
 };

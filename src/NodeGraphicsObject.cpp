@@ -26,6 +26,11 @@ NodeGraphicsObject::NodeGraphicsObject(FlowScene &scene, NodeIndex const &node)
     , proxyWidget_{new QGraphicsProxyWidget(this)}
     , geometry_{*this} {
   embedQWidget();
+
+  connect(reinterpret_cast<class Node *>(node.internalPointer()),
+          &Node::widgetChanged,
+          this,
+          &NodeGraphicsObject::embedQWidget);
 }
 
 NodeGraphicsObject::~NodeGraphicsObject() {}
@@ -36,9 +41,7 @@ int NodeGraphicsObject::type() const {
 
 void NodeGraphicsObject::moveConnections() const {
   for (PortType portType : {PortType::In, PortType::Out}) {
-    auto const &connectionEntries = nodeState().getEntries(portType);
-
-    for (auto const &connections : connectionEntries) {
+    for (auto const &connections : nodeState().getEntries(portType)) {
       for (auto &con : connections.second) {
         con->move();
       }
@@ -151,18 +154,24 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event) {
 
 void NodeGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
   NodeComposite::mouseReleaseEvent(event);
-  bool success{false};
-  for (auto &i : collidingItems(Qt::ItemSelectionMode::ContainsItemShape)) {
-    if (auto *item = dynamic_cast<NodeComposite *>(i); item) {
-      if (item->interractWith(this)) {
-        success = true;
-        break;
+  for (const auto &selected : flowScene().selectedItems()) {
+    bool success{false};
+    if (auto selectedComposite = dynamic_cast<NodeComposite *>(selected);
+        selectedComposite) {
+      for (auto &i : selectedComposite->collidingItems(
+               Qt::ItemSelectionMode::ContainsItemShape)) {
+        if (auto *item = dynamic_cast<NodeComposite *>(i); item) {
+          if (item->interractWith(selectedComposite)) {
+            success = true;
+            break;
+          }
+        }
+      }
+      if (auto parent = selectedComposite->parentItem(); !success && parent) {
+        selectedComposite->setParentItem(nullptr);
+        selectedComposite->setPos(parent->mapToScene(selectedComposite->pos()));
       }
     }
-  }
-  if (auto parent = parentItem(); !success && parent) {
-    setParentItem(nullptr);
-    setPos(parent->mapToScene(pos()));
   }
 
   event->accept();
