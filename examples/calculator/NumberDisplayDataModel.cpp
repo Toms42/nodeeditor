@@ -22,6 +22,8 @@ NumberDisplayDataModel::NumberDisplayDataModel()
 
     _label->adjustSize();
 
+    emit validationChange();
+
     return nullptr;
   };
 

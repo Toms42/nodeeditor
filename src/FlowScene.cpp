@@ -56,7 +56,6 @@ FlowScene::FlowScene(FlowSceneModel *model, QObject *parent)
           &FlowSceneModel::connectionAdded,
           this,
           &FlowScene::connectionAdded);
-  // connect(model, &FlowSceneModel::nodeMoved, this, &FlowScene::nodeMoved);
   connect(model, &FlowSceneModel::updateNode, this, &FlowScene::updateNode);
   connect(model,
           &FlowSceneModel::updateConnection,

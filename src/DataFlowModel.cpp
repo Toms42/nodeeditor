@@ -335,11 +335,9 @@ QUuid DataFlowModel::addNode(QString const &typeID, QUuid const &nodeid) {
 QUuid DataFlowModel::addNode(std::unique_ptr<NodeDataModel> &&model,
                              QUuid const &                    nodeid) {
   connect(model.get(),
-          &NodeDataModel::dataUpdated,
+          &NodeDataModel::validationChange,
           this,
-          [this, nodeid](PortIndex) {
-            emit nodeValidationUpdated(nodeIndex(nodeid));
-          });
+          [this, nodeid]() { emit nodeValidationUpdated(nodeIndex(nodeid)); });
 
   connect(model.get(),
           &NodeDataModel::portRemoved,

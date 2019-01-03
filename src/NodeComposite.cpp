@@ -127,33 +127,15 @@ void NodeComposite::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 }
 
 void NodeComposite::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-  switch (this->type()) {
-  case NodeComposite::Node:
-    // bring all the colliding nodes to background
-    for (auto &item : collidingItems()) {
-      if (item->type() == NodeComposite::Node) {
-        item->setZValue(0.0);
-      }
+  for (auto &item : collidingItems()) {
+    if (item->parentItem() == this->parentItem() &&
+        std::abs(item->zValue() - this->zValue()) < 0.01) {
+      item->stackBefore(this);
     }
-    // bring this node forward
-    setZValue(1.0);
-
-    geometry().setHovered(true);
-    update();
-    event->accept();
-    break;
-  case NodeComposite::Frame:
-    for (auto &item : collidingItems()) {
-      if (item->type() == NodeComposite::Frame) {
-        item->setZValue(-1.0);
-      }
-    }
-    setZValue(-0.9);
-    event->accept();
-    break;
-  default:
-    break;
   }
+  geometry().setHovered(true);
+  update();
+  event->accept();
 }
 
 void NodeComposite::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
@@ -169,28 +151,6 @@ void NodeComposite::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void NodeComposite::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
-  switch (this->type()) {
-  case NodeComposite::Node:
-    geometry().setHovered(false);
-    update();
-    event->accept();
-    break;
-  case NodeComposite::Frame:
-    setZValue(-1.0);
-    event->accept();
-    break;
-  default:
-    break;
-  }
-}
-
-void NodeComposite::focusInEvent(QFocusEvent *event) {
-  geometry().setHovered(true);
-  update();
-  event->accept();
-}
-
-void NodeComposite::focusOutEvent(QFocusEvent *event) {
   geometry().setHovered(false);
   update();
   event->accept();

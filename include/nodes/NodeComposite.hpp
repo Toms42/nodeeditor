@@ -102,10 +102,6 @@ protected:
    */
   void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
-  void focusInEvent(QFocusEvent *event) override;
-
-  void focusOutEvent(QFocusEvent *event) override;
-
 private:
   FlowScene &scene_;
   NodeIndex  nodeIndex_;

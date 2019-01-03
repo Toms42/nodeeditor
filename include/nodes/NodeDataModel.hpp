@@ -101,6 +101,8 @@ signals:
 
   void widgetChanged();
 
+  void validationChange();
+
 private:
   std::map<PortIndex, Port> inPorts_;
   std::map<PortIndex, Port> outPorts_;

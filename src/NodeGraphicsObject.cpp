@@ -77,7 +77,7 @@ QVariant NodeGraphicsObject::itemChange(GraphicsItemChange change,
     moveConnections();
   }
 
-  return QGraphicsItem::itemChange(change, value);
+  return NodeComposite::itemChange(change, value);
 }
 
 void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event) {

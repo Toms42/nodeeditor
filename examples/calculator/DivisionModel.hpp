@@ -55,6 +55,8 @@ private:
       _result.reset();
     }
 
+    emit validationChange();
+
     for (auto &i : ports(PortType::Out)) {
       emit dataUpdated(i);
     }
