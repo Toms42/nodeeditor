@@ -1,10 +1,11 @@
 #include "models.hpp"
 #include <QtWidgets/QApplication>
-#include <nodes/ConnectionStyle>
-#include <nodes/DataFlowScene>
-#include <nodes/DataModelRegistry>
-#include <nodes/FlowView>
-#include <nodes/NodeData>
+#include <nodes/ConnectionStyle.hpp>
+#include <nodes/DataFlowModel.hpp>
+#include <nodes/DataFlowScene.hpp>
+#include <nodes/DataModelRegistry.hpp>
+#include <nodes/FlowView.hpp>
+#include <nodes/NodeData.hpp>
 
 using QtNodes::ConnectionStyle;
 using QtNodes::DataFlowScene;
@@ -46,7 +47,8 @@ int main(int argc, char *argv[]) {
 
   setStyle();
 
-  DataFlowScene scene(registerDataModels());
+  QtNodes::DataFlowModel model{registerDataModels()};
+  DataFlowScene          scene(&model);
 
   FlowView view(&scene);
 

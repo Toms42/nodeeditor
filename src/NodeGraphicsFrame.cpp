@@ -106,4 +106,18 @@ void NodeGraphicsFrame::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 
   event->accept();
 }
+
+QVariant NodeGraphicsFrame::itemChange(QGraphicsItem::GraphicsItemChange change,
+                                       const QVariant &value) {
+  // this for keep forward grabed item
+  if (change == QGraphicsItem::ItemScenePositionHasChanged) {
+    for (auto &item : collidingItems()) {
+      if (item->parentItem() == this->parentItem() &&
+          this->type() == item->type()) {
+        item->stackBefore(this);
+      }
+    }
+  }
+  return NodeComposite::itemChange(change, value);
+}
 } // namespace QtNodes

@@ -61,16 +61,19 @@ public:
 
   QString nodePortCaption(PortType type, PortIndex index) const;
 
+  bool nodePortCaptionVisibility(PortType type, PortIndex index) const;
+
   NodeValidationState nodeValidationState() const;
 
   QString nodeValidationMessage() const;
 
   NodePainterDelegate *nodePainterDelegate() const;
 
-  std::vector<Connection *> const &connections(PortType  pType,
-                                               PortIndex pIdx) const;
+  std::list<std::shared_ptr<Connection>> const &
+  connections(PortType pType, PortIndex pIdx) const;
 
-  std::vector<Connection *> &connections(PortType pType, PortIndex pIdx);
+  std::list<std::shared_ptr<Connection>> &connections(PortType  pType,
+                                                      PortIndex pIdx);
 
   /**\brief add new port. Uses by model
    */
@@ -104,9 +107,9 @@ private:
   QUuid _uid;
 
   // data
-  std::unique_ptr<NodeDataModel>                 _nodeDataModel;
-  std::map<PortIndex, std::vector<Connection *>> _inConnections;
-  std::map<PortIndex, std::vector<Connection *>> _outConnections;
+  std::unique_ptr<NodeDataModel>                              _nodeDataModel;
+  std::map<PortIndex, std::list<std::shared_ptr<Connection>>> _inConnections;
+  std::map<PortIndex, std::list<std::shared_ptr<Connection>>> _outConnections;
   // TODO node haven't to know about this
   // QPointF                                        _pos;
 };

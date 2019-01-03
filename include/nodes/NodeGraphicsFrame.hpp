@@ -35,6 +35,9 @@ protected:
 
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
+  QVariant itemChange(QGraphicsItem::GraphicsItemChange change,
+                      const QVariant &                  value) override;
+
 private:
   FrameGeometry geometry_;
 };

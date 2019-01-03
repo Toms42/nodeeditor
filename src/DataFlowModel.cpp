@@ -66,7 +66,7 @@ QString DataFlowModel::nodeTypeIdentifier(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeDataModel()->name();
+  return node->nodeCaption();
 }
 QString DataFlowModel::nodeCaption(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
@@ -80,29 +80,13 @@ QString DataFlowModel::nodeCaption(NodeIndex const &index) const {
   // return node->nodeDataModel()->caption();
 }
 
-// QPointF DataFlowModel::nodeLocation(NodeIndex const &index) const {
-//  Q_ASSERT(index.isValid());
-
-//  auto *node = reinterpret_cast<Node *>(index.internalPointer());
-
-//  return node->position();
-//}
-
 QWidget *DataFlowModel::nodeWidget(NodeIndex const &index) const {
   Q_ASSERT(index.isValid());
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeDataModel()->embeddedWidget();
+  return node->nodeWidget();
 }
-
-// bool DataFlowModel::nodeResizable(NodeIndex const &index) const {
-//  Q_ASSERT(index.isValid());
-
-//  auto *node = reinterpret_cast<Node *>(index.internalPointer());
-
-//  return node->nodeDataModel()->resizable();
-//}
 
 NodeValidationState
 DataFlowModel::nodeValidationState(NodeIndex const &index) const {
@@ -110,7 +94,7 @@ DataFlowModel::nodeValidationState(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeDataModel()->validationState();
+  return node->nodeValidationState();
 }
 
 QString DataFlowModel::nodeValidationMessage(NodeIndex const &index) const {
@@ -118,7 +102,7 @@ QString DataFlowModel::nodeValidationMessage(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeDataModel()->validationMessage();
+  return node->nodeValidationMessage();
 }
 
 NodePainterDelegate *
@@ -127,7 +111,7 @@ DataFlowModel::nodePainterDelegate(NodeIndex const &index) const {
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeDataModel()->painterDelegate();
+  return node->nodePainterDelegate();
 }
 
 bool DataFlowModel::addPort(const NodeIndex &nIndex,
@@ -147,14 +131,14 @@ unsigned int DataFlowModel::nodePortCount(NodeIndex const &index,
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeDataModel()->nPorts(portType);
+  return node->nodePortCount(portType);
 }
 
 std::list<PortIndex> DataFlowModel::nodePortIndexes(const NodeIndex &index,
                                                     PortType portType) const {
   std::list<PortIndex> retval;
   auto *               node = reinterpret_cast<Node *>(index.internalPointer());
-  return node->nodeDataModel()->ports(portType);
+  return node->nodePortIndexes(portType);
   ;
 }
 
@@ -165,8 +149,8 @@ QString DataFlowModel::nodePortCaption(NodeIndex const &index,
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  if (node->nodeDataModel()->portCaptionVisibility(portType, pIndex)) {
-    return node->nodeDataModel()->portCaption(portType, pIndex);
+  if (node->nodePortCaptionVisibility(portType, pIndex)) {
+    return node->nodePortCaption(portType, pIndex);
   }
   return "";
 }
@@ -178,7 +162,7 @@ NodeDataType DataFlowModel::nodePortDataType(NodeIndex const &index,
 
   auto *node = reinterpret_cast<Node *>(index.internalPointer());
 
-  return node->nodeDataModel()->dataType(portType, pIndex);
+  return node->nodePortDataType(portType, pIndex);
 }
 ConnectionPolicy DataFlowModel::nodePortConnectionPolicy(
     NodeIndex const &index, PortIndex pIndex, PortType portType) const {
@@ -189,7 +173,7 @@ ConnectionPolicy DataFlowModel::nodePortConnectionPolicy(
   if (portType == PortType::In) {
     return ConnectionPolicy::One;
   }
-  return node->nodeDataModel()->portOutConnectionPolicy(pIndex);
+  return node->nodePortConnectionPolicy(PortType::Out, pIndex);
 }
 
 std::vector<std::pair<NodeIndex, PortIndex>> DataFlowModel::nodePortConnections(
@@ -258,26 +242,23 @@ bool DataFlowModel::removeConnection(NodeIndex const &leftNodeIdx,
   connID.lPortID = leftPortID;
   connID.rPortID = rightPortID;
 
-  CHECK_OUT_OF_RANGE(_connections.at(connID)->propagateEmptyData());
-
   // remove it from the nodes
   auto &leftConns = leftNode->connections(PortType::Out, leftPortID);
-  auto  iter =
-      std::find_if(leftConns.begin(), leftConns.end(), [&](Connection *conn) {
-        return conn->id() == connID;
-      });
+  auto  iter      = std::find_if(
+      leftConns.begin(),
+      leftConns.end(),
+      [&](std::shared_ptr<Connection> conn) { return conn->id() == connID; });
   Q_ASSERT(iter != leftConns.end());
+  (*iter)->propagateEmptyData();
   leftConns.erase(iter);
 
   auto &rightConns = rightNode->connections(PortType::In, rightPortID);
-  iter             = std::find_if(rightConns.begin(),
-                      rightConns.end(),
-                      [&](Connection *conn) { return conn->id() == connID; });
+  iter             = std::find_if(
+      rightConns.begin(),
+      rightConns.end(),
+      [&](std::shared_ptr<Connection> conn) { return conn->id() == connID; });
   Q_ASSERT(iter != rightConns.end());
   rightConns.erase(iter);
-
-  // remove it from the map
-  _connections.erase(connID);
 
   // tell the view
   emit connectionRemoved(leftNodeIdx, leftPortID, rightNodeIdx, rightPortID);
@@ -356,11 +337,6 @@ QUuid DataFlowModel::addNode(std::unique_ptr<NodeDataModel> &&model,
   // create a node
   auto node = std::make_unique<Node>(std::move(model), nodeid);
 
-  // node->setPosition(location);
-
-  // cache the pointer so the connection can be made
-  // auto nodePtr = node.get();
-
   // add it to the map
   if (!_nodes.insert(std::make_pair(nodeid, std::move(node))).second) {
     GET_INFO();
@@ -386,13 +362,10 @@ ConnectionID DataFlowModel::addConnection(Node *        leftNode,
   // create the connection
   auto conn = std::make_shared<Connection>(
       *rightNode, rightPortID, *leftNode, leftPortID, conv);
-  if (!_connections.insert(std::make_pair(connID, conn)).second) {
-    GET_INFO();
-  }
 
   // add it to the nodes
-  leftNode->connections(PortType::Out, leftPortID).push_back(conn.get());
-  rightNode->connections(PortType::In, rightPortID).push_back(conn.get());
+  leftNode->connections(PortType::Out, leftPortID).push_back(conn);
+  rightNode->connections(PortType::In, rightPortID).push_back(conn);
 
   // process data
   conn->getNode(PortType::Out)
@@ -405,21 +378,6 @@ ConnectionID DataFlowModel::addConnection(Node *        leftNode,
                        rightPortID);
 
   return connID;
-}
-
-// bool DataFlowModel::moveNode(NodeIndex const &index, QPointF newLocation) {
-//  Q_ASSERT(index.isValid());
-
-//  auto *node = reinterpret_cast<Node *>(index.internalPointer());
-//  node->setPosition(newLocation);
-
-//  // no need to emit, it's done by the function already
-//  return true;
-//}
-
-std::unordered_map<ConnectionID, QtNodes::DataFlowModel::SharedConnection> &
-DataFlowModel::connections() {
-  return _connections;
 }
 
 std::unordered_map<QUuid, QtNodes::DataFlowModel::UniqueNode> &
@@ -448,19 +406,6 @@ QJsonObject DataFlowModel::saveToMemory() const {
 
   modelJson["nodes"] = nodesJsonArray;
 
-  QJsonArray connectionJsonArray;
-  for (auto const &pair : _connections) {
-    auto const &connection = pair.second;
-
-    QJsonObject connectionJson = connection->save();
-
-    if (!connectionJson.isEmpty()) {
-      connectionJsonArray.append(connectionJson);
-    }
-  }
-
-  modelJson["connections"] = connectionJsonArray;
-
   QJsonDocument document(modelJson);
 
   return modelJson;
@@ -470,12 +415,15 @@ void DataFlowModel::loadFromMemory(const QByteArray &data) {
   QJsonObject const jsonDocument = QJsonDocument::fromJson(data).object();
 
   QJsonArray nodesJsonArray = jsonDocument["nodes"].toArray();
+  QJsonArray connectionJsonArray;
 
   for (int i = 0; i < nodesJsonArray.size(); ++i) {
     restoreNode(nodesJsonArray[i].toObject());
+    for (const auto &j :
+         nodesJsonArray[i].toObject()["connections"].toArray()) {
+      connectionJsonArray.push_back(j);
+    }
   }
-
-  QJsonArray connectionJsonArray = jsonDocument["connections"].toArray();
 
   for (int i = 0; i < connectionJsonArray.size(); ++i) {
     restoreConnection(connectionJsonArray[i].toObject());
@@ -499,17 +447,8 @@ void DataFlowModel::restoreConnection(const QJsonObject &connectionJson) {
   PortIndex portIndexIn  = connectionJson["in_index"].toInt();
   PortIndex portIndexOut = connectionJson["out_index"].toInt();
 
-  ConnectionID connId;
-  connId.lNodeID = nodeOutId;
-  connId.rNodeID = nodeInId;
-
-  connId.lPortID = portIndexOut;
-  connId.rPortID = portIndexIn;
-
-  addConnection(nodeIndex(nodeOutId),
-                connId.lPortID,
-                nodeIndex(nodeInId),
-                connId.rPortID);
+  addConnection(
+      nodeIndex(nodeOutId), portIndexOut, nodeIndex(nodeInId), portIndexIn);
 }
 
 } // namespace QtNodes

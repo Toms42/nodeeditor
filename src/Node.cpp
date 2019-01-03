@@ -6,6 +6,7 @@
 #include "NodeDataModel.hpp"
 #include "NodeGraphicsObject.hpp"
 #include "checker.hpp"
+#include <QJsonArray>
 #include <QtCore/QObject>
 #include <utility>
 
@@ -27,10 +28,12 @@ Node::Node(std::unique_ptr<NodeDataModel> &&nodeImp, QUuid const &id)
           &Node::widgetChanged);
 
   for (const auto &i : _nodeDataModel->inPorts_) {
-    _inConnections.insert(std::pair(i.first, std::vector<Connection *>()));
+    _inConnections.insert(
+        std::pair(i.first, std::list<std::shared_ptr<Connection>>()));
   }
   for (const auto &i : _nodeDataModel->outPorts_) {
-    _outConnections.insert(std::pair(i.first, std::vector<Connection *>()));
+    _outConnections.insert(
+        std::pair(i.first, std::list<std::shared_ptr<Connection>>()));
   }
 }
 
@@ -84,7 +87,8 @@ QtNodes::NodePainterDelegate *Node::nodePainterDelegate() const {
 bool Node::addPort(PortType pType, PortIndex pIndex) {
   switch (pType) {
   case PortType::In:
-    if (_inConnections.insert(std::pair(pIndex, std::vector<Connection *>()))
+    if (_inConnections
+            .insert(std::pair(pIndex, std::list<std::shared_ptr<Connection>>()))
             .second) {
       emit portAdded(pType, pIndex);
       return true;
@@ -93,7 +97,8 @@ bool Node::addPort(PortType pType, PortIndex pIndex) {
     }
     break;
   case PortType::Out:
-    if (_outConnections.insert(std::pair(pIndex, std::vector<Connection *>()))
+    if (_outConnections
+            .insert(std::pair(pIndex, std::list<std::shared_ptr<Connection>>()))
             .second) {
       emit portAdded(pType, pIndex);
       return true;
@@ -135,6 +140,16 @@ QJsonObject Node::save() const {
 
   nodeJson["model"] = _nodeDataModel->save();
 
+  // only out connections
+  QJsonArray connections;
+  for (const auto &i : _outConnections) {
+    for (const auto &j : i.second) {
+      connections.push_back(j->save());
+    }
+  }
+
+  nodeJson["connections"] = connections;
+
   return nodeJson;
 }
 
@@ -146,13 +161,14 @@ QtNodes::NodeDataModel *Node::nodeDataModel() const {
   return _nodeDataModel.get();
 }
 
-std::vector<Connection *> const &Node::connections(PortType  pType,
-                                                   PortIndex idx) const {
+std::list<std::shared_ptr<Connection>> const &
+Node::connections(PortType pType, PortIndex idx) const {
   CHECK_OUT_OF_RANGE(return pType == PortType::In ? _inConnections.at(idx)
                                                   : _outConnections.at(idx));
 }
 
-std::vector<Connection *> &Node::connections(PortType pType, PortIndex idx) {
+std::list<std::shared_ptr<Connection>> &Node::connections(PortType  pType,
+                                                          PortIndex idx) {
   CHECK_OUT_OF_RANGE(return pType == PortType::In ? _inConnections.at(idx)
                                                   : _outConnections.at(idx));
 }
@@ -181,4 +197,8 @@ unsigned Node::nodePortCount(PortType type) {
 
 std::list<QtNodes::PortIndex> Node::nodePortIndexes(PortType type) {
   return _nodeDataModel->ports(type);
+}
+
+bool Node::nodePortCaptionVisibility(PortType type, PortIndex index) const {
+  return _nodeDataModel->portCaptionVisibility(type, index);
 }

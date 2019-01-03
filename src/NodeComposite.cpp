@@ -129,10 +129,11 @@ void NodeComposite::mouseReleaseEvent(QGraphicsSceneMouseEvent *event) {
 void NodeComposite::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
   for (auto &item : collidingItems()) {
     if (item->parentItem() == this->parentItem() &&
-        std::abs(item->zValue() - this->zValue()) < 0.01) {
+        item->type() == this->type()) {
       item->stackBefore(this);
     }
   }
+
   geometry().setHovered(true);
   update();
   event->accept();

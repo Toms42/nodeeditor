@@ -1,4 +1,4 @@
-#add_subdirectory(connection_colors)
+add_subdirectory(connection_colors)
 
 add_subdirectory(example2)
 

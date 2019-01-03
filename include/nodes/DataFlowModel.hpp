@@ -131,8 +131,7 @@ public:
   void setRegistry(std::shared_ptr<DataModelRegistry> registry);
 
 private:
-  std::unordered_map<QUuid, UniqueNode>              _nodes;
-  std::unordered_map<ConnectionID, SharedConnection> _connections;
-  std::shared_ptr<DataModelRegistry>                 _registry;
+  std::unordered_map<QUuid, UniqueNode> _nodes;
+  std::shared_ptr<DataModelRegistry>    _registry;
 };
 }; // namespace QtNodes
